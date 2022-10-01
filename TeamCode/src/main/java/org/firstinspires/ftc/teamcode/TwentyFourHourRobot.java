@@ -7,6 +7,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvWebcam;
+
 @TeleOp(name = "24HourRobot", group = "MecanumDrive")
 public class TwentyFourHourRobot extends LinearOpMode {
 
@@ -19,7 +26,7 @@ public class TwentyFourHourRobot extends LinearOpMode {
     static DcMotor Rail;
     static Servo Claw;
     BNO055IMU IMU;
-    boolean open;
+
     double movement = 0.7;
     int increase = 0;
 
