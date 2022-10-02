@@ -98,7 +98,7 @@ public class TwentyFourHourRobot extends LinearOpMode {
 
             if (gamepad2.dpad_right) {
                 //code for the claw to open
-                Claw.setPosition(0);
+                Claw.setPosition(0.09);
             }
 
             if (gamepad2.a) {
@@ -130,7 +130,7 @@ public class TwentyFourHourRobot extends LinearOpMode {
 
             if (gamepad2.x) {
                 //code for releasing cone on any junction
-                Claw.setPosition(0.2);
+                Claw.setPosition(0.3);
                 Rail.setTargetPosition(0);
                 Rail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 Rail.setPower(1);
