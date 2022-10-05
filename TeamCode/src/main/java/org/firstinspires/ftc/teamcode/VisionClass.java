@@ -12,21 +12,21 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 public class VisionClass {
 
-    static int DifferenceLeft;
-    static int DifferenceCenter;
-    static int DifferenceRight;
+    static int DifferenceONE;
+    static int DifferenceTWO;
+    static int DifferenceTHREE;
 
-    public static class BarcodeDeterminationPipeline extends OpenCvPipeline
+    public static class SignalDeterminationPipeline extends OpenCvPipeline
     {
         /*
-         * An enum to define the skystone position
+         * An enum to define the Signal Sleeve type
          */
-        public enum ShippingElementPosition
+        public enum SignalSleeveType
         {
-            NONE,
-            LEFT,
-            CENTER,
-            RIGHT
+            LocationNONE,
+            LocationONE,
+            LocationTWO,
+            LocationTHREE
         }
 
         /*
@@ -43,10 +43,10 @@ public class VisionClass {
         static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(60,85);
         static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(590,65);
         static final Point REGION3_TOPLEFT_ANCHOR_POINT = new Point(1050,65);
-        static final int REGION_WIDTH = 80;
-        static final int REGION_HEIGHT = 80;
+        static final int REGION_WIDTH = 130;
+        static final int REGION_HEIGHT = 130;
 
-        static final int SHIPPING_ELEMENT_THRESHOLD = 55;
+        static final int SIGNAL_SLEEVE_THRESHOLD = 55;
 
         Telemetry telemetry_vision;
 
@@ -95,8 +95,7 @@ public class VisionClass {
         int avg1, avg2, avg3;
 
         // Volatile since accessed by OpMode thread w/o synchronization
-        //private volatile FarBlueOpenCV.SkystoneDeterminationPipeline.ShippingElementPosition position = FarBlueOpenCV.SkystoneDeterminationPipeline.ShippingElementPosition.LEFT;
-        private volatile ShippingElementPosition position = ShippingElementPosition.NONE;
+        private volatile SignalSleeveType type = SignalSleeveType.LocationNONE;
 
         /*
          * This function takes the RGB frame, converts to YCrCb,
@@ -127,9 +126,9 @@ public class VisionClass {
              * buffer. Any changes to the child affect the parent, and the
              * reverse also holds true.
              */
-            region1_Cb = Cb.submat(new Rect(region1_pointA, region1_pointB));
+//            region1_Cb = Cb.submat(new Rect(region1_pointA, region1_pointB));
             region2_Cb = Cb.submat(new Rect(region2_pointA, region2_pointB));
-            region3_Cb = Cb.submat(new Rect(region3_pointA, region3_pointB));
+//            region3_Cb = Cb.submat(new Rect(region3_pointA, region3_pointB));
         }
 
         @Override
@@ -182,22 +181,22 @@ public class VisionClass {
              * pixel value of the 3-channel image, and referenced the value
              * at index 2 here.
              */
-            avg1 = (int) Core.mean(region1_Cb).val[0];
+//            avg1 = (int) Core.mean(region1_Cb).val[0];
             avg2 = (int) Core.mean(region2_Cb).val[0];
-            avg3 = (int) Core.mean(region3_Cb).val[0];
+//            avg3 = (int) Core.mean(region3_Cb).val[0];
 
-            /*
-             * Draw a rectangle showing sample region 1 on the screen.
-             * Simply a visual aid. Serves no functional purpose.
-             */
-
-            Imgproc.rectangle(
-                    input, // Buffer to draw on
-                    region1_pointA, // First point which defines the rectangle
-                    region1_pointB, // Second point which defines the rectangle
-                    RED, // The color the rectangle is drawn in
-                    4); // Thickness of the rectangle lines
-
+//            /*
+//             * Draw a rectangle showing sample region 1 on the screen.
+//             * Simply a visual aid. Serves no functional purpose.
+//             */
+//
+//            Imgproc.rectangle(
+//                    input, // Buffer to draw on
+//                    region1_pointA, // First point which defines the rectangle
+//                    region1_pointB, // Second point which defines the rectangle
+//                    RED, // The color the rectangle is drawn in
+//                    4); // Thickness of the rectangle lines
+//
             /*
              * Draw a rectangle showing sample region 2 on the screen.
              * Simply a visual aid. Serves no functional purpose.
@@ -210,29 +209,29 @@ public class VisionClass {
                     RED, // The color the rectangle is drawn in
                     4); // Thickness of the rectangle lines
 
-            /*
-             * Draw a rectangle showing sample region 3 on the screen.
-             * Simply a visual aid. Serves no functional purpose.
-             */
-            Imgproc.rectangle(
-                    input, // Buffer to draw on
-                    region3_pointA, // First point which defines the rectangle
-                    region3_pointB, // Second point which defines the rectangle
-                    RED, // The color the rectangle is drawn in
-                    4); // Thickness of the rectangle lines
+//            /*
+//             * Draw a rectangle showing sample region 3 on the screen.
+//             * Simply a visual aid. Serves no functional purpose.
+//             */
+//            Imgproc.rectangle(
+//                    input, // Buffer to draw on
+//                    region3_pointA, // First point which defines the rectangle
+//                    region3_pointB, // Second point which defines the rectangle
+//                    RED, // The color the rectangle is drawn in
+//                    4); // Thickness of the rectangle lines
 
             /*
              * Now that we found the max, we actually need to go and
              * figure out which sample region that value was from
              */
 
-            DifferenceLeft = Avg1() - SHIPPING_ELEMENT_THRESHOLD;
-            DifferenceCenter = Avg2() - SHIPPING_ELEMENT_THRESHOLD;
-            DifferenceRight = Avg3() - SHIPPING_ELEMENT_THRESHOLD;
+            DifferenceONE = Avg2() - SIGNAL_SLEEVE_THRESHOLD;
+            DifferenceTWO = Avg2() - SIGNAL_SLEEVE_THRESHOLD;
+            DifferenceTHREE = Avg2() - SIGNAL_SLEEVE_THRESHOLD;
 
-            if ((DifferenceLeft > -40) && (DifferenceLeft < 40)) { // Was it from region 1?
+            if ((DifferenceONE > -40) && (DifferenceONE < 40)) { // Was it from region 1?
 
-                position = ShippingElementPosition.LEFT; // Record our analysis
+                type = SignalSleeveType.LocationONE; // Record our analysis
 
                 /*
                  * Draw a solid rectangle on top of the chosen region.
@@ -240,15 +239,31 @@ public class VisionClass {
                  */
                 Imgproc.rectangle(
                         input, // Buffer to draw on
-                        region1_pointA, // First point which defines the rectangle
-                        region1_pointB, // Second point which defines the rectangle
-                        GREEN, // The color the rectangle is drawn in
+                        region2_pointA, // First point which defines the rectangle
+                        region2_pointB, // Second point which defines the rectangle
+                        YELLOW, // The color the rectangle is drawn in
                         4); // Negative thickness means solid fill
             }
 
-            else if ((DifferenceCenter > -40) && (DifferenceCenter < 40)) { // Was it from region 2?
+            else if ((DifferenceTWO > -100) && (DifferenceTWO < 100)) { // Was it from region 2?
 
-                position = ShippingElementPosition.CENTER; // Record our analysis
+                type = SignalSleeveType.LocationTWO; // Record our analysis
+
+                /*
+                 * Draw a solid rectangle on top of the chosen region.
+                 * Simply a visual aid. Serves no functional purpose.
+                 */
+                Imgproc.rectangle(
+                        input, // Buffer to draw on
+                        region2_pointA, // First point which defines the rectangle
+                        region2_pointB, // Second point which defines the rectangle
+                        BLUE, // The color the rectangle is drawn in
+                        4); // Negative thickness means solid fill
+            }
+
+            else if ((DifferenceTHREE > 80) && (DifferenceTHREE < 100)) { // Was it from region 3?
+
+                type = SignalSleeveType.LocationTHREE; // Record our analysis
 
                 /*
                  * Draw a solid rectangle on top of the chosen region.
@@ -262,29 +277,13 @@ public class VisionClass {
                         4); // Negative thickness means solid fill
             }
 
-            else if ((DifferenceRight > -40) && (DifferenceRight < 40)) { // Was it from region 3?
-
-                position = ShippingElementPosition.RIGHT; // Record our analysis
-
-                /*
-                 * Draw a solid rectangle on top of the chosen region.
-                 * Simply a visual aid. Serves no functional purpose.
-                 */
-                Imgproc.rectangle(
-                        input, // Buffer to draw on
-                        region3_pointA, // First point which defines the rectangle
-                        region3_pointB, // Second point which defines the rectangle
-                        GREEN, // The color the rectangle is drawn in
-                        4); // Negative thickness means solid fill
-            }
-
             else {
-                position = ShippingElementPosition.NONE;
+                type = SignalSleeveType.LocationNONE;
             }
 
-            telemetry_vision.addData("Avg1", Avg1());
+//            telemetry_vision.addData("Avg1", Avg1());
             telemetry_vision.addData("Avg2", Avg2());
-            telemetry_vision.addData("Avg3", Avg3());
+//            telemetry_vision.addData("Avg3", Avg3());
             telemetry_vision.addData("Position", getAnalysis());
             telemetry_vision.update();
 
@@ -296,25 +295,25 @@ public class VisionClass {
             return input;
         }
 
-        public int Avg1 () {
-            return avg1;
-        }
+//        public int Avg1 () {
+//            return avg1;
+//        }
 
         public int Avg2 () {
             return avg2;
         }
 
-        public int Avg3 () {
-            return avg3;
-        }
+//        public int Avg3 () {
+//            return avg3;
+//        }
 
         /*
          * Call this from the OpMode thread to obtain the latest analysis
          */
 
-        public ShippingElementPosition getAnalysis()
+        public SignalSleeveType getAnalysis()
         {
-            return position;
+            return type;
         }
 
         public void InitTelemetry(Telemetry Obj) {
