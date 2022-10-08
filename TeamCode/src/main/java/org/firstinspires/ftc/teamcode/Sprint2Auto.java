@@ -161,20 +161,20 @@ public class Sprint2Auto extends LinearOpMode {
                     if (MechDrive.GetTaskState() == Task_State.INIT ||
                         MechDrive.GetTaskState() == Task_State.READY ||
                         MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(0, 4000, 0.7, 0);
+                        MechDrive.SetTargets(0, 2900, 0.7, 0);
                         programOrder++;
                     }
                     break;
 
                 case 2:
-                    SetAttachmentPosition(9520, -1925);
+                    SetAttachmentPosition(9520, -1882);
                     programOrder++;
                     break;
 
                 case 3:
                     Claw.setPosition(0.2);
                     sleep(400);
-                    SetAttachmentPosition(2000, 3850);
+                    SetAttachmentPosition(1500, 3763);
                     programOrder++;
                     break;
 
@@ -182,7 +182,7 @@ public class Sprint2Auto extends LinearOpMode {
                     if (MechDrive.GetTaskState() == Task_State.INIT ||
                             MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(90, 3000, 0.7, 0);
+                        MechDrive.SetTargets(90, 900, 0.7, 0);
                         programOrder++;
                     }
                     break;
@@ -193,7 +193,7 @@ public class Sprint2Auto extends LinearOpMode {
                     break;
 
                 case 6:
-                    SetAttachmentPosition(9520, -1925);
+                    SetAttachmentPosition(9520, -1882);
                     sleep(100);
                     programOrder++;
                     break;
@@ -202,7 +202,7 @@ public class Sprint2Auto extends LinearOpMode {
                     if (MechDrive.GetTaskState() == Task_State.INIT ||
                             MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(-90, 3000, 0.7, 0);
+                        MechDrive.SetTargets(-90, 724, 0.7, 0);
                         programOrder++;
                     }
                     programOrder++;
@@ -221,13 +221,13 @@ public class Sprint2Auto extends LinearOpMode {
                             MechDrive.GetTaskState() == Task_State.DONE) {
 
                         if (posOne) {
-                            MechDrive.SetTargets(-90, 3000, 0.7, 0);
+                            MechDrive.SetTargets(-90, 800, 0.7, 0);
                         }
                         else if (posTwo) {
                             MechDrive.SetTargets(0, 0, 0.1, 0);
                         }
                         else if (posThree) {
-                            MechDrive.SetTargets(90, 3000, 0.7, 0);
+                            MechDrive.SetTargets(90, 800, 0.7, 0);
                         }
                         programOrder++;
                     }

@@ -206,7 +206,6 @@ public class Sprint2Teleop extends LinearOpMode {
 
             /*****************************************************************
              * Button X (G2) : Reset Rail from any height to original position
-             *                 Reset base to 0 degrees to pick up new cones
              *****************************************************************/
 
             if (!button_x_already_pressed2) {
@@ -229,7 +228,7 @@ public class Sprint2Teleop extends LinearOpMode {
 
             if (!button_bumper_right_already_pressed2) {
                 if (gamepad2.right_bumper) {
-                    RotatingBase.setTargetPosition(3850);
+                    RotatingBase.setTargetPosition(3763);
                     RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     RotatingBase.setPower(1);
                     button_bumper_right_already_pressed2 = true;
@@ -246,7 +245,7 @@ public class Sprint2Teleop extends LinearOpMode {
 
             if (!button_bumper_left_already_pressed2) {
                 if (gamepad2.left_bumper) {
-                    RotatingBase.setTargetPosition(-3850);
+                    RotatingBase.setTargetPosition(-3763);
                     RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     RotatingBase.setPower(1);
                     button_bumper_left_already_pressed2 = true;
