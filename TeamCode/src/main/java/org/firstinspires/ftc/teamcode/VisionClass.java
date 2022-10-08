@@ -95,7 +95,7 @@ public class VisionClass {
         int avg1, avg2, avg3;
 
         // Volatile since accessed by OpMode thread w/o synchronization
-        private volatile SignalSleeveType type = SignalSleeveType.LocationNONE;
+        public volatile SignalSleeveType type = SignalSleeveType.LocationNONE;
 
         /*
          * This function takes the RGB frame, converts to YCrCb,

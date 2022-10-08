@@ -29,7 +29,9 @@ public class Sprint2Auto extends LinearOpMode {
     static DcMotor BackRight;
     static DcMotor FrontLeft;
     static DcMotor FrontRight;
-    static DcMotor Rail;
+    static DcMotor RailRight;
+    static DcMotor RailLeft;
+    static DcMotor RotatingBase;
     static Servo Claw;
 
     //Sensors
@@ -54,6 +56,9 @@ public class Sprint2Auto extends LinearOpMode {
     double final_value;
     boolean turnright = false;
     boolean turnleft = false;
+    boolean posOne;
+    boolean posTwo;
+    boolean posThree;
 
     public void runOpMode() {
 
@@ -63,7 +68,9 @@ public class Sprint2Auto extends LinearOpMode {
         FrontLeft = hardwareMap.get(DcMotor.class, "FrontLeft");
         FrontRight = hardwareMap.get(DcMotor.class, "FrontRight");
         Claw = hardwareMap.get(Servo.class, "Claw");
-        Rail = hardwareMap.get(DcMotor.class, "Rail");
+        RailRight = hardwareMap.get(DcMotor.class, "RailRight");
+        RailLeft = hardwareMap.get(DcMotor.class, "RailLeft");
+        RotatingBase = hardwareMap.get(DcMotor.class, "RotatingBase");
         IMU = hardwareMap.get(BNO055IMU.class, "imu");
 
         //Configure the control hub orientation
@@ -75,15 +82,12 @@ public class Sprint2Auto extends LinearOpMode {
         sleep(100);
 
         //Rail Presets
-        Rail.setDirection(DcMotorSimple.Direction.FORWARD);
-        Rail.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        Rail.setTargetPosition(0);
-        Rail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        AttachmentMotorPresets();
 
         //Claw Presets
         Claw.setDirection(Servo.Direction.FORWARD);
         Claw.scaleRange(0, 1);
-        Claw.setPosition(0.2);
+        Claw.setPosition(1);
 
         //Configrue IMU for GyroTurning
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -130,19 +134,113 @@ public class Sprint2Auto extends LinearOpMode {
             switch (programOrder) {
 
                 case 0:
-//                    MechDrive.SetTargets(0, 1000, 0.7, 0);
-//                    motorMethods.GyroTurn(45, 0.5);
-                    GyroTurn(45, 0.5);
+                    if (pipeline.type == VisionClass.SignalDeterminationPipeline.SignalSleeveType.LocationONE) {
+                        posOne = true;
+                        posTwo = false;
+                        posThree = false;
+                    }
+                    else if (pipeline.type == VisionClass.SignalDeterminationPipeline.SignalSleeveType.LocationTWO) {
+                        posOne = false;
+                        posTwo = true;
+                        posThree = false;
+                    }
+                    else if (pipeline.type == VisionClass.SignalDeterminationPipeline.SignalSleeveType.LocationTHREE) {
+                        posOne = false;
+                        posTwo = false;
+                        posThree = true;
+                    } else {
+                        posOne = true;
+                        posTwo = false;
+                        posThree = false;
+                    }
+                    programOrder++;
+                    break;
+
+                case 1:
+
+                    if (MechDrive.GetTaskState() == Task_State.INIT ||
+                        MechDrive.GetTaskState() == Task_State.READY ||
+                        MechDrive.GetTaskState() == Task_State.DONE) {
+                        MechDrive.SetTargets(0, 4000, 0.7, 0);
+                        programOrder++;
+                    }
+                    break;
+
+                case 2:
+                    SetAttachmentPosition(9520, -1925);
+                    programOrder++;
+                    break;
+
+                case 3:
+                    Claw.setPosition(0.2);
+                    sleep(400);
+                    SetAttachmentPosition(2000, 3850);
+                    programOrder++;
+                    break;
+
+                case 4:
+                    if (MechDrive.GetTaskState() == Task_State.INIT ||
+                            MechDrive.GetTaskState() == Task_State.READY ||
+                            MechDrive.GetTaskState() == Task_State.DONE) {
+                        MechDrive.SetTargets(90, 3000, 0.7, 0);
+                        programOrder++;
+                    }
+                    break;
+
+                case 5:
+                    Claw.setPosition(1);
+                    programOrder++;
+                    break;
+
+                case 6:
+                    SetAttachmentPosition(9520, -1925);
+                    sleep(100);
+                    programOrder++;
+                    break;
+
+                case 7:
+                    if (MechDrive.GetTaskState() == Task_State.INIT ||
+                            MechDrive.GetTaskState() == Task_State.READY ||
+                            MechDrive.GetTaskState() == Task_State.DONE) {
+                        MechDrive.SetTargets(-90, 3000, 0.7, 0);
+                        programOrder++;
+                    }
+                    programOrder++;
+                    break;
+
+                case 8:
+                    Claw.setPosition(0.2);
+                    sleep(400);
+                    SetAttachmentPosition(0, 0);
+                    programOrder++;
+                    break;
+
+                case 9:
+                    if (MechDrive.GetTaskState() == Task_State.INIT ||
+                            MechDrive.GetTaskState() == Task_State.READY ||
+                            MechDrive.GetTaskState() == Task_State.DONE) {
+
+                        if (posOne) {
+                            MechDrive.SetTargets(-90, 3000, 0.7, 0);
+                        }
+                        else if (posTwo) {
+                            MechDrive.SetTargets(0, 0, 0.1, 0);
+                        }
+                        else if (posThree) {
+                            MechDrive.SetTargets(90, 3000, 0.7, 0);
+                        }
+                        programOrder++;
+                    }
                     break;
 
                 default:
                     break;
             }
 
-//            MechDrive.Task(sensorMethods.GyroContinuity());
-//            telemetry.addData("backright encoder", BackRight.getCurrentPosition());
-//            telemetry.addData("gyro", sensorMethods.GyroContinuity());
-//            telemetry.update();
+            MechDrive.Task(GyroContinuity());
+            telemetry.addData("backright encoder", BackRight.getCurrentPosition());
+            telemetry.addData("gyro", GyroContinuity());
+            telemetry.update();
         }
 
     }
@@ -223,6 +321,36 @@ public class Sprint2Auto extends LinearOpMode {
         FrontLeft.setPower(FL);
         BackRight.setPower(BR);
         BackLeft.setPower(BL);
+    }
+
+    public void AttachmentMotorPresets() {
+        RailLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        RailLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        RailLeft.setTargetPosition(0);
+        RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        RailRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        RailRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        RailRight.setTargetPosition(0);
+        RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        RotatingBase.setDirection(DcMotorSimple.Direction.FORWARD);
+        RotatingBase.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        RotatingBase.setTargetPosition(0);
+        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public void SetAttachmentPosition(int railPos, int basePos) {
+        RailRight.setTargetPosition(railPos);
+        RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        RailRight.setPower(1);
+        RailLeft.setTargetPosition(railPos);
+        RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        RailLeft.setPower(1);
+        RotatingBase.setTargetPosition(basePos);
+        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        RotatingBase.setPower(1);
+
     }
 
 }
