@@ -17,8 +17,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@TeleOp(name = "Sprint2Teleop",  group = "MecanumDrive")
-public class Sprint2Teleop extends LinearOpMode {
+@TeleOp(name = "CalibrationTeleop",  group = "MecanumDrive")
+public class CalibrationTeleop extends LinearOpMode {
 
     //Control Hub Orientation
     byte AXIS_MAP_CONFIG_BYTE = 0x06; //rotates control hub 90 degrees around y axis by swapping x and z axis
@@ -49,7 +49,8 @@ public class Sprint2Teleop extends LinearOpMode {
     //Variables
     int programOrder = 0;
     double movement;
-    boolean PowerSetting = true;
+    boolean PowerSetting = false;
+    int increase;
 
     //Gyrocontinuity Variables
     double current_value;
@@ -154,18 +155,6 @@ public class Sprint2Teleop extends LinearOpMode {
             BackRight.setPower(BRPower);
 
             /*****************************************************************
-             * Dpad Left/Right (G2) - Open Close Claw
-             *****************************************************************/
-
-            if (gamepad2.dpad_left) {
-                Claw.setPosition(1);
-            }
-
-            if (gamepad2.dpad_right) {
-                Claw.setPosition(0);
-            }
-
-            /*****************************************************************
              * Button A (G2) : Set Rail height to place on the low junction
              *****************************************************************/
 
@@ -238,12 +227,37 @@ public class Sprint2Teleop extends LinearOpMode {
             }
 
             /*****************************************************************
-             * Bumper Right (G2) : Rotate 360 base 90 degrees
+             * Dpad Left/Right (G2) - Calibrate Base
+             *****************************************************************/
+            if (!button_dpad_left_already_pressed2) {
+                if (gamepad2.dpad_left) {
+                    increase = increase - 25;
+                    button_dpad_left_already_pressed2 = true;
+                }
+            } else {
+                if (!gamepad2.dpad_left) {
+                    button_dpad_left_already_pressed2 = false;
+                }
+            }
+
+            if (!button_dpad_right_already_pressed2) {
+                if (gamepad2.dpad_right) {
+                    increase = increase + 25;
+                    button_dpad_right_already_pressed2 = true;
+                }
+            } else {
+                if (!gamepad2.dpad_right) {
+                    button_dpad_right_already_pressed2 = false;
+                }
+            }
+
+            /*****************************************************************
+             * Bumper Right (G2) : Rotate 360 base according to the "increase" in ticks
              *****************************************************************/
 
             if (!button_bumper_right_already_pressed2) {
                 if (gamepad2.right_bumper) {
-                    RotatingBase.setTargetPosition(-3763);
+                    RotatingBase.setTargetPosition(increase);
                     RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     RotatingBase.setPower(1);
                     button_bumper_right_already_pressed2 = true;
@@ -254,24 +268,8 @@ public class Sprint2Teleop extends LinearOpMode {
                 }
             }
 
-            /*****************************************************************
-             * Bumper Left (G2) : Rotate 360 base to -90
-             *****************************************************************/
-
-            if (!button_bumper_left_already_pressed2) {
-                if (gamepad2.left_bumper) {
-                    RotatingBase.setTargetPosition(3763);
-                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    RotatingBase.setPower(1);
-                    button_bumper_left_already_pressed2 = true;
-                }
-            } else {
-                if (!gamepad2.left_bumper) {
-                    button_bumper_left_already_pressed2 = false;
-                }
-            }
-
-//            telemetry.update();
+            telemetry.addData("Base Position", increase);
+            telemetry.update();
         }
     }
 

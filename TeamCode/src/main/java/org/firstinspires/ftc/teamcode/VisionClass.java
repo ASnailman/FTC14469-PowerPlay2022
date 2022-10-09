@@ -33,6 +33,7 @@ public class VisionClass {
         /*
          * Some color constants
          */
+        static final Scalar WHITE = new Scalar(255, 255, 255);
         static final Scalar BLUE = new Scalar(0, 0, 255);
         static final Scalar GREEN = new Scalar(0, 255, 0);
         static final Scalar RED = new Scalar(255, 0, 0);
@@ -42,10 +43,10 @@ public class VisionClass {
          * The core values which define the location and size of the sample regions
          */
         static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(60,85);
-        static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(600,250);
+        static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(600,225);
         static final Point REGION3_TOPLEFT_ANCHOR_POINT = new Point(1050,65);
-        static final int REGION_WIDTH = 90;
-        static final int REGION_HEIGHT = 90;
+        static final int REGION_WIDTH = 80;
+        static final int REGION_HEIGHT = 80;
 
         static final int SIGNAL_SLEEVE_THRESHOLD = 10;
 
@@ -207,7 +208,7 @@ public class VisionClass {
                     input, // Buffer to draw on
                     region2_pointA, // First point which defines the rectangle
                     region2_pointB, // Second point which defines the rectangle
-                    RED, // The color the rectangle is drawn in
+                    WHITE, // The color the rectangle is drawn in
                     4); // Thickness of the rectangle lines
 
 //            /*
@@ -230,7 +231,7 @@ public class VisionClass {
             DifferenceTWO = Avg2() + SIGNAL_SLEEVE_THRESHOLD;
             DifferenceTHREE = Avg2() + SIGNAL_SLEEVE_THRESHOLD;
 
-            if ((DifferenceONE > 70) && (DifferenceONE < 95)) { // Was it from region 1?
+            if ((DifferenceONE > 40) && (DifferenceONE < 75)) { // Was it from region 1?
 
                 type = SignalSleeveType.LocationONE; // Record our analysis
 
@@ -246,7 +247,7 @@ public class VisionClass {
                         4); // Negative thickness means solid fill
             }
 
-            else if ((DifferenceTWO > 140) && (DifferenceTWO < 165)) { // Was it from region 2?
+            else if ((DifferenceTWO > 155) && (DifferenceTWO < 185)) { // Was it from region 2?
 
                 type = SignalSleeveType.LocationTWO; // Record our analysis
 
@@ -262,7 +263,7 @@ public class VisionClass {
                         4); // Negative thickness means solid fill
             }
 
-            else if ((DifferenceTHREE > 100) && (DifferenceTHREE < 130)) { // Was it from region 3?
+            else if ((DifferenceTHREE > 95) && (DifferenceTHREE < 135)) { // Was it from region 3?
 
                 type = SignalSleeveType.LocationTHREE; // Record our analysis
 
