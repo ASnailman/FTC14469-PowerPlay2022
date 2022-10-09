@@ -12,6 +12,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 public class VisionClass {
 
+//    static int Difference;
     static int DifferenceONE;
     static int DifferenceTWO;
     static int DifferenceTHREE;
@@ -41,12 +42,12 @@ public class VisionClass {
          * The core values which define the location and size of the sample regions
          */
         static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(60,85);
-        static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(590,65);
+        static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(600,250);
         static final Point REGION3_TOPLEFT_ANCHOR_POINT = new Point(1050,65);
-        static final int REGION_WIDTH = 130;
-        static final int REGION_HEIGHT = 130;
+        static final int REGION_WIDTH = 90;
+        static final int REGION_HEIGHT = 90;
 
-        static final int SIGNAL_SLEEVE_THRESHOLD = 55;
+        static final int SIGNAL_SLEEVE_THRESHOLD = 10;
 
         Telemetry telemetry_vision;
 
@@ -226,10 +227,10 @@ public class VisionClass {
              */
 
             DifferenceONE = Avg2() - SIGNAL_SLEEVE_THRESHOLD;
-            DifferenceTWO = Avg2() - SIGNAL_SLEEVE_THRESHOLD;
-            DifferenceTHREE = Avg2() - SIGNAL_SLEEVE_THRESHOLD;
+            DifferenceTWO = Avg2() + SIGNAL_SLEEVE_THRESHOLD;
+            DifferenceTHREE = Avg2() + SIGNAL_SLEEVE_THRESHOLD;
 
-            if ((DifferenceONE > -40) && (DifferenceONE < 40)) { // Was it from region 1?
+            if ((DifferenceONE > 70) && (DifferenceONE < 95)) { // Was it from region 1?
 
                 type = SignalSleeveType.LocationONE; // Record our analysis
 
@@ -245,7 +246,7 @@ public class VisionClass {
                         4); // Negative thickness means solid fill
             }
 
-            else if ((DifferenceTWO > -100) && (DifferenceTWO < 100)) { // Was it from region 2?
+            else if ((DifferenceTWO > 140) && (DifferenceTWO < 165)) { // Was it from region 2?
 
                 type = SignalSleeveType.LocationTWO; // Record our analysis
 
@@ -261,7 +262,7 @@ public class VisionClass {
                         4); // Negative thickness means solid fill
             }
 
-            else if ((DifferenceTHREE > 80) && (DifferenceTHREE < 100)) { // Was it from region 3?
+            else if ((DifferenceTHREE > 100) && (DifferenceTHREE < 130)) { // Was it from region 3?
 
                 type = SignalSleeveType.LocationTHREE; // Record our analysis
 
@@ -273,7 +274,7 @@ public class VisionClass {
                         input, // Buffer to draw on
                         region2_pointA, // First point which defines the rectangle
                         region2_pointB, // Second point which defines the rectangle
-                        GREEN, // The color the rectangle is drawn in
+                        RED, // The color the rectangle is drawn in
                         4); // Negative thickness means solid fill
             }
 

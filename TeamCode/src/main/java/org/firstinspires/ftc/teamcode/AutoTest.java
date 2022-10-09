@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -17,8 +18,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "Sprint2Auto", group = "MecanumDrive")
-public class Sprint2Auto extends LinearOpMode {
+@Autonomous(name = "AutoTest", group = "MecanumDrive")
+public class AutoTest extends LinearOpMode {
 
     //Control Hub Orientation
     byte AXIS_MAP_CONFIG_BYTE = 0x06; //rotates control hub 90 degrees around y axis by swapping x and z axis
@@ -59,6 +60,8 @@ public class Sprint2Auto extends LinearOpMode {
     boolean posOne;
     boolean posTwo;
     boolean posThree;
+
+    ElapsedTime ET = new ElapsedTime();
 
     public void runOpMode() {
 
@@ -129,114 +132,76 @@ public class Sprint2Auto extends LinearOpMode {
 
         waitForStart();
 
+        ET.reset();
+
         while (opModeIsActive()) {
 
             switch (programOrder) {
 
+//                case 0:
+//                    if (pipeline.type == VisionClass.SignalDeterminationPipeline.SignalSleeveType.LocationONE) {
+//                        posOne = true;
+//                        posTwo = false;
+//                        posThree = false;
+//                    }
+//                    else if (pipeline.type == VisionClass.SignalDeterminationPipeline.SignalSleeveType.LocationTWO) {
+//                        posOne = false;
+//                        posTwo = true;
+//                        posThree = false;
+//                    }
+//                    else if (pipeline.type == VisionClass.SignalDeterminationPipeline.SignalSleeveType.LocationTHREE) {
+//                        posOne = false;
+//                        posTwo = false;
+//                        posThree = true;
+//                    } else {
+//                        posOne = true;
+//                        posTwo = false;
+//                        posThree = false;
+//                    }
+//                    programOrder++;
+//                    break;
+
                 case 0:
-                    if (pipeline.type == VisionClass.SignalDeterminationPipeline.SignalSleeveType.LocationONE) {
-                        posOne = true;
-                        posTwo = false;
-                        posThree = false;
+                    if (MechDrive.GetTaskState() == Task_State.INIT ||
+                            MechDrive.GetTaskState() == Task_State.READY ||
+                            MechDrive.GetTaskState() == Task_State.DONE) {
+                        MechDrive.SetTargets(0, 600, 0.3, 1);
+                        programOrder++;
                     }
-                    else if (pipeline.type == VisionClass.SignalDeterminationPipeline.SignalSleeveType.LocationTWO) {
-                        posOne = false;
-                        posTwo = true;
-                        posThree = false;
-                    }
-                    else if (pipeline.type == VisionClass.SignalDeterminationPipeline.SignalSleeveType.LocationTHREE) {
-                        posOne = false;
-                        posTwo = false;
-                        posThree = true;
-                    } else {
-                        posOne = true;
-                        posTwo = false;
-                        posThree = false;
-                    }
-                    programOrder++;
                     break;
 
                 case 1:
-                    SetAttachmentPosition(2000, -3763);
+
                     programOrder++;
                     break;
 
                 case 2:
 
-                    if (MechDrive.GetTaskState() == Task_State.INIT ||
-                        MechDrive.GetTaskState() == Task_State.READY ||
-                        MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(0, 2900, 0.7, 0);
-                        programOrder++;
-                    }
+                    programOrder++;
                     break;
 
                 case 3:
-                    SetAttachmentPosition(9520, -1882);
+
                     programOrder++;
                     break;
 
-                case 4:
-                    Claw.setPosition(0.2);
-                    sleep(400);
-                    SetAttachmentPosition(1500, 0);
-//                    SetAttachmentPosition(1500, 3763);
-                    programOrder++;
-                    break;
-
-                case 5:
-//                    if (
-//                            MechDrive.GetTaskState() == Task_State.READY ||
-//                            MechDrive.GetTaskState() == Task_State.DONE) {
-//                        MechDrive.SetTargets(90, 900, 0.7, 0);
-                        programOrder++;
-//                    }
-                    break;
-
-                case 6:
-//                    Claw.setPosition(1);
-                    programOrder++;
-                    break;
-
-                case 7:
-//                    SetAttachmentPosition(9520, 1882);
-//                    sleep(100);
-                    programOrder++;
-                    break;
-
-                case 8:
+//                case 10:
 //                    if (MechDrive.GetTaskState() == Task_State.INIT ||
 //                            MechDrive.GetTaskState() == Task_State.READY ||
 //                            MechDrive.GetTaskState() == Task_State.DONE) {
-//                        MechDrive.SetTargets(-90, 724, 0.7, 0);
-                        programOrder++;
+//
+//                        if (posOne) {
+//                            MechDrive.SetTargets(-90, 800, 0.7, 0);
+//                        }
+//                        else if (posTwo) {
+//                            MechDrive.SetTargets(0, 0, 0.1, 0);
+//                        }
+//                        else if (posThree) {
+//                            MechDrive.SetTargets(90, 800, 0.7, 0);
+//                        }
+//                        programOrder++;
 //                    }
-                    break;
-
-                case 9:
-//                    Claw.setPosition(0.2);
-//                    sleep(400);
-//                    SetAttachmentPosition(0, 0);
-                    programOrder++;
-                    break;
-
-                case 10:
-                    if (MechDrive.GetTaskState() == Task_State.INIT ||
-                            MechDrive.GetTaskState() == Task_State.READY ||
-                            MechDrive.GetTaskState() == Task_State.DONE) {
-
-                        if (posOne) {
-                            MechDrive.SetTargets(-90, 800, 0.7, 0);
-                        }
-                        else if (posTwo) {
-                            MechDrive.SetTargets(0, 0, 0.1, 0);
-                        }
-                        else if (posThree) {
-                            MechDrive.SetTargets(90, 800, 0.7, 0);
-                        }
-                        programOrder++;
-                    }
-                    break;
+//                    break;
 
                 default:
                     break;

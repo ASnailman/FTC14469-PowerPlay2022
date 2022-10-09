@@ -63,7 +63,9 @@ public class Sprint2Teleop extends LinearOpMode {
     boolean button_y_already_pressed2 = false;
     boolean button_bumper_left_already_pressed2 = false;
     boolean button_bumper_right_already_pressed2 = false;
-    boolean button_dpad_right_already_pressed = false;
+    boolean button_dpad_up_already_pressed = false;
+    boolean button_dpad_right_already_pressed2 = false;
+    boolean button_dpad_left_already_pressed2 = false;
 
     public void runOpMode() {
 
@@ -107,7 +109,7 @@ public class Sprint2Teleop extends LinearOpMode {
         while (opModeIsActive()) {
 
             /*****************************************************************
-             * Right Dpad (G1) - Set Low Power Mode/High Power Mode for driving
+             * Up Dpad (G1) - Set Low Power Mode/High Power Mode for driving
              *****************************************************************/
 
             if (PowerSetting) {
@@ -116,18 +118,18 @@ public class Sprint2Teleop extends LinearOpMode {
                 movement = 0.4;
             }
 
-            if (!button_dpad_right_already_pressed) {
-                if (gamepad1.dpad_right) {
+            if (!button_dpad_up_already_pressed) {
+                if (gamepad1.dpad_up) {
                     if (!PowerSetting) {
                         PowerSetting = true;
                     } else {
                         PowerSetting = false;
                     }
-                    button_dpad_right_already_pressed = true;
+                    button_dpad_up_already_pressed = true;
                 }
             } else {
-                if (!gamepad1.dpad_right) {
-                    button_dpad_right_already_pressed = false;
+                if (!gamepad1.dpad_up) {
+                    button_dpad_up_already_pressed = false;
                 }
             }
 
@@ -149,6 +151,18 @@ public class Sprint2Teleop extends LinearOpMode {
             BackLeft.setPower(BLPower);
             FrontRight.setPower(FRPower);
             BackRight.setPower(BRPower);
+
+            /*****************************************************************
+             * Dpad Left/Right (G2) - Open Close Claw
+             *****************************************************************/
+
+            if (gamepad2.dpad_left) {
+                Claw.setPosition(1);
+            }
+
+            if (gamepad2.dpad_right) {
+                Claw.setPosition(0);
+            }
 
             /*****************************************************************
              * Button A (G2) : Set Rail height to place on the low junction
@@ -258,7 +272,6 @@ public class Sprint2Teleop extends LinearOpMode {
 
 //            telemetry.update();
         }
-
     }
 
     private double GyroContinuity() {
