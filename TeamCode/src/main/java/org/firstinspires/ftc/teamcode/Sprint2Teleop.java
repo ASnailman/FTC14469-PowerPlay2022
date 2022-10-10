@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -47,9 +48,12 @@ public class Sprint2Teleop extends LinearOpMode {
     Orientation orientation;
 
     //Variables
-    int programOrder = 0;
+    ElapsedTime ET = new ElapsedTime();
+    int leftHighPickup = 0;
+    int rightHighPickup = 0;
     double movement;
     boolean PowerSetting = true;
+    boolean ClawSetting = false;
 
     //Gyrocontinuity Variables
     double current_value;
@@ -66,6 +70,8 @@ public class Sprint2Teleop extends LinearOpMode {
     boolean button_dpad_up_already_pressed = false;
     boolean button_dpad_right_already_pressed2 = false;
     boolean button_dpad_left_already_pressed2 = false;
+    boolean button_dpad_up_already_pressed2 = false;
+    boolean button_dpad_down_already_pressed2 = false;
 
     public void runOpMode() {
 
@@ -104,6 +110,12 @@ public class Sprint2Teleop extends LinearOpMode {
         //Mechdrive Object
         MechDrive = new Mech_Drive_FAST(FrontRight, FrontLeft, BackRight, BackLeft, MoveDirection.FORWARD, telemetry);
 //        motorMethods = new Methods(telemetry, IMU, orientation, FrontLeft, FrontRight, BackLeft, BackRight, MoveDirection.FORWARD);
+
+        //Zero Power Behavior
+        BackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        BackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        FrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        FrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         waitForStart();
 
@@ -154,15 +166,92 @@ public class Sprint2Teleop extends LinearOpMode {
             BackRight.setPower(BRPower);
 
             /*****************************************************************
-             * Dpad Left/Right (G2) - Open Close Claw
+             * Dpad Up (G2) - Open/Close Claw
              *****************************************************************/
 
-            if (gamepad2.dpad_left) {
+            if (!button_dpad_up_already_pressed2) {
+                if (gamepad2.dpad_up) {
+                    if (!ClawSetting) {
+                        ClawSetting = true;
+                    } else {
+                        ClawSetting = false;
+                    }
+                    button_dpad_up_already_pressed2 = true;
+                }
+            } else {
+                if (!gamepad2.dpad_up) {
+                    button_dpad_up_already_pressed2 = false;
+                }
+            }
+
+            if (!ClawSetting) {
+                Claw.setPosition(0);
+            } else {
                 Claw.setPosition(1);
             }
 
-            if (gamepad2.dpad_right) {
-                Claw.setPosition(0);
+            /*****************************************************************
+             * Dpad Left/Right (G2) - Instant Positioning for Left/Right High Junction
+             *****************************************************************/
+
+            if (!button_dpad_left_already_pressed2) {
+                if (gamepad2.dpad_left) {
+                    leftHighPickup = 1;
+                    button_dpad_left_already_pressed2 = true;
+                }
+            } else {
+                if (!gamepad2.dpad_left) {
+                    button_dpad_left_already_pressed2 = false;
+                }
+            }
+
+            switch (leftHighPickup) {
+                case 1:
+                    ClawSetting = true;
+                    ET.reset();
+                    leftHighPickup++;
+                    break;
+
+                case 2:
+                    if (ET.milliseconds() > 1000) {
+                        SetRailPosition(9620);
+                        SetBasePosition(3763);
+                        leftHighPickup++;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+
+            if (!button_dpad_right_already_pressed2) {
+                if (gamepad2.dpad_right) {
+                    rightHighPickup = 1;
+                    button_dpad_right_already_pressed2 = true;
+                }
+            } else {
+                if (!gamepad2.dpad_right) {
+                    button_dpad_right_already_pressed2 = false;
+                }
+            }
+
+            switch (rightHighPickup) {
+                case 1:
+                    ClawSetting = true;
+                    ET.reset();
+                    rightHighPickup++;
+                    break;
+
+                case 2:
+                    if (ET.milliseconds() > 1000) {
+                        SetRailPosition(9620);
+                        SetBasePosition(-3763);
+                        rightHighPickup++;
+                    }
+                    break;
+
+                default:
+                    break;
             }
 
             /*****************************************************************
@@ -172,9 +261,11 @@ public class Sprint2Teleop extends LinearOpMode {
             if (!button_a_already_pressed2) {
                 if (gamepad2.a) {
                     //code for low junction when pressed
+                    ClawSetting = true;
                     Claw.setPosition(1);
                     sleep(400);
-                    SetRailPosition(4200);
+                    SetRailPosition(4300);
+                    SetBasePosition(0);
                     button_a_already_pressed2 = true;
                 }
             } else {
@@ -190,9 +281,11 @@ public class Sprint2Teleop extends LinearOpMode {
             if (!button_b_already_pressed2) {
                 if (gamepad2.b) {
                     //code for medium junction when pressed
+                    ClawSetting = true;
                     Claw.setPosition(1);
                     sleep(400);
                     SetRailPosition(7000);
+                    SetBasePosition(0);
                     button_b_already_pressed2 = true;
                 }
             } else {
@@ -208,9 +301,11 @@ public class Sprint2Teleop extends LinearOpMode {
             if (!button_y_already_pressed2) {
                 if (gamepad2.y) {
                     //code for low junction when pressed
+                    ClawSetting = true;
                     Claw.setPosition(1);
                     sleep(400);
-                    SetRailPosition(9520);
+                    SetRailPosition(9620);
+                    SetBasePosition(0);
                     button_y_already_pressed2 = true;
                 }
             } else {
@@ -220,20 +315,41 @@ public class Sprint2Teleop extends LinearOpMode {
             }
 
             /*****************************************************************
-             * Button X (G2) : Reset Rail from any height to original position
+             * Button X (G2) : Reset Rail and Base from any height to original position
              *****************************************************************/
 
             if (!button_x_already_pressed2) {
                 if (gamepad2.x) {
                     //code for releasing cone and resetting base
-                    Claw.setPosition(0.2);
+                    ClawSetting = false;
+                    Claw.setPosition(0);
                     sleep(400);
                     SetRailPosition(0);
+                    SetBasePosition(0);
                     button_x_already_pressed2 = true;
                 }
             } else {
                 if (!gamepad2.x) {
                     button_x_already_pressed2 = false;
+                }
+            }
+
+            /*****************************************************************
+             * Button Dpad Down (G2) : Reset Rail from any height to original position
+             *****************************************************************/
+
+            if (!button_dpad_down_already_pressed2) {
+                if (gamepad2.dpad_down) {
+                    //code for releasing cone and resetting base
+                    ClawSetting = false;
+                    Claw.setPosition(0);
+                    sleep(400);
+                    SetRailPosition(0);
+                    button_dpad_down_already_pressed2 = true;
+                }
+            } else {
+                if (!gamepad2.dpad_down) {
+                    button_dpad_down_already_pressed2 = false;
                 }
             }
 
@@ -319,5 +435,11 @@ public class Sprint2Teleop extends LinearOpMode {
         RailLeft.setTargetPosition(position);
         RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RailLeft.setPower(1);
+    }
+
+    public void SetBasePosition(int position) {
+        RotatingBase.setTargetPosition(position);
+        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        RotatingBase.setPower(1);
     }
 }

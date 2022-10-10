@@ -247,7 +247,7 @@ public class VisionClass {
                         4); // Negative thickness means solid fill
             }
 
-            else if ((DifferenceTWO > 155) && (DifferenceTWO < 185)) { // Was it from region 2?
+            else if ((DifferenceTWO > 155) && (DifferenceTWO < 205)) { // Was it from region 2?
 
                 type = SignalSleeveType.LocationTWO; // Record our analysis
 
