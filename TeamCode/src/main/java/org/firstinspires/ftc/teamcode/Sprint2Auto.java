@@ -165,7 +165,7 @@ public class Sprint2Auto extends LinearOpMode {
                     break;
 
                 case 1:
-                    SetAttachmentPosition(500, 7526);
+                    SetAttachmentPosition(150, 7526);
                     ET.reset();
                     programOrder++;
                     break;
@@ -184,8 +184,8 @@ public class Sprint2Auto extends LinearOpMode {
 
                 case 3:
                     if (RotatingBase.getCurrentPosition() >= 7496 && RotatingBase.getCurrentPosition() <= 7556) {
-                        SetAttachmentPosition(9520, 7526);
-                        if (RailRight.getCurrentPosition() >= 7350) {
+                        SetAttachmentPosition(4660, 7526);
+                        if (RailRight.getCurrentPosition() >= 2700) {
                             programOrder++;
                         }
                     }
@@ -205,7 +205,7 @@ public class Sprint2Auto extends LinearOpMode {
 //                                MechDrive.GetTaskState() == Task_State.DONE) {
 //                            MechDrive.SetTargets(0, 150, 0.4, 1);
 //                            ET.reset();
-                    SetAttachmentPosition(9520, 3763);
+                    SetAttachmentPosition(4660, 3763);
                     programOrder++;
 //                        }
 //                    }
@@ -213,7 +213,7 @@ public class Sprint2Auto extends LinearOpMode {
 
                 case 6:
                     if ( (MechDrive.GetTaskState() == Task_State.READY || MechDrive.GetTaskState() == Task_State.DONE)
-                            && (RailRight.getCurrentPosition() >= 9490 && RailRight.getCurrentPosition() <= 9550)
+                            && (RailRight.getCurrentPosition() >= 4630 && RailRight.getCurrentPosition() <= 4690)
                             && (RotatingBase.getCurrentPosition() >= 3733 && RotatingBase.getCurrentPosition() <= 3793)
                     ) {
                         Claw.setPosition(0);
@@ -229,18 +229,18 @@ public class Sprint2Auto extends LinearOpMode {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
                             MechDrive.SetTargets(90, 1450, 0.4, 1);
-                            SetAttachmentPosition(1300, -100);
+                            SetAttachmentPosition(600, -100);
                             programOrder++;
                         }
                     }
                     break;
 
                 case 8:
-                    if (RailRight.getCurrentPosition() <= 1400) {
+                    if (RailRight.getCurrentPosition() <= 700) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
                             MechDrive.SetTargets(90, 455, 0.4, 1);
-                            SetAttachmentPosition(1270, -100);
+                            SetAttachmentPosition(570, -100);
                             ET.reset();
                             programOrder++;
                             }
@@ -248,7 +248,7 @@ public class Sprint2Auto extends LinearOpMode {
                     break;
 
                 case 9:
-                    if (RailRight.getCurrentPosition() > 1200 &&
+                    if (RailRight.getCurrentPosition() > 470 &&
                             RotatingBase.getCurrentPosition() < -70 &&
                             ET.milliseconds() > 1000) {
                         Claw.setPosition(1);
@@ -261,8 +261,8 @@ public class Sprint2Auto extends LinearOpMode {
 
                 case 10:
                     if (ET.milliseconds() > 1000) {
-                        SetAttachmentPosition(9520, 0);
-                        if (RailRight.getCurrentPosition() >= 3400) {
+                        SetAttachmentPosition(4660, 0);
+                        if (RailRight.getCurrentPosition() >= 1600) {
                             programOrder++;
                         }
                     }
@@ -277,10 +277,10 @@ public class Sprint2Auto extends LinearOpMode {
                     break;
 
                 case 12:
-                    if (RailRight.getCurrentPosition() > 7400) {
+                    if (RailRight.getCurrentPosition() > 3600) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
-                            SetAttachmentPosition(9520, 3763);
+                            SetAttachmentPosition(4660, 3763);
                             MechDrive.SetTargets(180, 0, 0.4, 1);
                             ET.reset();
                             programOrder++;
@@ -440,7 +440,7 @@ public class Sprint2Auto extends LinearOpMode {
     }
 
     public void SetAttachmentPosition(int railPos, int basePos) {
-        RailRight.setTargetPosition(railPos);
+        RailRight.setTargetPosition(-railPos);
         RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RailRight.setPower(1);
         RailLeft.setTargetPosition(railPos);

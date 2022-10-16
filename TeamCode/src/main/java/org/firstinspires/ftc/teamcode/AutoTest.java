@@ -162,25 +162,30 @@ public class AutoTest extends LinearOpMode {
 //                    break;
 
                 case 0:
+//                    SetAttachmentPosition(9520, 0);
+//                    if (RailRight.getCurrentPosition() > 9400) {
+                        GyroTurn(90, 0.2);
+//                    }
+                    break;
+
+                case 2:
                     if (MechDrive.GetTaskState() == Task_State.INIT ||
                             MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(0, 600, 0.3, 1);
+                        MechDrive.SetTargets(-90, 10000, 0.3, 1);
                         programOrder++;
                     }
                     break;
 
-                case 1:
-
-                    programOrder++;
-                    break;
-
-                case 2:
-
-                    programOrder++;
-                    break;
-
                 case 3:
+                    if (MechDrive.GetTaskState() == Task_State.READY ||
+                            MechDrive.GetTaskState() == Task_State.DONE) {
+                        MechDrive.SetTargets(90, 10000, 0.3, 1);
+                        programOrder++;
+                    }
+                    break;
+
+                case 4:
 
                     programOrder++;
                     break;
@@ -311,7 +316,7 @@ public class AutoTest extends LinearOpMode {
     }
 
     public void SetAttachmentPosition(int railPos, int basePos) {
-        RailRight.setTargetPosition(railPos);
+        RailRight.setTargetPosition(-railPos);
         RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RailRight.setPower(1);
         RailLeft.setTargetPosition(railPos);

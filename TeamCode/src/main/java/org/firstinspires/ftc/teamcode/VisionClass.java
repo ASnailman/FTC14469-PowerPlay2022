@@ -43,10 +43,10 @@ public class VisionClass {
          * The core values which define the location and size of the sample regions
          */
         static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(60,85);
-        static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(600,225);
+        static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(630,225);
         static final Point REGION3_TOPLEFT_ANCHOR_POINT = new Point(1050,65);
-        static final int REGION_WIDTH = 80;
-        static final int REGION_HEIGHT = 80;
+        static final int REGION_WIDTH = 50;
+        static final int REGION_HEIGHT = 50;
 
         static final int SIGNAL_SLEEVE_THRESHOLD = 10;
 

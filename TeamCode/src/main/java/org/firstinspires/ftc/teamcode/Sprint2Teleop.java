@@ -54,6 +54,7 @@ public class Sprint2Teleop extends LinearOpMode {
     double movement;
     boolean PowerSetting = true;
     boolean ClawSetting = false;
+    boolean coneStackMode = false;
 
     //Gyrocontinuity Variables
     double current_value;
@@ -100,7 +101,7 @@ public class Sprint2Teleop extends LinearOpMode {
         //Claw Presets
         Claw.setDirection(Servo.Direction.FORWARD);
         Claw.scaleRange(0, 1);
-        Claw.setPosition(0.2);
+        Claw.setPosition(0);
 
         //Configrue IMU for GyroTurning
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -118,6 +119,8 @@ public class Sprint2Teleop extends LinearOpMode {
         FrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         waitForStart();
+
+        ET.reset();
 
         while (opModeIsActive()) {
 
@@ -214,7 +217,7 @@ public class Sprint2Teleop extends LinearOpMode {
 
                 case 2:
                     if (ET.milliseconds() > 1000) {
-                        SetRailPosition(9620);
+                        SetRailPosition(4660);
                         SetBasePosition(3763);
                         leftHighPickup++;
                     }
@@ -244,7 +247,7 @@ public class Sprint2Teleop extends LinearOpMode {
 
                 case 2:
                     if (ET.milliseconds() > 1000) {
-                        SetRailPosition(9620);
+                        SetRailPosition(4660);
                         SetBasePosition(-3763);
                         rightHighPickup++;
                     }
@@ -254,63 +257,124 @@ public class Sprint2Teleop extends LinearOpMode {
                     break;
             }
 
-            /*****************************************************************
-             * Button A (G2) : Set Rail height to place on the low junction
-             *****************************************************************/
+            //If cone stack mode is false, then buttons a, b, and y will correspond to the height of the junctions
+            if (!coneStackMode) {
 
-            if (!button_a_already_pressed2) {
-                if (gamepad2.a) {
-                    //code for low junction when pressed
-                    ClawSetting = true;
-                    Claw.setPosition(1);
-                    sleep(400);
-                    SetRailPosition(4300);
-                    SetBasePosition(0);
-                    button_a_already_pressed2 = true;
+                /*****************************************************************
+                 * Button A (G2) : Set Rail height to place on the low junction
+                 *****************************************************************/
+
+                if (!button_a_already_pressed2) {
+                    if (gamepad2.a) {
+                        //code for low junction when pressed
+                        ClawSetting = true;
+                        coneStackMode = true;
+                        Claw.setPosition(1);
+                        sleep(500);
+                        SetRailPosition(2000);
+                        SetBasePosition(0);
+                        button_a_already_pressed2 = true;
+                    }
+                } else {
+                    if (!gamepad2.a) {
+                        button_a_already_pressed2 = false;
+                    }
                 }
+
+                /*****************************************************************
+                 * Button B (G2) : Set Rail height to place on the medium junction
+                 *****************************************************************/
+
+                if (!button_b_already_pressed2) {
+                    if (gamepad2.b) {
+                        //code for medium junction when pressed
+                        ClawSetting = true;
+                        coneStackMode = true;
+                        Claw.setPosition(1);
+                        sleep(500);
+                        SetRailPosition(3350);
+                        SetBasePosition(0);
+                        button_b_already_pressed2 = true;
+                    }
+                } else {
+                    if (!gamepad2.b) {
+                        button_b_already_pressed2 = false;
+                    }
+                }
+
+                /*****************************************************************
+                 * Button Y (G2) : Set Rail height to place on the high junction
+                 *****************************************************************/
+
+                if (!button_y_already_pressed2) {
+                    if (gamepad2.y) {
+                        //code for low junction when pressed
+                        ClawSetting = true;
+                        coneStackMode = true;
+                        Claw.setPosition(1);
+                        sleep(500);
+                        SetRailPosition(4660);
+                        SetBasePosition(0);
+                        button_y_already_pressed2 = true;
+                    }
+                } else {
+                    if (!gamepad2.y) {
+                        button_y_already_pressed2 = false;
+                    }
+                }
+
+            //if cone stack mode is true, buttons a, b, and y will correspond to the height of the cone stack
             } else {
-                if (!gamepad2.a) {
-                    button_a_already_pressed2 = false;
-                }
-            }
 
-            /*****************************************************************
-             * Button B (G2) : Set Rail height to place on the medium junction
-             *****************************************************************/
-
-            if (!button_b_already_pressed2) {
-                if (gamepad2.b) {
-                    //code for medium junction when pressed
-                    ClawSetting = true;
-                    Claw.setPosition(1);
-                    sleep(400);
-                    SetRailPosition(7000);
-                    SetBasePosition(0);
-                    button_b_already_pressed2 = true;
+                if (!button_a_already_pressed2) {
+                    if (gamepad2.a) {
+                        //code for low junction when pressed
+                        ClawSetting = false;
+                        coneStackMode = false;
+                        Claw.setPosition(0);
+                        sleep(100);
+                        SetRailPosition(535);
+                        SetBasePosition(-3763);
+                        button_a_already_pressed2 = true;
+                    }
+                } else {
+                    if (!gamepad2.a) {
+                        button_a_already_pressed2 = false;
+                    }
                 }
-            } else {
-                if (!gamepad2.b) {
-                    button_b_already_pressed2 = false;
-                }
-            }
 
-            /*****************************************************************
-             * Button Y (G2) : Set Rail height to place on the high junction
-             *****************************************************************/
-
-            if (!button_y_already_pressed2) {
-                if (gamepad2.y) {
-                    //code for low junction when pressed
-                    ClawSetting = true;
-                    Claw.setPosition(1);
-                    sleep(400);
-                    SetRailPosition(9620);
-                    SetBasePosition(0);
-                    button_y_already_pressed2 = true;
+                if (!button_b_already_pressed2) {
+                    if (gamepad2.b) {
+                        //code for medium junction when pressed
+                        ClawSetting = false;
+                        coneStackMode = false;
+                        Claw.setPosition(1);
+                        sleep(100);
+                        SetRailPosition(635);
+                        SetBasePosition(-3763);
+                        button_b_already_pressed2 = true;
+                    }
+                } else {
+                    if (!gamepad2.b) {
+                        button_b_already_pressed2 = false;
+                    }
                 }
-            } else {
-                if (!gamepad2.y) {
-                    button_y_already_pressed2 = false;
+
+                if (!button_y_already_pressed2) {
+                    if (gamepad2.y) {
+                        //code for low junction when pressed
+                        ClawSetting = false;
+                        coneStackMode = false;
+                        Claw.setPosition(1);
+                        sleep(100);
+                        SetRailPosition(735);
+                        SetBasePosition(-3763);
+                        button_y_already_pressed2 = true;
+                    }
+                } else {
+                    if (!gamepad2.y) {
+                        button_y_already_pressed2 = false;
+                    }
                 }
             }
 
@@ -322,8 +386,9 @@ public class Sprint2Teleop extends LinearOpMode {
                 if (gamepad2.x) {
                     //code for releasing cone and resetting base
                     ClawSetting = false;
+                    coneStackMode = false;
                     Claw.setPosition(0);
-                    sleep(400);
+                    sleep(100);
                     SetRailPosition(0);
                     SetBasePosition(0);
                     button_x_already_pressed2 = true;
@@ -335,16 +400,16 @@ public class Sprint2Teleop extends LinearOpMode {
             }
 
             /*****************************************************************
-             * Button Dpad Down (G2) : Reset Rail from any height to original position
+             * Button Dpad Down (G2) : Set Rail For Ground Junction
              *****************************************************************/
 
             if (!button_dpad_down_already_pressed2) {
                 if (gamepad2.dpad_down) {
                     //code for releasing cone and resetting base
-                    ClawSetting = false;
-                    Claw.setPosition(0);
-                    sleep(400);
-                    SetRailPosition(0);
+                    ClawSetting = true;
+                    Claw.setPosition(1);
+                    sleep(500);
+                    SetRailPosition(100);
                     button_dpad_down_already_pressed2 = true;
                 }
             } else {
@@ -429,7 +494,7 @@ public class Sprint2Teleop extends LinearOpMode {
     }
 
     public void SetRailPosition(int position) {
-        RailRight.setTargetPosition(position);
+        RailRight.setTargetPosition(-position);
         RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RailRight.setPower(1);
         RailLeft.setTargetPosition(position);
