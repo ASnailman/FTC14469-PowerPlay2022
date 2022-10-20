@@ -165,7 +165,7 @@ public class Sprint2Auto extends LinearOpMode {
                     break;
 
                 case 1:
-                    SetAttachmentPosition(150, 7526);
+                    SetAttachmentPosition(350, 7526);
                     ET.reset();
                     programOrder++;
                     break;
@@ -175,7 +175,7 @@ public class Sprint2Auto extends LinearOpMode {
                         if (MechDrive.GetTaskState() == Task_State.INIT ||
                                 MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
-                            MechDrive.SetTargets(0, 2120, 0.4, 1);
+                            MechDrive.SetTargets(0, 2120, 0.33, 1);
                                 programOrder++;
 
                         }
@@ -440,10 +440,10 @@ public class Sprint2Auto extends LinearOpMode {
     }
 
     public void SetAttachmentPosition(int railPos, int basePos) {
-        RailRight.setTargetPosition(-railPos);
+        RailRight.setTargetPosition(railPos);
         RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RailRight.setPower(1);
-        RailLeft.setTargetPosition(railPos);
+        RailLeft.setTargetPosition(-railPos);
         RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RailLeft.setPower(1);
         RotatingBase.setTargetPosition(basePos);

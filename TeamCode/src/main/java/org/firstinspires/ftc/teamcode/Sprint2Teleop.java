@@ -41,6 +41,7 @@ public class Sprint2Teleop extends LinearOpMode {
     //Variables of Classes
     Methods motorMethods;
     Mech_Drive_FAST MechDrive;
+    Rail_Control RailControl;
 
     //Variables For IMU Gyro
     double globalangle;
@@ -51,10 +52,12 @@ public class Sprint2Teleop extends LinearOpMode {
     ElapsedTime ET = new ElapsedTime();
     int leftHighPickup = 0;
     int rightHighPickup = 0;
+    int resetSequence = 0;
     double movement;
     boolean PowerSetting = true;
     boolean ClawSetting = false;
     boolean coneStackMode = false;
+    boolean groundJunctionMode = false;
 
     //Gyrocontinuity Variables
     double current_value;
@@ -110,7 +113,8 @@ public class Sprint2Teleop extends LinearOpMode {
 
         //Mechdrive Object
         MechDrive = new Mech_Drive_FAST(FrontRight, FrontLeft, BackRight, BackLeft, MoveDirection.FORWARD, telemetry);
-//        motorMethods = new Methods(telemetry, IMU, orientation, FrontLeft, FrontRight, BackLeft, BackRight, MoveDirection.FORWARD);
+        RailControl = new Rail_Control(RailLeft, RailRight);
+        //        motorMethods = new Methods(telemetry, IMU, orientation, FrontLeft, FrontRight, BackLeft, BackRight, MoveDirection.FORWARD);
 
         //Zero Power Behavior
         BackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -131,7 +135,7 @@ public class Sprint2Teleop extends LinearOpMode {
             if (PowerSetting) {
                 movement = 0.7;
             } else {
-                movement = 0.4;
+                movement = 0.5;
             }
 
             if (!button_dpad_up_already_pressed) {
@@ -209,13 +213,13 @@ public class Sprint2Teleop extends LinearOpMode {
             }
 
             switch (leftHighPickup) {
-                case 1:
+                case 2:
                     ClawSetting = true;
                     ET.reset();
                     leftHighPickup++;
                     break;
 
-                case 2:
+                case 3:
                     if (ET.milliseconds() > 1000) {
                         SetRailPosition(4660);
                         SetBasePosition(3763);
@@ -239,13 +243,13 @@ public class Sprint2Teleop extends LinearOpMode {
             }
 
             switch (rightHighPickup) {
-                case 1:
+                case 2:
                     ClawSetting = true;
                     ET.reset();
                     rightHighPickup++;
                     break;
 
-                case 2:
+                case 3:
                     if (ET.milliseconds() > 1000) {
                         SetRailPosition(4660);
                         SetBasePosition(-3763);
@@ -264,20 +268,40 @@ public class Sprint2Teleop extends LinearOpMode {
                  * Button A (G2) : Set Rail height to place on the low junction
                  *****************************************************************/
 
-                if (!button_a_already_pressed2) {
-                    if (gamepad2.a) {
-                        //code for low junction when pressed
-                        ClawSetting = true;
-                        coneStackMode = true;
-                        Claw.setPosition(1);
-                        sleep(500);
-                        SetRailPosition(2000);
-                        SetBasePosition(0);
-                        button_a_already_pressed2 = true;
+                if (groundJunctionMode) {
+                    if (!button_a_already_pressed2) {
+                        if (gamepad2.a) {
+                            //code for low junction when pressed
+                            ClawSetting = false;
+                            coneStackMode = false;
+                            groundJunctionMode = false;
+                            Claw.setPosition(0);
+                            sleep(450);
+                            SetRailPosition(2000);
+                            SetBasePosition(0);
+                            button_a_already_pressed2 = true;
+                        }
+                    } else {
+                        if (!gamepad2.a) {
+                            button_a_already_pressed2 = false;
+                        }
                     }
                 } else {
-                    if (!gamepad2.a) {
-                        button_a_already_pressed2 = false;
+                    if (!button_a_already_pressed2) {
+                        if (gamepad2.a) {
+                            //code for low junction when pressed
+                            ClawSetting = true;
+                            coneStackMode = true;
+                            Claw.setPosition(1);
+                            sleep(450);
+                            SetRailPosition(2000);
+                            SetBasePosition(0);
+                            button_a_already_pressed2 = true;
+                        }
+                    } else {
+                        if (!gamepad2.a) {
+                            button_a_already_pressed2 = false;
+                        }
                     }
                 }
 
@@ -313,7 +337,13 @@ public class Sprint2Teleop extends LinearOpMode {
                         coneStackMode = true;
                         Claw.setPosition(1);
                         sleep(500);
-                        SetRailPosition(4660);
+//                        RailRight.setTargetPosition(4600);
+//                        RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                        RailRight.setPower(1);
+//                        RailLeft.setTargetPosition(-4660);
+//                        RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                        RailLeft.setPower(1);
+                        RailControl.SetTargetPosition(4600, -1, 1);
                         SetBasePosition(0);
                         button_y_already_pressed2 = true;
                     }
@@ -333,8 +363,10 @@ public class Sprint2Teleop extends LinearOpMode {
                         coneStackMode = false;
                         Claw.setPosition(0);
                         sleep(100);
-                        SetRailPosition(535);
-                        SetBasePosition(-3763);
+                        SetRailPosition(2000);
+                        SetBasePosition(0);
+//                        SetRailPosition(535);
+//                        SetBasePosition(-3763);
                         button_a_already_pressed2 = true;
                     }
                 } else {
@@ -350,7 +382,7 @@ public class Sprint2Teleop extends LinearOpMode {
                         coneStackMode = false;
                         Claw.setPosition(1);
                         sleep(100);
-                        SetRailPosition(635);
+                        SetRailPosition(735);
                         SetBasePosition(-3763);
                         button_b_already_pressed2 = true;
                     }
@@ -367,7 +399,7 @@ public class Sprint2Teleop extends LinearOpMode {
                         coneStackMode = false;
                         Claw.setPosition(1);
                         sleep(100);
-                        SetRailPosition(735);
+                        SetRailPosition(835);
                         SetBasePosition(-3763);
                         button_y_already_pressed2 = true;
                     }
@@ -389,14 +421,67 @@ public class Sprint2Teleop extends LinearOpMode {
                     coneStackMode = false;
                     Claw.setPosition(0);
                     sleep(100);
-                    SetRailPosition(0);
-                    SetBasePosition(0);
+//                    RailRight.setTargetPosition(0);
+//                    RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    RailRight.setPower(0.9);
+//                    RailLeft.setTargetPosition(-0);
+//                    RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    RailLeft.setPower(0.9);
+                    RailControl.SetTargetPosition(0, -1, 1);
+//                    resetSequence = 1;
+//                    SetBasePosition(0);
                     button_x_already_pressed2 = true;
                 }
             } else {
                 if (!gamepad2.x) {
                     button_x_already_pressed2 = false;
                 }
+            }
+
+            switch (resetSequence) {
+
+                case 1:
+                    ET.reset();
+                    resetSequence++;
+                    break;
+
+                case 2:
+                    RailRight.setTargetPosition(0);
+                    RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    RailRight.setPower(0.5);
+                    RailLeft.setTargetPosition(-0);
+                    RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    RailLeft.setPower(0.5);
+                    if (ET.milliseconds() > 1000) {
+                        ET.reset();
+                        resetSequence++;
+                    }
+                    break;
+
+                case 3:
+                    RailRight.setTargetPosition(0);
+                    RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    RailRight.setPower(0.7);
+                    RailLeft.setTargetPosition(-0);
+                    RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    RailLeft.setPower(0.7);
+                    if (ET.milliseconds() > 1000) {
+                        resetSequence++;
+                    }
+                    break;
+
+                case 4:
+                    RailRight.setTargetPosition(0);
+                    RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    RailRight.setPower(0.9);
+                    RailLeft.setTargetPosition(-0);
+                    RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    RailLeft.setPower(0.9);
+                    resetSequence++;
+                    break;
+
+                default:
+                    break;
             }
 
             /*****************************************************************
@@ -407,9 +492,12 @@ public class Sprint2Teleop extends LinearOpMode {
                 if (gamepad2.dpad_down) {
                     //code for releasing cone and resetting base
                     ClawSetting = true;
+                    coneStackMode = false;
+                    groundJunctionMode = true;
                     Claw.setPosition(1);
                     sleep(500);
                     SetRailPosition(100);
+                    SetBasePosition(0);
                     button_dpad_down_already_pressed2 = true;
                 }
             } else {
@@ -452,7 +540,10 @@ public class Sprint2Teleop extends LinearOpMode {
                 }
             }
 
-//            telemetry.update();
+            RailControl.RailTask();
+            telemetry.addData("LeftRail Encoder", RailLeft.getCurrentPosition());
+            telemetry.addData("RightRail Encoder", RailRight.getCurrentPosition());
+            telemetry.update();
         }
     }
 
@@ -494,10 +585,10 @@ public class Sprint2Teleop extends LinearOpMode {
     }
 
     public void SetRailPosition(int position) {
-        RailRight.setTargetPosition(-position);
+        RailRight.setTargetPosition(position);
         RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RailRight.setPower(1);
-        RailLeft.setTargetPosition(position);
+        RailLeft.setTargetPosition(-position);
         RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RailLeft.setPower(1);
     }

@@ -316,10 +316,10 @@ public class AutoTest extends LinearOpMode {
     }
 
     public void SetAttachmentPosition(int railPos, int basePos) {
-        RailRight.setTargetPosition(-railPos);
+        RailRight.setTargetPosition(railPos);
         RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RailRight.setPower(1);
-        RailLeft.setTargetPosition(railPos);
+        RailLeft.setTargetPosition(-railPos);
         RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RailLeft.setPower(1);
         RotatingBase.setTargetPosition(basePos);
