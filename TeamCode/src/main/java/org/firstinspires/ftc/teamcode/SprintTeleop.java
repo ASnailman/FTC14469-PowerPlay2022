@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -13,8 +14,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-@TeleOp(name = "Sprint2Teleop",  group = "MecanumDrive")
-public class Sprint3Teleop extends LinearOpMode {
+@TeleOp(name = "SprintTeleop",  group = "MecanumDrive")
+public class SprintTeleop extends LinearOpMode {
 
     //Control Hub Orientation
     byte AXIS_MAP_CONFIG_BYTE = 0x06; //rotates control hub 90 degrees around y axis by swapping x and z axis
@@ -28,7 +29,8 @@ public class Sprint3Teleop extends LinearOpMode {
     static DcMotor RailLeft;
     static DcMotor RailRight;
     static DcMotor RotatingBase;
-    static Servo Claw;
+    static CRServo LeftClaw;
+    static CRServo RightClaw;
 
     //Sensors
     BNO055IMU IMU;
@@ -48,6 +50,7 @@ public class Sprint3Teleop extends LinearOpMode {
     int leftHighPickup = 0;
     int rightHighPickup = 0;
     int resetSequence = 0;
+    int targetJunction = 0;
     double movement;
     boolean PowerSetting = true;
     boolean ClawSetting = false;
@@ -64,6 +67,8 @@ public class Sprint3Teleop extends LinearOpMode {
     boolean button_b_already_pressed2 = false;
     boolean button_x_already_pressed2 = false;
     boolean button_y_already_pressed2 = false;
+    boolean button_bumper_left_already_pressed = false;
+    boolean button_bumper_right_already_pressed = false;
     boolean button_bumper_left_already_pressed2 = false;
     boolean button_bumper_right_already_pressed2 = false;
     boolean button_dpad_up_already_pressed = false;
@@ -79,7 +84,8 @@ public class Sprint3Teleop extends LinearOpMode {
         BackRight = hardwareMap.get(DcMotor.class, "BackRight");
         FrontLeft = hardwareMap.get(DcMotor.class, "FrontLeft");
         FrontRight = hardwareMap.get(DcMotor.class, "FrontRight");
-        Claw = hardwareMap.get(Servo.class, "Claw");
+        LeftClaw = hardwareMap.get(CRServo.class, "leftClaw");
+        RightClaw = hardwareMap.get(CRServo.class, "rightClaw");
         RailLeft = hardwareMap.get(DcMotor.class, "RailLeft");
         RailRight = hardwareMap.get(DcMotor.class, "RailRight");
         RotatingBase = hardwareMap.get(DcMotor.class, "RotatingBase");
@@ -97,9 +103,14 @@ public class Sprint3Teleop extends LinearOpMode {
         AttachmentMotorPresets();
 
         //Claw Presets
-        Claw.setDirection(Servo.Direction.FORWARD);
-        Claw.scaleRange(0, 1);
-        Claw.setPosition(0);
+        LeftClaw.setDirection(CRServo.Direction.REVERSE);
+//        LeftClaw.scaleRange(0, 1);
+//        LeftClaw.setPosition(0);
+        LeftClaw.setPower(-1);
+        RightClaw.setDirection(CRServo.Direction.FORWARD);
+//        RightClaw.scaleRange(0, 1);
+//        RightClaw.setPosition(0);
+        RightClaw.setPower(-1);
 
         //Configrue IMU for GyroTurning
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -128,23 +139,23 @@ public class Sprint3Teleop extends LinearOpMode {
              *****************************************************************/
 
             if (PowerSetting) {
-                movement = 0.7;
+                movement = 0.75;
             } else {
-                movement = 0.5;
+                movement = 0.3;
             }
 
-            if (!button_dpad_up_already_pressed) {
-                if (gamepad1.dpad_up) {
+            if (!button_bumper_right_already_pressed) {
+                if (gamepad1.right_bumper) {
                     if (!PowerSetting) {
                         PowerSetting = true;
                     } else {
                         PowerSetting = false;
                     }
-                    button_dpad_up_already_pressed = true;
+                    button_bumper_right_already_pressed = true;
                 }
             } else {
-                if (!gamepad1.dpad_up) {
-                    button_dpad_up_already_pressed = false;
+                if (!gamepad1.right_bumper) {
+                    button_bumper_right_already_pressed = false;
                 }
             }
 
@@ -187,10 +198,79 @@ public class Sprint3Teleop extends LinearOpMode {
             }
 
             if (!ClawSetting) {
-                Claw.setPosition(0);
+//                RightClaw.setPosition(0);
+//                LeftClaw.setPosition(1);
+                RightClaw.setPower(-1);
+                LeftClaw.setPower(-1);
             } else {
-                Claw.setPosition(1);
+//                RightClaw.setPosition(1);
+//                LeftClaw.setPosition(0);
+                RightClaw.setPower(1);
+                LeftClaw.setPower(1);
             }
+
+                switch (targetJunction) {
+                    case 1:
+                        ET.reset();
+                        targetJunction++;
+                        break;
+                    case 2:
+                        if (ET.milliseconds() > 650) {
+                            RailControl.SetTargetPosition(2000, -1, 1);
+                            SetBasePosition(0);
+                            targetJunction++;
+                        }
+                        break;
+                    case 3:
+                        break;
+
+                    case 4:
+                        ET.reset();
+                        targetJunction++;
+                        break;
+                    case 5:
+                        if (ET.milliseconds() > 650) {
+                            RailControl.SetTargetPosition(3350, -1, 1);
+                            SetBasePosition(0);
+                            targetJunction++;
+                        }
+                        break;
+                    case 6:
+                        break;
+
+                    case 7:
+                        ET.reset();
+                        targetJunction++;
+                        break;
+                    case 8:
+                        if (ET.milliseconds() > 650) {
+                            RailControl.SetTargetPosition(4700, -1, 1);
+                            SetBasePosition(0);
+                            targetJunction++;
+                        }
+                        break;
+                    case 9:
+                        break;
+
+                    case 10:
+                        ET.reset();
+                        targetJunction++;
+                        break;
+
+                    case 11:
+                        if (ET.milliseconds() > 650) {
+                            RailControl.SetTargetPosition(200, -1, 1);
+                            SetBasePosition(0);
+                            targetJunction++;
+                        }
+                        break;
+                    case 12:
+                        break;
+
+                    default:
+                        break;
+
+                }
 
             //If cone stack mode is false, then buttons a, b, and y will correspond to the height of the junctions
             //If ground junction mode is true, then button a will not close claw when moving to low junction position
@@ -207,10 +287,11 @@ public class Sprint3Teleop extends LinearOpMode {
                             ClawSetting = false;
                             coneStackMode = false;
                             groundJunctionMode = false;
-                            Claw.setPosition(0);
-                            sleep(450);
-                            RailControl.SetTargetPosition(2000, -1, 1);
-                            SetBasePosition(0);
+//                            RightClaw.setPosition(0);
+//                            LeftClaw.setPosition(0);
+                            RightClaw.setPower(-1);
+                            LeftClaw.setPower(-1);
+                            targetJunction = 1;
                             button_a_already_pressed2 = true;
                         }
                     } else {
@@ -224,10 +305,11 @@ public class Sprint3Teleop extends LinearOpMode {
                             //code for low junction when pressed
                             ClawSetting = true;
                             coneStackMode = true;
-                            Claw.setPosition(1);
-                            sleep(450);
-                            RailControl.SetTargetPosition(2000, -1, 1);
-                            SetBasePosition(0);
+//                            RightClaw.setPosition(1);
+//                            LeftClaw.setPosition(1);
+                            RightClaw.setPower(1);
+                            LeftClaw.setPower(1);
+                            targetJunction = 1;
                             button_a_already_pressed2 = true;
                         }
                     } else {
@@ -246,10 +328,11 @@ public class Sprint3Teleop extends LinearOpMode {
                         //code for medium junction when pressed
                         ClawSetting = true;
                         coneStackMode = true;
-                        Claw.setPosition(1);
-                        sleep(500);
-                        RailControl.SetTargetPosition(3350, -1, 1);
-                        SetBasePosition(0);
+//                        RightClaw.setPosition(1);
+//                        LeftClaw.setPosition(1);
+                        RightClaw.setPower(1);
+                        LeftClaw.setPower(1);
+                        targetJunction = 4;
                         button_b_already_pressed2 = true;
                     }
                 } else {
@@ -267,10 +350,11 @@ public class Sprint3Teleop extends LinearOpMode {
                         //code for low junction when pressed
                         ClawSetting = true;
                         coneStackMode = true;
-                        Claw.setPosition(1);
-                        sleep(500);
-                        RailControl.SetTargetPosition(4600, -1, 1);
-                        SetBasePosition(0);
+//                        RightClaw.setPosition(1);
+//                        LeftClaw.setPosition(1);
+                        RightClaw.setPower(1);
+                        LeftClaw.setPower(1);
+                        targetJunction = 7;
                         button_y_already_pressed2 = true;
                     }
                 } else {
@@ -287,8 +371,10 @@ public class Sprint3Teleop extends LinearOpMode {
                         //code for low junction when pressed
                         ClawSetting = false;
                         coneStackMode = false;
-                        Claw.setPosition(0);
-                        sleep(100);
+//                        RightClaw.setPosition(0);
+//                        LeftClaw.setPosition(0);
+                        RightClaw.setPower(-1);
+                        LeftClaw.setPower(-1);
                         RailControl.SetTargetPosition(2000, -1, 1);
                         SetBasePosition(0);
 //                        SetRailPosition(535);
@@ -306,9 +392,11 @@ public class Sprint3Teleop extends LinearOpMode {
                         //code for medium junction when pressed
                         ClawSetting = false;
                         coneStackMode = false;
-                        Claw.setPosition(1);
-                        sleep(100);
-                        RailControl.SetTargetPosition(735, -1, 1);
+//                        RightClaw.setPosition(1);
+//                        LeftClaw.setPosition(1);
+                        RightClaw.setPower(1);
+                        LeftClaw.setPower(1);
+                        RailControl.SetTargetPosition(675, -1, 1);
                         SetBasePosition(-3763);
                         button_b_already_pressed2 = true;
                     }
@@ -323,9 +411,11 @@ public class Sprint3Teleop extends LinearOpMode {
                         //code for low junction when pressed
                         ClawSetting = false;
                         coneStackMode = false;
-                        Claw.setPosition(1);
-                        sleep(100);
-                        RailControl.SetTargetPosition(835, -1, 1);
+//                        RightClaw.setPosition(1);
+//                        LeftClaw.setPosition(1);
+                        RightClaw.setPower(1);
+                        LeftClaw.setPower(1);
+                        RailControl.SetTargetPosition(775, -1, 1);
                         SetBasePosition(-3763);
                         button_y_already_pressed2 = true;
                     }
@@ -345,9 +435,12 @@ public class Sprint3Teleop extends LinearOpMode {
                     //code for releasing cone and resetting base
                     ClawSetting = false;
                     coneStackMode = false;
-                    Claw.setPosition(0);
-                    sleep(100);
-                    RailControl.SetTargetPosition(0, -1, 1);
+                    groundJunctionMode = false;
+//                    RightClaw.setPosition(0);
+//                    LeftClaw.setPosition(0);
+                    RightClaw.setPower(-1);
+                    LeftClaw.setPower(-1);
+                    RailControl.SetTargetPosition(0, -0.7, 0.7);
                     button_x_already_pressed2 = true;
                 }
             } else {
@@ -366,10 +459,11 @@ public class Sprint3Teleop extends LinearOpMode {
                     ClawSetting = true;
                     coneStackMode = false;
                     groundJunctionMode = true;
-                    Claw.setPosition(1);
-                    sleep(500);
-                    RailControl.SetTargetPosition(100, -1, 1);
-                    SetBasePosition(0);
+//                    RightClaw.setPosition(1);
+//                    LeftClaw.setPosition(1);
+                    RightClaw.setPower(1);
+                    LeftClaw.setPower(1);
+                    targetJunction = 10;
                     button_dpad_down_already_pressed2 = true;
                 }
             } else {

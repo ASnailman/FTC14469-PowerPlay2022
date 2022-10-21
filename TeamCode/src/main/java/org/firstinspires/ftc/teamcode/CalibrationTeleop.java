@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -32,7 +33,8 @@ public class CalibrationTeleop extends LinearOpMode {
     static DcMotor RailLeft;
     static DcMotor RailRight;
     static DcMotor RotatingBase;
-    static Servo Claw;
+    static CRServo RightClaw;
+    static CRServo LeftClaw;
 
     //Sensors
     BNO055IMU IMU;
@@ -75,7 +77,8 @@ public class CalibrationTeleop extends LinearOpMode {
         BackRight = hardwareMap.get(DcMotor.class, "BackRight");
         FrontLeft = hardwareMap.get(DcMotor.class, "FrontLeft");
         FrontRight = hardwareMap.get(DcMotor.class, "FrontRight");
-        Claw = hardwareMap.get(Servo.class, "Claw");
+        RightClaw = hardwareMap.get(CRServo.class, "rightClaw");
+        LeftClaw = hardwareMap.get(CRServo.class, "leftClaw");
         RailLeft = hardwareMap.get(DcMotor.class, "RailLeft");
         RailRight = hardwareMap.get(DcMotor.class, "RailRight");
         RotatingBase = hardwareMap.get(DcMotor.class, "RotatingBase");
@@ -93,9 +96,10 @@ public class CalibrationTeleop extends LinearOpMode {
         AttachmentMotorPresets();
 
         //Claw Presets
-        Claw.setDirection(Servo.Direction.FORWARD);
-        Claw.scaleRange(0, 1);
-        Claw.setPosition(0.2);
+        LeftClaw.setDirection(CRServo.Direction.REVERSE);
+        LeftClaw.setPower(-1);
+        RightClaw.setDirection(CRServo.Direction.FORWARD);
+        RightClaw.setPower(-1);
 
         //Configrue IMU for GyroTurning
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -153,78 +157,6 @@ public class CalibrationTeleop extends LinearOpMode {
             BackLeft.setPower(BLPower);
             FrontRight.setPower(FRPower);
             BackRight.setPower(BRPower);
-
-            /*****************************************************************
-             * Button A (G2) : Set Rail height to place on the low junction
-             *****************************************************************/
-
-            if (!button_a_already_pressed2) {
-                if (gamepad2.a) {
-                    //code for low junction when pressed
-                    Claw.setPosition(1);
-                    sleep(400);
-                    SetRailPosition(4200);
-                    button_a_already_pressed2 = true;
-                }
-            } else {
-                if (!gamepad2.a) {
-                    button_a_already_pressed2 = false;
-                }
-            }
-
-            /*****************************************************************
-             * Button B (G2) : Set Rail height to place on the medium junction
-             *****************************************************************/
-
-            if (!button_b_already_pressed2) {
-                if (gamepad2.b) {
-                    //code for medium junction when pressed
-                    Claw.setPosition(1);
-                    sleep(400);
-                    SetRailPosition(7000);
-                    button_b_already_pressed2 = true;
-                }
-            } else {
-                if (!gamepad2.b) {
-                    button_b_already_pressed2 = false;
-                }
-            }
-
-            /*****************************************************************
-             * Button Y (G2) : Set Rail height to place on the high junction
-             *****************************************************************/
-
-            if (!button_y_already_pressed2) {
-                if (gamepad2.y) {
-                    //code for low junction when pressed
-                    Claw.setPosition(1);
-                    sleep(400);
-                    SetRailPosition(9520);
-                    button_y_already_pressed2 = true;
-                }
-            } else {
-                if (!gamepad2.y) {
-                    button_y_already_pressed2 = false;
-                }
-            }
-
-            /*****************************************************************
-             * Button X (G2) : Reset Rail from any height to original position
-             *****************************************************************/
-
-            if (!button_x_already_pressed2) {
-                if (gamepad2.x) {
-                    //code for releasing cone and resetting base
-                    Claw.setPosition(0.2);
-                    sleep(400);
-                    SetRailPosition(0);
-                    button_x_already_pressed2 = true;
-                }
-            } else {
-                if (!gamepad2.x) {
-                    button_x_already_pressed2 = false;
-                }
-            }
 
             /*****************************************************************
              * Dpad Left/Right (G2) - Calibrate Base

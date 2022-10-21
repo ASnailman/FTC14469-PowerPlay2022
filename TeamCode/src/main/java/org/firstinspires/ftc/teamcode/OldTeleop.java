@@ -18,8 +18,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@TeleOp(name = "Sprint2Teleop",  group = "MecanumDrive")
-public class Sprint2Teleop extends LinearOpMode {
+@TeleOp(name = "OldTeleop",  group = "MecanumDrive")
+public class OldTeleop extends LinearOpMode {
 
     //Control Hub Orientation
     byte AXIS_MAP_CONFIG_BYTE = 0x06; //rotates control hub 90 degrees around y axis by swapping x and z axis
@@ -344,7 +344,7 @@ public class Sprint2Teleop extends LinearOpMode {
 //                        RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //                        RailLeft.setPower(1);
                         RailControl.SetTargetPosition(4600, -1, 1);
-                        SetBasePosition(0);
+                        SetBasePosition(1881);
                         button_y_already_pressed2 = true;
                     }
                 } else {

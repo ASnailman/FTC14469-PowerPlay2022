@@ -164,7 +164,8 @@ public class AutoTest extends LinearOpMode {
                 case 0:
 //                    SetAttachmentPosition(9520, 0);
 //                    if (RailRight.getCurrentPosition() > 9400) {
-                        GyroTurn(90, 0.2);
+//                        GyroTurn(90, 0.2);
+                    programOrder = 2;
 //                    }
                     break;
 
@@ -172,17 +173,17 @@ public class AutoTest extends LinearOpMode {
                     if (MechDrive.GetTaskState() == Task_State.INIT ||
                             MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(-90, 10000, 0.3, 1);
+                        MechDrive.SetTargets(-90, 10000, 0.25, 1);
                         programOrder++;
                     }
                     break;
 
                 case 3:
-                    if (MechDrive.GetTaskState() == Task_State.READY ||
-                            MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(90, 10000, 0.3, 1);
-                        programOrder++;
-                    }
+//                    if (MechDrive.GetTaskState() == Task_State.READY ||
+//                            MechDrive.GetTaskState() == Task_State.DONE) {
+//                        MechDrive.SetTargets(90, 10000, 0.25, 1);
+//                        programOrder++;
+//                    }
                     break;
 
                 case 4:

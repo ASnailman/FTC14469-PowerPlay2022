@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -18,8 +19,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "Sprint2Auto", group = "MecanumDrive")
-public class Sprint2Auto extends LinearOpMode {
+@Autonomous(name = "SprintAuto", group = "MecanumDrive")
+public class SprintAuto extends LinearOpMode {
 
     //Control Hub Orientation
     byte AXIS_MAP_CONFIG_BYTE = 0x06; //rotates control hub 90 degrees around y axis by swapping x and z axis
@@ -33,7 +34,8 @@ public class Sprint2Auto extends LinearOpMode {
     static DcMotor RailRight;
     static DcMotor RailLeft;
     static DcMotor RotatingBase;
-    static Servo Claw;
+    static CRServo LeftClaw;
+    static CRServo RightClaw;
 
     //Sensors
     BNO055IMU IMU;
@@ -43,6 +45,7 @@ public class Sprint2Auto extends LinearOpMode {
     //Variables of Classes
     Methods motorMethods;
     Mech_Drive_FAST MechDrive;
+    Rail_Control RailControl;
 
     //Variables For IMU Gyro
     double globalangle;
@@ -69,7 +72,8 @@ public class Sprint2Auto extends LinearOpMode {
         BackRight = hardwareMap.get(DcMotor.class, "BackRight");
         FrontLeft = hardwareMap.get(DcMotor.class, "FrontLeft");
         FrontRight = hardwareMap.get(DcMotor.class, "FrontRight");
-        Claw = hardwareMap.get(Servo.class, "Claw");
+        LeftClaw = hardwareMap.get(CRServo.class, "leftClaw");
+        RightClaw = hardwareMap.get(CRServo.class, "rightClaw");
         RailRight = hardwareMap.get(DcMotor.class, "RailRight");
         RailLeft = hardwareMap.get(DcMotor.class, "RailLeft");
         RotatingBase = hardwareMap.get(DcMotor.class, "RotatingBase");
@@ -87,9 +91,13 @@ public class Sprint2Auto extends LinearOpMode {
         AttachmentMotorPresets();
 
         //Claw Presets
-        Claw.setDirection(Servo.Direction.FORWARD);
-        Claw.scaleRange(0, 1);
-        Claw.setPosition(1);
+        LeftClaw.setDirection(CRServo.Direction.REVERSE);
+        RightClaw.setDirection(CRServo.Direction.FORWARD);
+        LeftClaw.setPower(1);
+        RightClaw.setPower(1);
+        sleep(700);
+        LeftClaw.setPower(0);
+        RightClaw.setPower(0);
 
         //Configrue IMU for GyroTurning
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -98,7 +106,8 @@ public class Sprint2Auto extends LinearOpMode {
 
         //Mechdrive Object
         MechDrive = new Mech_Drive_FAST(FrontRight, FrontLeft, BackRight, BackLeft, MoveDirection.FORWARD, telemetry);
-//        motorMethods = new Methods(telemetry, IMU, orientation, FrontLeft, FrontRight, BackLeft, BackRight, MoveDirection.FORWARD);
+        RailControl = new Rail_Control(RailLeft, RailRight);
+        //        motorMethods = new Methods(telemetry, IMU, orientation, FrontLeft, FrontRight, BackLeft, BackRight, MoveDirection.FORWARD);
 
         //Zero Power Behavior
         BackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -148,26 +157,38 @@ public class Sprint2Auto extends LinearOpMode {
                         posOne = true;
                         posTwo = false;
                         posThree = false;
+                        LeftClaw.setPower(1);
+                        RightClaw.setPower(1);
                     } else if (pipeline.type == VisionClass.SignalDeterminationPipeline.SignalSleeveType.LocationTWO) {
                         posOne = false;
                         posTwo = true;
                         posThree = false;
+                        LeftClaw.setPower(1);
+                        RightClaw.setPower(1);
                     } else if (pipeline.type == VisionClass.SignalDeterminationPipeline.SignalSleeveType.LocationTHREE) {
                         posOne = false;
                         posTwo = false;
                         posThree = true;
+                        LeftClaw.setPower(1);
+                        RightClaw.setPower(1);
                     } else {
                         posOne = true;
                         posTwo = false;
                         posThree = false;
+                        LeftClaw.setPower(1);
+                        RightClaw.setPower(1);
                     }
                     programOrder++;
                     break;
 
                 case 1:
-                    SetAttachmentPosition(350, 7526);
-                    ET.reset();
-                    programOrder++;
+                    if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
+                        SetAttachmentPosition(0, 4803);
+                        ET.reset();
+                    }
+                    else if (RailControl.GetTaskState() == Task_State.DONE) {
+                        programOrder++;
+                    }
                     break;
 
                 case 2:
@@ -175,7 +196,7 @@ public class Sprint2Auto extends LinearOpMode {
                         if (MechDrive.GetTaskState() == Task_State.INIT ||
                                 MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
-                            MechDrive.SetTargets(0, 2120, 0.33, 1);
+                            MechDrive.SetTargets(0, 2275, 0.38, 1);
                                 programOrder++;
 
                         }
@@ -183,9 +204,9 @@ public class Sprint2Auto extends LinearOpMode {
                     break;
 
                 case 3:
-                    if (RotatingBase.getCurrentPosition() >= 7496 && RotatingBase.getCurrentPosition() <= 7556) {
-                        SetAttachmentPosition(4660, 7526);
-                        if (RailRight.getCurrentPosition() >= 2700) {
+                    if (RotatingBase.getCurrentPosition() >= 4700 && RotatingBase.getCurrentPosition() <= 4900) {
+                        if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
+                            SetAttachmentPosition(4610, 5644);
                             programOrder++;
                         }
                     }
@@ -194,30 +215,26 @@ public class Sprint2Auto extends LinearOpMode {
                 case 4:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(-90, 540, 0.4, 1);
+                        MechDrive.SetTargets(-90, 140, 0.4, 1);
                         programOrder++;
                     }
                     break;
 
                 case 5:
-//                    if (ET.milliseconds() > 500) {
-//                        if (MechDrive.GetTaskState() == Task_State.READY ||
-//                                MechDrive.GetTaskState() == Task_State.DONE) {
-//                            MechDrive.SetTargets(0, 150, 0.4, 1);
-//                            ET.reset();
-                    SetAttachmentPosition(4660, 3763);
-                    programOrder++;
-//                        }
-//                    }
+                    if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
+                        SetAttachmentPosition(4610, 6272);
+                        programOrder++;
+                    }
                     break;
 
                 case 6:
                     if ( (MechDrive.GetTaskState() == Task_State.READY || MechDrive.GetTaskState() == Task_State.DONE)
-                            && (RailRight.getCurrentPosition() >= 4630 && RailRight.getCurrentPosition() <= 4690)
-                            && (RotatingBase.getCurrentPosition() >= 3733 && RotatingBase.getCurrentPosition() <= 3793)
+                            && (RailRight.getCurrentPosition() >= 4450 && RailRight.getCurrentPosition() <= 4750)
+                            && (RotatingBase.getCurrentPosition() >= 6200 && RotatingBase.getCurrentPosition() <= 6400)
                     ) {
-                        Claw.setPosition(0);
-                        if (Claw.getPosition() < 0.05) {
+                        RightClaw.setPower(-1);
+                        LeftClaw.setPower(-1);
+                        if (RightClaw.getPower() < -0.95 && LeftClaw.getPower() < -0.95) {
                             ET.reset();
                             programOrder++;
                         }
@@ -229,30 +246,34 @@ public class Sprint2Auto extends LinearOpMode {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
                             MechDrive.SetTargets(90, 1450, 0.4, 1);
-                            SetAttachmentPosition(600, -100);
-                            programOrder++;
+                            if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
+                                SetAttachmentPosition(600, -100);
+                                programOrder++;
+                            }
                         }
                     }
                     break;
 
                 case 8:
-                    if (RailRight.getCurrentPosition() <= 700) {
+//                    if (RailRight.getCurrentPosition() <= 800) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
-                            MechDrive.SetTargets(90, 455, 0.4, 1);
-                            SetAttachmentPosition(570, -100);
-                            ET.reset();
-                            programOrder++;
+                                MechDrive.SetTargets(90, 455, 0.4, 1);
+                                if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
+                                    SetAttachmentPosition(570, -100);
+                                    ET.reset();
+                                    programOrder++;
+                                }
                             }
-                        }
+//                        }
                     break;
 
                 case 9:
-                    if (RailRight.getCurrentPosition() > 470 &&
-                            RotatingBase.getCurrentPosition() < -70 &&
+                    if (RotatingBase.getCurrentPosition() < -70 &&
                             ET.milliseconds() > 1000) {
-                        Claw.setPosition(1);
-                        if (Claw.getPosition() > 0.95) {
+                        RightClaw.setPower(1);
+                        LeftClaw.setPower(1);
+                        if (RightClaw.getPower() > 0.95 && LeftClaw.getPower() > 0.95) {
                             ET.reset();
                             programOrder++;
                         }
@@ -261,8 +282,8 @@ public class Sprint2Auto extends LinearOpMode {
 
                 case 10:
                     if (ET.milliseconds() > 1000) {
-                        SetAttachmentPosition(4660, 0);
-                        if (RailRight.getCurrentPosition() >= 1600) {
+                        if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
+                            SetAttachmentPosition(4660, 0);
                             programOrder++;
                         }
                     }
@@ -280,18 +301,21 @@ public class Sprint2Auto extends LinearOpMode {
                     if (RailRight.getCurrentPosition() > 3600) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
-                            SetAttachmentPosition(4660, 3763);
                             MechDrive.SetTargets(180, 0, 0.4, 1);
-                            ET.reset();
-                            programOrder++;
+                            if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
+                                SetAttachmentPosition(4660, 3763);
+                                ET.reset();
+                                programOrder++;
+                            }
                         }
                     }
                     break;
 
                 case 13:
                     if (RotatingBase.getCurrentPosition() >= 3700 && ET.milliseconds() > 2000) {
-                        Claw.setPosition(0);
-                        if (Claw.getPosition() < 0.05) {
+                        RightClaw.setPower(-1);
+                        LeftClaw.setPower(-1);
+                        if (RightClaw.getPower() < -0.95 && LeftClaw.getPower() < -0.95) {
                             ET.reset();
                             programOrder++;
                         }
@@ -327,8 +351,11 @@ public class Sprint2Auto extends LinearOpMode {
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
                         MechDrive.SetTargets(180, 250, 0.4, 1);
-                        SetAttachmentPosition(0, 3763);
-                        programOrder++;
+                        if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
+                            SetAttachmentPosition(0, 3763);
+                            ET.reset();
+                            programOrder++;
+                        }
                     }
                     break;
 
@@ -337,6 +364,7 @@ public class Sprint2Auto extends LinearOpMode {
             }
 
             MechDrive.Task(GyroContinuity());
+            RailControl.RailTask();
             telemetry.addData("backright encoder", BackRight.getCurrentPosition());
             telemetry.addData("gyro", GyroContinuity());
             telemetry.update();
@@ -440,12 +468,7 @@ public class Sprint2Auto extends LinearOpMode {
     }
 
     public void SetAttachmentPosition(int railPos, int basePos) {
-        RailRight.setTargetPosition(railPos);
-        RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        RailRight.setPower(1);
-        RailLeft.setTargetPosition(-railPos);
-        RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        RailLeft.setPower(1);
+        RailControl.SetTargetPosition(railPos, -1, 1);
         RotatingBase.setTargetPosition(basePos);
         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RotatingBase.setPower(1);
