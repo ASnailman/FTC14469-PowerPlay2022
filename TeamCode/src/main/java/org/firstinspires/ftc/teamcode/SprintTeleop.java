@@ -215,8 +215,8 @@ public class SprintTeleop extends LinearOpMode {
                         targetJunction++;
                         break;
                     case 2:
-                        if (ET.milliseconds() > 650) {
-                            RailControl.SetTargetPosition(2000, -1, 1);
+                        if (ET.milliseconds() > 800) {
+                            RailControl.SetTargetPosition(2125, -1, 1);
                             SetBasePosition(0);
                             targetJunction++;
                         }
@@ -229,8 +229,8 @@ public class SprintTeleop extends LinearOpMode {
                         targetJunction++;
                         break;
                     case 5:
-                        if (ET.milliseconds() > 650) {
-                            RailControl.SetTargetPosition(3350, -1, 1);
+                        if (ET.milliseconds() > 800) {
+                            RailControl.SetTargetPosition(3475, -1, 1);
                             SetBasePosition(0);
                             targetJunction++;
                         }
@@ -243,8 +243,8 @@ public class SprintTeleop extends LinearOpMode {
                         targetJunction++;
                         break;
                     case 8:
-                        if (ET.milliseconds() > 650) {
-                            RailControl.SetTargetPosition(4700, -1, 1);
+                        if (ET.milliseconds() > 800) {
+                            RailControl.SetTargetPosition(4825, -1, 1);
                             SetBasePosition(0);
                             targetJunction++;
                         }
@@ -258,8 +258,8 @@ public class SprintTeleop extends LinearOpMode {
                         break;
 
                     case 11:
-                        if (ET.milliseconds() > 650) {
-                            RailControl.SetTargetPosition(200, -1, 1);
+                        if (ET.milliseconds() > 800) {
+                            RailControl.SetTargetPosition(300, -0.5, 0.5);
                             SetBasePosition(0);
                             targetJunction++;
                         }
@@ -375,7 +375,7 @@ public class SprintTeleop extends LinearOpMode {
 //                        LeftClaw.setPosition(0);
                         RightClaw.setPower(-1);
                         LeftClaw.setPower(-1);
-                        RailControl.SetTargetPosition(2000, -1, 1);
+                        RailControl.SetTargetPosition(2125, -1, 1);
                         SetBasePosition(0);
 //                        SetRailPosition(535);
 //                        SetBasePosition(-3763);
@@ -396,7 +396,7 @@ public class SprintTeleop extends LinearOpMode {
 //                        LeftClaw.setPosition(1);
                         RightClaw.setPower(1);
                         LeftClaw.setPower(1);
-                        RailControl.SetTargetPosition(675, -1, 1);
+                        RailControl.SetTargetPosition(800, -1, 1);
                         SetBasePosition(-3763);
                         button_b_already_pressed2 = true;
                     }
@@ -415,7 +415,7 @@ public class SprintTeleop extends LinearOpMode {
 //                        LeftClaw.setPosition(1);
                         RightClaw.setPower(1);
                         LeftClaw.setPower(1);
-                        RailControl.SetTargetPosition(775, -1, 1);
+                        RailControl.SetTargetPosition(900, -1, 1);
                         SetBasePosition(-3763);
                         button_y_already_pressed2 = true;
                     }
@@ -446,6 +446,25 @@ public class SprintTeleop extends LinearOpMode {
             } else {
                 if (!gamepad2.x) {
                     button_x_already_pressed2 = false;
+                }
+            }
+
+            if (!button_dpad_right_already_pressed2) {
+                if (gamepad2.dpad_right) {
+                    //code for releasing cone and resetting base
+                    ClawSetting = true;
+                    coneStackMode = false;
+                    groundJunctionMode = false;
+//                    RightClaw.setPosition(0);
+//                    LeftClaw.setPosition(0);
+                    RightClaw.setPower(1);
+                    LeftClaw.setPower(1);
+                    RailControl.SetTargetPosition(0, -0.7, 0.7);
+                    button_dpad_right_already_pressed2 = true;
+                }
+            } else {
+                if (!gamepad2.dpad_right) {
+                    button_dpad_right_already_pressed2 = false;
                 }
             }
 

@@ -182,7 +182,7 @@ public class SprintAutoRight extends LinearOpMode {
 
                 case 1:
                     if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
-                        SetAttachmentPosition(0, 4803);
+                        SetAttachmentPosition(0, 4953);
                         ET.reset();
                     } else if (RailControl.GetTaskState() == Task_State.DONE) {
                         programOrder++;
@@ -194,7 +194,7 @@ public class SprintAutoRight extends LinearOpMode {
                         if (MechDrive.GetTaskState() == Task_State.INIT ||
                                 MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
-                            MechDrive.SetTargets(0, 2190, 0.36, 1);
+                            MechDrive.SetTargets(0, 2220, 0.355, 1);
                             programOrder++;
                         }
                     }
@@ -203,7 +203,7 @@ public class SprintAutoRight extends LinearOpMode {
                 case 3:
                     if (RotatingBase.getCurrentPosition() >= 4700 && RotatingBase.getCurrentPosition() <= 4900) {
                         if (RailControl.GetTaskState() == Task_State.DONE || RailControl.GetTaskState() == Task_State.READY) {
-                            SetAttachmentPosition(4610, 5644);
+                            SetAttachmentPosition(4660, 3763);
                             programOrder++;
                         }
                     }
@@ -213,24 +213,31 @@ public class SprintAutoRight extends LinearOpMode {
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
                         MechDrive.SetTargets(-90, 140, 0.4, 1);
+                        SetAttachmentPosition(4660, 5750);
                         programOrder++;
                     }
                     break;
 
                 case 5:
-                    if (RailControl.GetTaskState() == Task_State.DONE || RailControl.GetTaskState() == Task_State.READY) {
-                        SetAttachmentPosition(4610, 6272);
-                        programOrder++;
+                    if (RotatingBase.getCurrentPosition() > 5450) {
+                        if (RailControl.GetTaskState() == Task_State.DONE || RailControl.GetTaskState() == Task_State.READY) {
+//                        SetAttachmentPosition(4660, 6272);
+                            SetAttachmentPosition(4660, 5750);
+                            ET.reset();
+                            programOrder++;
+                        }
                     }
                     break;
 
                 case 6:
-                    RightClaw.setPower(-1);
-                    LeftClaw.setPower(-1);
-                    if (RightClaw.getPower() < -0.95 && LeftClaw.getPower() < -0.95) {
-                        programOrder++;
-                        ET.reset();
+                    if (ET.milliseconds() > 1000) {
+                        RightClaw.setPower(-1);
+                        LeftClaw.setPower(-1);
+                        if (RightClaw.getPower() < -0.95 && LeftClaw.getPower() < -0.95) {
+                            programOrder++;
+                            ET.reset();
 //                        programOrder = 15;
+                        }
                     }
                     break;
 
@@ -246,7 +253,7 @@ public class SprintAutoRight extends LinearOpMode {
 
                 case 8:
                     if (RailControl.GetTaskState() == Task_State.DONE || RailControl.GetTaskState() == Task_State.READY) {
-                        SetAttachmentPosition(4610, -200);
+                        SetAttachmentPosition(4660, -200);
                         programOrder++;
                     }
                     break;
@@ -256,7 +263,7 @@ public class SprintAutoRight extends LinearOpMode {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
                             MechDrive.SetTargets(90, 500, 0.4, 1);
-                            SetAttachmentPosition(600, -200);
+                            SetAttachmentPosition(680, -200);
                             programOrder++;
                         }
                     }
@@ -266,7 +273,7 @@ public class SprintAutoRight extends LinearOpMode {
                    if (RotatingBase.getCurrentPosition() < -100) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
-                            MechDrive.SetTargets(90, 485, 0.4, 1);
+                            MechDrive.SetTargets(90, 420, 0.4, 1);
                             ET.reset();
                             programOrder++;
                         }
@@ -288,7 +295,7 @@ public class SprintAutoRight extends LinearOpMode {
                 case 12:
                     if (ET.milliseconds() > 800) {
                         if (RailControl.GetTaskState() == Task_State.DONE || RailControl.GetTaskState() == Task_State.READY) {
-                            SetAttachmentPosition(4610, -200);
+                            SetAttachmentPosition(4660, -200);
                             programOrder++;
                         }
                     }
@@ -298,7 +305,7 @@ public class SprintAutoRight extends LinearOpMode {
                     if (RailRight.getCurrentPosition() > 2000) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
-                            MechDrive.SetTargets(-91, 1220, 0.4, 1);
+                            MechDrive.SetTargets(-91, 1200, 0.4, 1);
                             programOrder++;
                         }
                     }
@@ -306,7 +313,7 @@ public class SprintAutoRight extends LinearOpMode {
 
                 case 14:
                     if (RailControl.GetTaskState() == Task_State.DONE || RailControl.GetTaskState() == Task_State.READY) {
-                        SetAttachmentPosition(4610, 5775);
+                        SetAttachmentPosition(4660, 5690);
                         programOrder++;
                     }
                     break;
@@ -317,9 +324,9 @@ public class SprintAutoRight extends LinearOpMode {
 //                                MechDrive.GetTaskState() == Task_State.DONE) {
 //                            MechDrive.SetTargets(180, 0, 0.4, 1);
 //                            if (RailControl.GetTaskState() == Task_State.DONE || RailControl.GetTaskState() == Task_State.READY) {
-//                                SetAttachmentPosition(4610, 5750);
+//                                SetAttachmentPosition(4660, 5750);
 //                                ET.reset();
-                    if (RotatingBase.getCurrentPosition() > 5700 && RailRight.getCurrentPosition() > 4500) {
+                    if (RotatingBase.getCurrentPosition() > 5640 && RailRight.getCurrentPosition() > 4500) {
                         ET.reset();
                         programOrder++;
                     }
@@ -329,11 +336,11 @@ public class SprintAutoRight extends LinearOpMode {
                     break;
 
                 case 16:
-                    if (ET.milliseconds() > 1000) {
+                    if (ET.milliseconds() > 800) {
                         RightClaw.setPower(-1);
                         LeftClaw.setPower(-1);
                         if (RightClaw.getPower() < -0.95 && LeftClaw.getPower() < -0.95) {
-//                            ET.reset();
+                            ET.reset();
                             programOrder++;
                         }
                     }
@@ -350,7 +357,7 @@ public class SprintAutoRight extends LinearOpMode {
                     break;
 
                 case 18:
-//                    if (ET.milliseconds() > 800) {
+                    if (ET.milliseconds() > 800) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
 
@@ -363,7 +370,7 @@ public class SprintAutoRight extends LinearOpMode {
                             }
                             programOrder++;
                         }
-//                    }
+                    }
                     break;
 
                 case 19:
@@ -376,7 +383,7 @@ public class SprintAutoRight extends LinearOpMode {
 
                 case 20:
                     if (RailControl.GetTaskState() == Task_State.DONE || RailControl.GetTaskState() == Task_State.READY) {
-                        SetAttachmentPosition(4610, 3763);
+                        SetAttachmentPosition(4660, 3763);
                         ET.reset();
                         programOrder++;
                     }
