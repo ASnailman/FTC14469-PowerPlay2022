@@ -38,7 +38,7 @@ public class AutoTest extends LinearOpMode {
     //Sensors
     BNO055IMU IMU;
     OpenCvWebcam webcam;
-    VisionClass.SignalDeterminationPipeline pipeline;
+    VisionClassAutoRight.SignalDeterminationPipeline pipeline;
 
     //Variables of Classes
     Methods motorMethods;
@@ -105,7 +105,7 @@ public class AutoTest extends LinearOpMode {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
-        pipeline = new VisionClass.SignalDeterminationPipeline();
+        pipeline = new VisionClassAutoRight.SignalDeterminationPipeline();
         webcam.setPipeline(pipeline);
         pipeline.InitTelemetry(telemetry);
 

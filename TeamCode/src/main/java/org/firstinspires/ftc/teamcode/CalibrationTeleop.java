@@ -159,7 +159,7 @@ public class CalibrationTeleop extends LinearOpMode {
             BackRight.setPower(BRPower);
 
             /*****************************************************************
-             * Dpad Left/Right (G2) - Calibrate Base
+             * Dpad Left/Right & Button X/B (G2) - Calibrate Base
              *****************************************************************/
             if (!button_dpad_left_already_pressed2) {
                 if (gamepad2.dpad_left) {
@@ -181,6 +181,14 @@ public class CalibrationTeleop extends LinearOpMode {
                 if (!gamepad2.dpad_right) {
                     button_dpad_right_already_pressed2 = false;
                 }
+            }
+
+            if (gamepad2.x) {
+                increase = increase - 1;
+            }
+
+            if (gamepad2.b) {
+                increase = increase + 1;
             }
 
             /*****************************************************************

@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -19,8 +18,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "SprintAuto", group = "MecanumDrive")
-public class SprintAuto extends LinearOpMode {
+@Autonomous(name = "SprintAutoLeft", group = "MecanumDrive")
+public class SprintAutoLeft extends LinearOpMode {
 
     //Control Hub Orientation
     byte AXIS_MAP_CONFIG_BYTE = 0x06; //rotates control hub 90 degrees around y axis by swapping x and z axis
@@ -40,7 +39,7 @@ public class SprintAuto extends LinearOpMode {
     //Sensors
     BNO055IMU IMU;
     OpenCvWebcam webcam;
-    VisionClass.SignalDeterminationPipeline pipeline;
+    VisionClassAutoLeft.SignalDeterminationPipeline pipeline;
 
     //Variables of Classes
     Methods motorMethods;
@@ -119,7 +118,7 @@ public class SprintAuto extends LinearOpMode {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
-        pipeline = new VisionClass.SignalDeterminationPipeline();
+        pipeline = new VisionClassAutoLeft.SignalDeterminationPipeline();
         webcam.setPipeline(pipeline);
         pipeline.InitTelemetry(telemetry);
 
@@ -153,19 +152,19 @@ public class SprintAuto extends LinearOpMode {
             switch (programOrder) {
 
                 case 0:
-                    if (pipeline.type == VisionClass.SignalDeterminationPipeline.SignalSleeveType.LocationONE) {
+                    if (pipeline.type == VisionClassAutoLeft.SignalDeterminationPipeline.SignalSleeveType.LocationONE) {
                         posOne = true;
                         posTwo = false;
                         posThree = false;
                         LeftClaw.setPower(1);
                         RightClaw.setPower(1);
-                    } else if (pipeline.type == VisionClass.SignalDeterminationPipeline.SignalSleeveType.LocationTWO) {
+                    } else if (pipeline.type == VisionClassAutoLeft.SignalDeterminationPipeline.SignalSleeveType.LocationTWO) {
                         posOne = false;
                         posTwo = true;
                         posThree = false;
                         LeftClaw.setPower(1);
                         RightClaw.setPower(1);
-                    } else if (pipeline.type == VisionClass.SignalDeterminationPipeline.SignalSleeveType.LocationTHREE) {
+                    } else if (pipeline.type == VisionClassAutoLeft.SignalDeterminationPipeline.SignalSleeveType.LocationTHREE) {
                         posOne = false;
                         posTwo = false;
                         posThree = true;
@@ -183,7 +182,7 @@ public class SprintAuto extends LinearOpMode {
 
                 case 1:
                     if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
-                        SetAttachmentPosition(0, 4803);
+                        SetAttachmentPosition(0, -4903);
                         ET.reset();
                     }
                     else if (RailControl.GetTaskState() == Task_State.DONE) {
@@ -196,7 +195,7 @@ public class SprintAuto extends LinearOpMode {
                         if (MechDrive.GetTaskState() == Task_State.INIT ||
                                 MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
-                            MechDrive.SetTargets(0, 2275, 0.38, 1);
+                            MechDrive.SetTargets(0, 2350, 0.35, 1);
                                 programOrder++;
 
                         }
@@ -204,50 +203,50 @@ public class SprintAuto extends LinearOpMode {
                     break;
 
                 case 3:
-                    if (RotatingBase.getCurrentPosition() >= 4700 && RotatingBase.getCurrentPosition() <= 4900) {
+                    if (RotatingBase.getCurrentPosition() <= -4700 && RotatingBase.getCurrentPosition() >= -4900) {
                         if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
-                            SetAttachmentPosition(4610, 5644);
+                            SetAttachmentPosition(4610, -4903);
                             programOrder++;
                         }
                     }
                     break;
 
                 case 4:
-                    if (MechDrive.GetTaskState() == Task_State.READY ||
-                            MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(-90, 140, 0.4, 1);
+//                    if (MechDrive.GetTaskState() == Task_State.READY ||
+//                            MechDrive.GetTaskState() == Task_State.DONE) {
+//                        MechDrive.SetTargets(90, 70, 0.4, 1);
                         programOrder++;
-                    }
+//                    }
                     break;
 
                 case 5:
                     if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
-                        SetAttachmentPosition(4610, 6272);
+                        SetAttachmentPosition(4610, -5644);
+                        ET.reset();
                         programOrder++;
                     }
                     break;
 
                 case 6:
-                    if ( (MechDrive.GetTaskState() == Task_State.READY || MechDrive.GetTaskState() == Task_State.DONE)
-                            && (RailRight.getCurrentPosition() >= 4450 && RailRight.getCurrentPosition() <= 4750)
-                            && (RotatingBase.getCurrentPosition() >= 6200 && RotatingBase.getCurrentPosition() <= 6400)
-                    ) {
+                    if (ET.milliseconds() > 1000) {
                         RightClaw.setPower(-1);
                         LeftClaw.setPower(-1);
                         if (RightClaw.getPower() < -0.95 && LeftClaw.getPower() < -0.95) {
                             ET.reset();
-                            programOrder++;
+//                            programOrder++;
+                            programOrder = 15;
                         }
                     }
                     break;
 
                 case 7:
-                    if (ET.milliseconds() > 500) {
+                    if (ET.milliseconds() > 1000) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
-                            MechDrive.SetTargets(90, 1450, 0.4, 1);
+                            MechDrive.SetTargets(-90, 1080, 0.4, 1);
                             if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
-                                SetAttachmentPosition(600, -100);
+                                SetAttachmentPosition(600, 200);
+                                ET.reset();
                                 programOrder++;
                             }
                         }
@@ -255,21 +254,21 @@ public class SprintAuto extends LinearOpMode {
                     break;
 
                 case 8:
-//                    if (RailRight.getCurrentPosition() <= 800) {
+                    if (ET.milliseconds() > 1000) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
-                                MechDrive.SetTargets(90, 455, 0.4, 1);
+                                MechDrive.SetTargets(-90, 355, 0.4, 1);
                                 if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
-                                    SetAttachmentPosition(570, -100);
+                                    SetAttachmentPosition(590, 200);
                                     ET.reset();
                                     programOrder++;
                                 }
                             }
-//                        }
+                    }
                     break;
 
                 case 9:
-                    if (RotatingBase.getCurrentPosition() < -70 &&
+                    if (RotatingBase.getCurrentPosition() > 70 &&
                             ET.milliseconds() > 1000) {
                         RightClaw.setPower(1);
                         LeftClaw.setPower(1);
@@ -292,7 +291,7 @@ public class SprintAuto extends LinearOpMode {
                 case 11:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(-92, 1730, 0.4, 1);
+                        MechDrive.SetTargets(92, 1730, 0.4, 1);
                         programOrder++;
                     }
                     break;
@@ -303,7 +302,7 @@ public class SprintAuto extends LinearOpMode {
                                 MechDrive.GetTaskState() == Task_State.DONE) {
                             MechDrive.SetTargets(180, 0, 0.4, 1);
                             if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
-                                SetAttachmentPosition(4660, 3763);
+                                SetAttachmentPosition(4660, -3763);
                                 ET.reset();
                                 programOrder++;
                             }
@@ -312,7 +311,7 @@ public class SprintAuto extends LinearOpMode {
                     break;
 
                 case 13:
-                    if (RotatingBase.getCurrentPosition() >= 3700 && ET.milliseconds() > 2000) {
+                    if (RotatingBase.getCurrentPosition() <= -3650 && ET.milliseconds() > 2000) {
                         RightClaw.setPower(-1);
                         LeftClaw.setPower(-1);
                         if (RightClaw.getPower() < -0.95 && LeftClaw.getPower() < -0.95) {
@@ -326,25 +325,27 @@ public class SprintAuto extends LinearOpMode {
                     if (ET.milliseconds() > 500) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
-                            MechDrive.SetTargets(90, 850, 0.4, 1);
+                            MechDrive.SetTargets(-90, 850, 0.4, 1);
                             programOrder++;
                         }
                     }
                     break;
 
                 case 15:
+                    if (ET.milliseconds() > 800) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
 
                             if (posOne) {
-                                MechDrive.SetTargets(-90, 800, 0.4, 1);
+                                MechDrive.SetTargets(-90, 1240, 0.4, 1);
                             } else if (posTwo) {
-                                MechDrive.SetTargets(90, 0, 0, 1);
+                                MechDrive.SetTargets(90, 100, 0, 1);
                             } else if (posThree) {
-                                MechDrive.SetTargets(90, 2000, 0.4, 1);
+                                MechDrive.SetTargets(90, 1310, 0.4, 1);
                             }
                             programOrder++;
                         }
+                    }
                     break;
 
                 case 16:
@@ -352,10 +353,17 @@ public class SprintAuto extends LinearOpMode {
                             MechDrive.GetTaskState() == Task_State.DONE) {
                         MechDrive.SetTargets(180, 250, 0.4, 1);
                         if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
-                            SetAttachmentPosition(0, 3763);
+                            SetAttachmentPosition(0, -3763);
                             ET.reset();
                             programOrder++;
                         }
+                    }
+                    break;
+
+                case 17:
+                    if (RotatingBase.getCurrentPosition() > -5300) {
+                        SetAttachmentPosition(0, -3763);
+                        programOrder++;
                     }
                     break;
 
