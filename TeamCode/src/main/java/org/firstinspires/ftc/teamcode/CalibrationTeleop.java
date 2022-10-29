@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -35,6 +37,11 @@ public class CalibrationTeleop extends LinearOpMode {
     static DcMotor RotatingBase;
     static CRServo RightClaw;
     static CRServo LeftClaw;
+
+    static NormalizedColorSensor rightColorsensor;
+    static NormalizedColorSensor leftColorsensor;
+    static DistanceSensor rightDistanceSensor;
+    static DistanceSensor leftDistanceSensor;
 
     //Sensors
     BNO055IMU IMU;
@@ -83,6 +90,11 @@ public class CalibrationTeleop extends LinearOpMode {
         RailRight = hardwareMap.get(DcMotor.class, "RailRight");
         RotatingBase = hardwareMap.get(DcMotor.class, "RotatingBase");
         IMU = hardwareMap.get(BNO055IMU.class, "imu");
+
+        rightColorsensor = hardwareMap.get(NormalizedColorSensor.class, "rightColorSensor");
+        leftColorsensor = hardwareMap.get(NormalizedColorSensor.class, "leftColorSensor");
+        rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "rightDistanceSensor");
+        leftDistanceSensor = hardwareMap.get(DistanceSensor.class, "leftDistanceSensor");
 
         //Configure the control hub orientation
         IMU.write8(BNO055IMU.Register.OPR_MODE, BNO055IMU.SensorMode.CONFIG.bVal & 0x0F);
@@ -163,7 +175,7 @@ public class CalibrationTeleop extends LinearOpMode {
              *****************************************************************/
             if (!button_dpad_left_already_pressed2) {
                 if (gamepad2.dpad_left) {
-                    increase = increase - 25;
+                    increase = increase - 5;
                     button_dpad_left_already_pressed2 = true;
                 }
             } else {
@@ -174,7 +186,7 @@ public class CalibrationTeleop extends LinearOpMode {
 
             if (!button_dpad_right_already_pressed2) {
                 if (gamepad2.dpad_right) {
-                    increase = increase + 25;
+                    increase = increase + 5;
                     button_dpad_right_already_pressed2 = true;
                 }
             } else {
@@ -199,7 +211,7 @@ public class CalibrationTeleop extends LinearOpMode {
                 if (gamepad2.right_bumper) {
                     RotatingBase.setTargetPosition(increase);
                     RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    RotatingBase.setPower(1);
+                    RotatingBase.setPower(0.5);
                     button_bumper_right_already_pressed2 = true;
                 }
             } else {

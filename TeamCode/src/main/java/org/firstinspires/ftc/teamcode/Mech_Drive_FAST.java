@@ -126,10 +126,17 @@ public class Mech_Drive_FAST {
                 frpower = (power_y_new - 1.1 * power_x_new - steeringoutput) / denominator;
                 brpower = (power_y_new + 1.1 * power_x_new - steeringoutput) / denominator;
 
-                FrontLeft.setPower(flpower);
-                FrontRight.setPower(frpower);
-                BackLeft.setPower(blpower);
-                BackRight.setPower(brpower);
+                if (targetdistance == 0) {
+                    FrontLeft.setPower(0);
+                    FrontRight.setPower(0);
+                    BackLeft.setPower(0);
+                    BackRight.setPower(0);
+                } else {
+                    FrontLeft.setPower(flpower);
+                    FrontRight.setPower(frpower);
+                    BackLeft.setPower(blpower);
+                    BackRight.setPower(brpower);
+                }
             }
             else {
                 FrontLeft.setPower(0);

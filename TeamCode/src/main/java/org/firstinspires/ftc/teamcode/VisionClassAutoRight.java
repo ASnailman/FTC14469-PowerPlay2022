@@ -51,10 +51,10 @@ public class VisionClassAutoRight {
          */
 
         static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(60,85);
-        static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(630,240);
+        static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(640,210);
         static final Point REGION3_TOPLEFT_ANCHOR_POINT = new Point(1050,65);
-        static final int REGION_WIDTH = 50;
-        static final int REGION_HEIGHT = 50;
+        static final int REGION_WIDTH = 40;
+        static final int REGION_HEIGHT = 40;
 
         static final int SIGNAL_SLEEVE_THRESHOLD = 10;
 
@@ -239,7 +239,7 @@ public class VisionClassAutoRight {
             DifferenceTWO = Avg2() + SIGNAL_SLEEVE_THRESHOLD;
             DifferenceTHREE = Avg2() + SIGNAL_SLEEVE_THRESHOLD;
 
-            if ((DifferenceONE > 40) && (DifferenceONE < 75)) { // Was it from region 1?
+            if ((DifferenceONE > 60) && (DifferenceONE < 95)) { // Was it from region 1?
 
                 type = SignalSleeveType.LocationONE; // Record our analysis
 
@@ -271,7 +271,7 @@ public class VisionClassAutoRight {
                         4); // Negative thickness means solid fill
             }
 
-            else if ((DifferenceTHREE > 95) && (DifferenceTHREE < 135)) { // Was it from region 3?
+            else if ((DifferenceTHREE > 105) && (DifferenceTHREE < 135)) { // Was it from region 3?
 
                 type = SignalSleeveType.LocationTHREE; // Record our analysis
 

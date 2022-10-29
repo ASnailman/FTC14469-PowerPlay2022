@@ -1,17 +1,23 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -41,6 +47,11 @@ public class SprintAutoLeft extends LinearOpMode {
     OpenCvWebcam webcam;
     VisionClassAutoLeft.SignalDeterminationPipeline pipeline;
 
+    static NormalizedColorSensor rightColorsensor;
+    static NormalizedColorSensor leftColorsensor;
+    static DistanceSensor rightDistanceSensor;
+    static DistanceSensor leftDistanceSensor;
+
     //Variables of Classes
     Methods motorMethods;
     Mech_Drive_FAST MechDrive;
@@ -64,6 +75,11 @@ public class SprintAutoLeft extends LinearOpMode {
     boolean posTwo;
     boolean posThree;
 
+    boolean red;
+    boolean blue;
+    boolean unknown;
+    double distance;
+
     public void runOpMode() {
 
         //Initialize the motors and sensors
@@ -77,6 +93,11 @@ public class SprintAutoLeft extends LinearOpMode {
         RailLeft = hardwareMap.get(DcMotor.class, "RailLeft");
         RotatingBase = hardwareMap.get(DcMotor.class, "RotatingBase");
         IMU = hardwareMap.get(BNO055IMU.class, "imu");
+
+        rightColorsensor = hardwareMap.get(NormalizedColorSensor.class, "rightColorSensor");
+        leftColorsensor = hardwareMap.get(NormalizedColorSensor.class, "leftColorSensor");
+        rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "rightDistanceSensor");
+        leftDistanceSensor = hardwareMap.get(DistanceSensor.class, "leftDistanceSensor");
 
         //Configure the control hub orientation
         IMU.write8(BNO055IMU.Register.OPR_MODE, BNO055IMU.SensorMode.CONFIG.bVal & 0x0F);
@@ -372,6 +393,7 @@ public class SprintAutoLeft extends LinearOpMode {
                     break;
             }
 
+
             MechDrive.Task(GyroContinuity());
             RailControl.RailTask();
             telemetry.addData("backright encoder", BackRight.getCurrentPosition());
@@ -482,6 +504,112 @@ public class SprintAutoLeft extends LinearOpMode {
         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RotatingBase.setPower(1);
 
+    }
+
+    private int rightColorSensorLineDetector() {
+
+        float[] rHSV = new float[3];
+        NormalizedRGBA rightRGBA = rightColorsensor.getNormalizedColors();
+        rightColorsensor.setGain(30);
+
+        Color.colorToHSV(rightRGBA.toColor(), rHSV);
+        telemetry.addData("Right H:", rHSV[0]);
+        telemetry.addData("Right S:", rHSV[1]);
+        telemetry.addData("Right V:", rHSV[2]);
+
+        int Blue = 2;
+        int Red = 1;
+        int Unknown = 0;
+
+        //Right Colorsensor from front of Robot
+        if (rHSV[1] >= 0 && rHSV[1] <= 0.45) {
+            telemetry.addData("Color:", "Blue");
+//            telemetry.update();
+            blue = true;
+            red = false;
+            unknown = false;
+            return Blue;
+        } else if (rHSV[1] >= 0.5 && rHSV[1] <= 0.8) {
+            telemetry.addData("Color:", "Red");
+//            telemetry.update();
+            blue = false;
+            red = true;
+            unknown = false;
+            return Red;
+        } else {
+            telemetry.addData("Color:", "Unknown");
+//            telemetry.update();
+            blue = false;
+            red = false;
+            unknown = true;
+            return Unknown;
+        }
+    }
+
+//    private int leftColorSensorLineDetector() {
+//
+//        float[] lHSV = new float[3];
+//        NormalizedRGBA leftRGBA = leftColorsensor.getNormalizedColors();
+//        leftColorsensor.setGain(30);
+//
+//        Color.colorToHSV(leftRGBA.toColor(), lHSV);
+//        telemetry.addData("Left H:", lHSV[0]);
+//        telemetry.addData("Left S:", lHSV[1]);
+//        telemetry.addData("Left V:", lHSV[2]);
+//
+//        int Blue = 2;
+//        int Red = 1;
+//        int Unknown = 0;
+//
+//        //Left Colorsensor from front of Robot
+//        if (lHSV[1] >= 0 && lHSV[1] <= 0.45) {
+//            telemetry.addData("Color:", "Blue");
+//            telemetry.update();
+//            blue = true;
+//            red = false;
+//            unknown = false;
+//            return Blue;
+//        } else if (lHSV[1] >= 0.5 && lHSV[1] <= 0.8) {
+//            telemetry.addData("Color:", "Red");
+//            telemetry.update();
+//            blue = false;
+//            red = true;
+//            unknown = false;
+//            return Red;
+//        } else {
+//            telemetry.addData("Color:", "Unknown");
+//            telemetry.update();
+//            blue = false;
+//            red = false;
+//            unknown = true;
+//            return Unknown;
+//        }
+//    }
+
+    //From Back of robot
+    private void rightWallDetector() {
+        distance = rightDistanceSensor.getDistance(DistanceUnit.CM);
+        telemetry.addData("Right Distance Sensor", distance);
+//        if (distance < 10) {
+//            //Motor Power Zero
+//            //Increase Case
+//            programOrder++;
+//        } else {
+//            //Motor Power On
+//        }
+    }
+
+    //From Back of robot
+    private void leftWallDetector() {
+        distance = leftDistanceSensor.getDistance(DistanceUnit.CM);
+        telemetry.addData("Left Distance Sensor", distance);
+//        if (distance < 10) {
+//            //Motor Power Zero
+//            //Increase Case
+//            programOrder++;
+//        } else {
+//            //Motor Power On
+//        }
     }
 
 }
