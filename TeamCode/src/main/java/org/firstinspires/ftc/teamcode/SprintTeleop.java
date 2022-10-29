@@ -51,11 +51,13 @@ public class SprintTeleop extends LinearOpMode {
     int rightHighPickup = 0;
     int resetSequence = 0;
     int targetJunction = 0;
+    int baseManualReset = 0;
     double movement;
     boolean PowerSetting = true;
     boolean ClawSetting = false;
     boolean coneStackMode = false;
     boolean groundJunctionMode = false;
+    int basePosition;
 
     //Gyrocontinuity Variables
     double current_value;
@@ -76,6 +78,9 @@ public class SprintTeleop extends LinearOpMode {
     boolean button_dpad_left_already_pressed2 = false;
     boolean button_dpad_up_already_pressed2 = false;
     boolean button_dpad_down_already_pressed2 = false;
+    boolean button_left_trigger_already_pressed2 = false;
+    boolean button_right_trigger_already_pressed2 = false;
+    boolean double_trigger_already_pressed = false;
 
     public void runOpMode() {
 
@@ -497,7 +502,7 @@ public class SprintTeleop extends LinearOpMode {
 
             if (!button_bumper_right_already_pressed2) {
                 if (gamepad2.right_bumper) {
-                    RotatingBase.setTargetPosition(-3763);
+                    RotatingBase.setTargetPosition(-1020);
                     RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     RotatingBase.setPower(1);
                     button_bumper_right_already_pressed2 = true;
@@ -514,7 +519,7 @@ public class SprintTeleop extends LinearOpMode {
 
             if (!button_bumper_left_already_pressed2) {
                 if (gamepad2.left_bumper) {
-                    RotatingBase.setTargetPosition(3763);
+                    RotatingBase.setTargetPosition(1020);
                     RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     RotatingBase.setPower(1);
                     button_bumper_left_already_pressed2 = true;
@@ -523,6 +528,73 @@ public class SprintTeleop extends LinearOpMode {
                 if (!gamepad2.left_bumper) {
                     button_bumper_left_already_pressed2 = false;
                 }
+            }
+
+            /******************************************
+             * Trigger (G2) Manual Calibration For Rotating Base
+             ******************************************/
+
+            if (button_left_trigger_already_pressed2 == false) {
+                if (gamepad2.left_trigger > 0 && gamepad2.right_trigger == 0) {
+
+                    basePosition = basePosition + 10;
+                    baseManualReset = 1;
+
+                    button_left_trigger_already_pressed2 = true;
+                }
+            } else {
+                if (gamepad2.left_trigger == 0) {
+                    baseManualReset = 0;
+                    button_left_trigger_already_pressed2 = false;
+                }
+            }
+
+            if (button_right_trigger_already_pressed2 == false) {
+                if (gamepad2.right_trigger > 0 && gamepad2.left_trigger == 0) {
+
+                    basePosition = basePosition - 10;
+                    baseManualReset = 1;
+
+                    button_right_trigger_already_pressed2 = true;
+                }
+            } else {
+                if (gamepad2.right_trigger == 0) {
+                    baseManualReset = 0;
+                    button_right_trigger_already_pressed2 = false;
+                }
+            }
+
+            if (double_trigger_already_pressed == false) {
+                if (gamepad2.right_trigger > 0 && gamepad2.left_trigger > 0) {
+//                    RotatingBase.setTargetPosition(0);
+//                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    RotatingBase.setPower(0);
+                    RotatingBase.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    RotatingBase.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    double_trigger_already_pressed = true;
+                }
+            } else {
+                if (gamepad2.right_trigger == 0 && gamepad2.left_trigger == 0) {
+                    double_trigger_already_pressed = false;
+                }
+            }
+
+            switch (baseManualReset) {
+
+                case 1:
+
+                    baseManualReset++;
+                    break;
+
+                case 2:
+                    RotatingBase.setTargetPosition(basePosition);
+                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    RotatingBase.setPower(0);
+                    baseManualReset++;
+                    break;
+
+                default:
+                    break;
             }
 
             RailControl.RailTask();
