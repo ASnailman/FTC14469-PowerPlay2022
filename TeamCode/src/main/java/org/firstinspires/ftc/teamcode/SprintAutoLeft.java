@@ -92,9 +92,6 @@ public class SprintAutoLeft extends LinearOpMode {
         //Claw Presets
         LeftClaw.setDirection(CRServo.Direction.REVERSE);
         RightClaw.setDirection(CRServo.Direction.FORWARD);
-        LeftClaw.setPower(1);
-        RightClaw.setPower(1);
-        sleep(700);
         LeftClaw.setPower(0);
         RightClaw.setPower(0);
 
@@ -158,30 +155,34 @@ public class SprintAutoLeft extends LinearOpMode {
                         posThree = false;
                         LeftClaw.setPower(1);
                         RightClaw.setPower(1);
+                        ET.reset();
                     } else if (pipeline.type == VisionClassAutoLeft.SignalDeterminationPipeline.SignalSleeveType.LocationTWO) {
                         posOne = false;
                         posTwo = true;
                         posThree = false;
                         LeftClaw.setPower(1);
                         RightClaw.setPower(1);
+                        ET.reset();
                     } else if (pipeline.type == VisionClassAutoLeft.SignalDeterminationPipeline.SignalSleeveType.LocationTHREE) {
                         posOne = false;
                         posTwo = false;
                         posThree = true;
                         LeftClaw.setPower(1);
                         RightClaw.setPower(1);
+                        ET.reset();
                     } else {
-                        posOne = true;
-                        posTwo = false;
+                        posOne = false;
+                        posTwo = true;
                         posThree = false;
                         LeftClaw.setPower(1);
                         RightClaw.setPower(1);
+                        ET.reset();
                     }
                     programOrder++;
                     break;
 
                 case 1:
-                    if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
+                    if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY && ET.milliseconds() > 2000) {
                         SetAttachmentPosition(0, -4903);
                         ET.reset();
                     }
