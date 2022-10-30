@@ -9,7 +9,7 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-public class VisionClassAutoLeft {
+public class VisionClassAutoLeftBlue {
 
 //    static int Difference;
     static int DifferenceONE;
@@ -50,12 +50,12 @@ public class VisionClassAutoLeft {
          */
 
         static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(60,85);
-        static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(550,210);
+        static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(520,210);
         static final Point REGION3_TOPLEFT_ANCHOR_POINT = new Point(1050,65);
         static final int REGION_WIDTH = 40;
         static final int REGION_HEIGHT = 40;
 
-        static final int SIGNAL_SLEEVE_THRESHOLD = 10;
+        static final int SIGNAL_SLEEVE_THRESHOLD = 5;
 
         Telemetry telemetry_vision;
 
