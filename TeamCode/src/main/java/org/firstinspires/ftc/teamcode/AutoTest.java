@@ -43,7 +43,7 @@ public class AutoTest extends LinearOpMode {
     static CRServo RightClaw;
 
     static NormalizedColorSensor rightColorsensor;
-//    static NormalizedColorSensor leftColorsensor;
+    static NormalizedColorSensor leftColorsensor;
     static DistanceSensor rightDistanceSensor;
     static DistanceSensor leftDistanceSensor;
 
@@ -72,9 +72,12 @@ public class AutoTest extends LinearOpMode {
     boolean posTwo;
     boolean posThree;
 
-    boolean red;
-    boolean blue;
-    boolean unknown;
+    boolean rightRed;
+    boolean rightBlue;
+    boolean rightUnknown;
+    boolean leftRed;
+    boolean leftBlue;
+    boolean leftUnknown;
     double distance;
 
     ElapsedTime ET = new ElapsedTime();
@@ -94,7 +97,7 @@ public class AutoTest extends LinearOpMode {
         IMU = hardwareMap.get(BNO055IMU.class, "imu");
 
         rightColorsensor = hardwareMap.get(NormalizedColorSensor.class, "rightColorSensor");
-//        leftColorsensor = hardwareMap.get(NormalizedColorSensor.class, "leftColorSensor");
+        leftColorsensor = hardwareMap.get(NormalizedColorSensor.class, "leftColorSensor");
         rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "rightDistanceSensor");
         leftDistanceSensor = hardwareMap.get(DistanceSensor.class, "leftDistanceSensor");
 
@@ -235,13 +238,14 @@ public class AutoTest extends LinearOpMode {
                     break;
             }
 
-//            leftColorSensorLineDetector();
+            leftColorSensorLineDetector();
             rightColorSensorLineDetector();
-            rightWallDetector();
-            leftWallDetector();
-            MechDrive.Task(GyroContinuity());
-            telemetry.addData("backright encoder", BackRight.getCurrentPosition());
-            telemetry.addData("gyro", GyroContinuity());
+
+//            rightWallDetector();
+//            leftWallDetector();
+//            MechDrive.Task(GyroContinuity());
+//            telemetry.addData("backright encoder", BackRight.getCurrentPosition());
+//            telemetry.addData("gyro", GyroContinuity());
             telemetry.update();
         }
 
@@ -366,74 +370,74 @@ public class AutoTest extends LinearOpMode {
         telemetry.addData("Right S:", rHSV[1]);
         telemetry.addData("Right V:", rHSV[2]);
 
-        int Blue = 2;
-        int Red = 1;
-        int Unknown = 0;
+        int rBlue = 2;
+        int rRed = 1;
+        int rUnknown = 0;
 
-        //Right Colorsensor from front of Robot
-        if (rHSV[1] >= 0 && rHSV[1] <= 0.45) {
+        //Right Colorsensor from back of Robot
+        if (rHSV[0] >= 200 && rHSV[0] <= 230) {
             telemetry.addData("Color:", "Blue");
 //            telemetry.update();
-            blue = true;
-            red = false;
-            unknown = false;
-            return Blue;
-        } else if (rHSV[1] >= 0.5 && rHSV[1] <= 0.8) {
+            rightBlue = true;
+            rightRed = false;
+            rightUnknown = false;
+            return rBlue;
+        } else if (rHSV[0] >= 10 && rHSV[0] <= 50) {
             telemetry.addData("Color:", "Red");
 //            telemetry.update();
-            blue = false;
-            red = true;
-            unknown = false;
-            return Red;
+            rightBlue = false;
+            rightRed = true;
+            rightUnknown = false;
+            return rRed;
         } else {
             telemetry.addData("Color:", "Unknown");
 //            telemetry.update();
-            blue = false;
-            red = false;
-            unknown = true;
-            return Unknown;
+            rightBlue = false;
+            rightRed = false;
+            rightUnknown = true;
+            return rUnknown;
         }
     }
 
-//    private int leftColorSensorLineDetector() {
-//
-//        float[] lHSV = new float[3];
-//        NormalizedRGBA leftRGBA = leftColorsensor.getNormalizedColors();
-//        leftColorsensor.setGain(30);
-//
-//        Color.colorToHSV(leftRGBA.toColor(), lHSV);
-//        telemetry.addData("Left H:", lHSV[0]);
-//        telemetry.addData("Left S:", lHSV[1]);
-//        telemetry.addData("Left V:", lHSV[2]);
-//
-//        int Blue = 2;
-//        int Red = 1;
-//        int Unknown = 0;
-//
-//        //Left Colorsensor from front of Robot
-//        if (lHSV[1] >= 0 && lHSV[1] <= 0.45) {
-//            telemetry.addData("Color:", "Blue");
-//            telemetry.update();
-//            blue = true;
-//            red = false;
-//            unknown = false;
-//            return Blue;
-//        } else if (lHSV[1] >= 0.5 && lHSV[1] <= 0.8) {
-//            telemetry.addData("Color:", "Red");
-//            telemetry.update();
-//            blue = false;
-//            red = true;
-//            unknown = false;
-//            return Red;
-//        } else {
-//            telemetry.addData("Color:", "Unknown");
-//            telemetry.update();
-//            blue = false;
-//            red = false;
-//            unknown = true;
-//            return Unknown;
-//        }
-//    }
+    private int leftColorSensorLineDetector() {
+
+        float[] lHSV = new float[3];
+        NormalizedRGBA leftRGBA = leftColorsensor.getNormalizedColors();
+        leftColorsensor.setGain(30);
+
+        Color.colorToHSV(leftRGBA.toColor(), lHSV);
+        telemetry.addData("Left H:", lHSV[0]);
+        telemetry.addData("Left S:", lHSV[1]);
+        telemetry.addData("Left V:", lHSV[2]);
+
+        int lBlue = 2;
+        int lRed = 1;
+        int lUnknown = 0;
+
+        //Left Colorsensor from back of Robot
+        if (lHSV[0] >= 190 && lHSV[0] <= 240) {
+            telemetry.addData("Color:", "Blue");
+            telemetry.update();
+            leftBlue = true;
+            leftRed = false;
+            leftUnknown = false;
+            return lBlue;
+        } else if (lHSV[0] >= 10 && lHSV[0] <= 50) {
+            telemetry.addData("Color:", "Red");
+            telemetry.update();
+            leftBlue = false;
+            leftRed = true;
+            leftUnknown = false;
+            return lRed;
+        } else {
+            telemetry.addData("Color:", "Unknown");
+            telemetry.update();
+            leftBlue = false;
+            leftRed = false;
+            leftUnknown = true;
+            return lUnknown;
+        }
+    }
 
     //From Back of robot
     private void rightWallDetector() {

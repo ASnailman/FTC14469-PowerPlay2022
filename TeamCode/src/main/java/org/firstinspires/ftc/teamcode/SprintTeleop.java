@@ -442,6 +442,7 @@ public class SprintTeleop extends LinearOpMode {
                         ClawSetting = false;
                         coneStackMode = false;
                         groundJunctionMode = false;
+                        lowJunctionResetMode = false;
                         RightClaw.setPower(-1);
                         LeftClaw.setPower(-1);
                         RailControl.SetTargetPosition(0, -0.7, 0.7);

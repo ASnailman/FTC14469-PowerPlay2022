@@ -372,7 +372,7 @@ public class SprintAutoLeftBlue extends LinearOpMode {
                     break;
 
                 case 15:
-                    if (RotatingBase.getCurrentPosition() < 50 &&
+                    if (RotatingBase.getCurrentPosition() > -50 &&
                             ET.milliseconds() > 700) {
                         RightClaw.setPower(1);
                         LeftClaw.setPower(1);

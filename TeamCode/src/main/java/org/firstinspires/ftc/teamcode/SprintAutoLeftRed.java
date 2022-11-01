@@ -233,7 +233,7 @@ public class SprintAutoLeftRed extends LinearOpMode {
                     if (ET.milliseconds() > 600) {
                         if (RotatingBase.getCurrentPosition() <= -490 && RotatingBase.getCurrentPosition() >= -590) {
                             if (RailControl.GetTaskState() == Task_State.DONE || RailControl.GetTaskState() == Task_State.READY) {
-                                SetAttachmentPosition(400, -1300);
+                                SetAttachmentPosition(400, -1250);
                                 programOrder++;
                             }
                         }
@@ -250,10 +250,10 @@ public class SprintAutoLeftRed extends LinearOpMode {
                     break;
 
                 case 5:
-                    if (RotatingBase.getCurrentPosition() <= -1250 && RotatingBase.getCurrentPosition() >= -1350) {
+                    if (RotatingBase.getCurrentPosition() <= -1200 && RotatingBase.getCurrentPosition() >= -1300) {
                         if (RailControl.GetTaskState() == Task_State.DONE || RailControl.GetTaskState() == Task_State.READY) {
 //                            SetAttachmentPosition(4660, 1020);
-                            SetAttachmentPosition(4660, -1440);
+                            SetAttachmentPosition(4660, -1250);
                             programOrder++;
                         }
                     }
@@ -262,7 +262,7 @@ public class SprintAutoLeftRed extends LinearOpMode {
                 case 6:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(90, 50, 0.4, 1);
+                        MechDrive.SetTargets(90, 0, 0.4, 1);
                         SetAttachmentPosition(4660, -1570);
                         programOrder++;
                     }
@@ -280,7 +280,7 @@ public class SprintAutoLeftRed extends LinearOpMode {
                     break;
 
                 case 8:
-                    if (ET.milliseconds() > 1200) {
+                    if (ET.milliseconds() > 1400) {
                         RightClaw.setPower(-1);
                         LeftClaw.setPower(-1);
                         if (RightClaw.getPower() < -0.95 && LeftClaw.getPower() < -0.95) {
@@ -357,23 +357,24 @@ public class SprintAutoLeftRed extends LinearOpMode {
                     break;
 
                 case 14:
-                    if (MechDrive.GetTaskState() == Task_State.READY ||
-                            MechDrive.GetTaskState() == Task_State.DONE) {
+//                    if (MechDrive.GetTaskState() == Task_State.READY ||
+//                            MechDrive.GetTaskState() == Task_State.DONE) {
 //                              MechDrive.SetTargets(90, 920, 0.4, 1);
                         if (repeat == 0) {
-                            MechDrive.SetTargets(-90, 180, 0.4, 1);
+                            MechDrive.SetTargets(-88, 550, 0.4, 1);
                             ET.reset();
+                            programOrder++;
                         } else if (repeat == 1) {
-                            MechDrive.SetTargets(-90, 200, 0.4, 1);
+                            MechDrive.SetTargets(-88, 550, 0.4, 1);
                             ET.reset();
+                            programOrder++;
                         }
-                        programOrder++;
-                    }
+//                        programOrder++;
+//                    }
                     break;
 
                 case 15:
-                    if (RotatingBase.getCurrentPosition() < 50 &&
-                            ET.milliseconds() > 700) {
+                    if (RotatingBase.getCurrentPosition() > -50 && ET.milliseconds() > 700) {
                         RightClaw.setPower(1);
                         LeftClaw.setPower(1);
                         if (RightClaw.getPower() > 0.95 && LeftClaw.getPower() > 0.95) {
@@ -455,8 +456,8 @@ public class SprintAutoLeftRed extends LinearOpMode {
                         ET.reset();
                     }
                     else if (repeat == 0) {
-                        programOrder = 9;
                         repeat++;
+                        programOrder = 9;
                         ET.reset();
                     }
                     break;
