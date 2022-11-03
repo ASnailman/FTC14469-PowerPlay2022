@@ -60,6 +60,9 @@ public class SprintTeleop extends LinearOpMode {
     boolean groundJunctionMode = false;
     int basePosition;
 
+    double l;
+    double assist_gain = 0.006;
+
     //Gyrocontinuity Variables
     double current_value;
     double prev_value = 0;
@@ -147,7 +150,7 @@ public class SprintTeleop extends LinearOpMode {
             if (PowerSetting) {
                 movement = 0.7;
             } else {
-                movement = 0.45;
+                movement = 0.40;
             }
 
             if (!button_bumper_right_already_pressed) {
@@ -173,11 +176,23 @@ public class SprintTeleop extends LinearOpMode {
             double x = gamepad1.left_stick_x * movement;
             double rx = gamepad1.right_stick_x * movement;
 
+            if (y < 0.1 && y > -0.1 || x < 0.1 && x > -0.1) {
+                l = 0;
+            } else {
+                l = assist_gain * (RotatingBase.getCurrentPosition() / 1020f);
+            }
+
+            if (y < 0) {
+                l = l * -1;
+            }
+
             double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-            double FLPower = (y + x + rx) / denominator;
-            double BLPower = (y - x + rx) / denominator;
-            double FRPower = (y - x - rx) / denominator;
-            double BRPower = (y + x - rx) / denominator;
+            double FLPower = (y + x + rx + l) / denominator;
+            double BLPower = (y - x + rx + l) / denominator;
+            double FRPower = (y - x - rx - l) / denominator;
+            double BRPower = (y + x - rx - l) / denominator;
+
+
 
             FrontLeft.setPower(FLPower);
             BackLeft.setPower(BLPower);
@@ -461,6 +476,7 @@ public class SprintTeleop extends LinearOpMode {
                     if (gamepad2.x) {
                         //code for releasing cone and resetting base
                         ClawSetting = false;
+                        coneStackMode = false;
                         RightClaw.setPower(1);
                         LeftClaw.setPower(1);
                         RailControl.SetTargetPosition(250, -1, 1);
@@ -477,6 +493,7 @@ public class SprintTeleop extends LinearOpMode {
                     if (gamepad2.a) {
                         //code for 3rd highest cone on stack
                         ClawSetting = false;
+                        coneStackMode = false;
                         RightClaw.setPower(-1);
                         LeftClaw.setPower(-1);
                         RailControl.SetTargetPosition(400, -1, 1);
@@ -493,6 +510,7 @@ public class SprintTeleop extends LinearOpMode {
                     if (gamepad2.b) {
                         //code for 2nd highest cone on stack
                         ClawSetting = false;
+                        coneStackMode = false;
                         RightClaw.setPower(1);
                         LeftClaw.setPower(1);
                         RailControl.SetTargetPosition(575, -1, 1);
@@ -509,6 +527,7 @@ public class SprintTeleop extends LinearOpMode {
                     if (gamepad2.y) {
                         //code for highest cone on stack
                         ClawSetting = false;
+                        coneStackMode = false;
                         RightClaw.setPower(1);
                         LeftClaw.setPower(1);
                         RailControl.SetTargetPosition(725, -1, 1);
