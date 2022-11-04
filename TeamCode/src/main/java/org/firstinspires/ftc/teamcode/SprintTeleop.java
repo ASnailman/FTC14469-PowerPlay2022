@@ -61,7 +61,8 @@ public class SprintTeleop extends LinearOpMode {
     int basePosition;
 
     double l;
-    double assist_gain = 0.006;
+    double assist_gain = 0.02;
+    double assist_offset = 0.03;    // compensation - robot drifting to the right when base is 0 deg
 
     //Gyrocontinuity Variables
     double current_value;
@@ -148,7 +149,7 @@ public class SprintTeleop extends LinearOpMode {
              *****************************************************************/
 
             if (PowerSetting) {
-                movement = 0.7;
+                movement = 0.75;
             } else {
                 movement = 0.40;
             }
@@ -178,8 +179,21 @@ public class SprintTeleop extends LinearOpMode {
 
             if (y < 0.1 && y > -0.1 || x < 0.1 && x > -0.1) {
                 l = 0;
-            } else {
-                l = assist_gain * (RotatingBase.getCurrentPosition() / 1020f);
+            }
+            else if ((y > 0.45 && y < 0.55) && (x > 0.45 && x < 0.55)) {
+                l = 0;
+            }
+            else if ((y > 0.45 && y < 0.55) && (x < -0.45 && x > -0.55)) {
+                l = 0;
+            }
+            else if ((y < -0.45 && y > -0.55) && (x < -0.45 && x > -0.55)) {
+                l = 0;
+            }
+            else if ((y < -0.45 && y > -0.55) && (x > 0.45 && x < 0.55)) {
+                l = 0;
+            }
+            else {
+                l = assist_gain * (RotatingBase.getCurrentPosition() / 1020f) - assist_offset;
             }
 
             if (y < 0) {
@@ -191,8 +205,6 @@ public class SprintTeleop extends LinearOpMode {
             double BLPower = (y - x + rx + l) / denominator;
             double FRPower = (y - x - rx - l) / denominator;
             double BRPower = (y + x - rx - l) / denominator;
-
-
 
             FrontLeft.setPower(FLPower);
             BackLeft.setPower(BLPower);
@@ -236,8 +248,11 @@ public class SprintTeleop extends LinearOpMode {
                         targetJunction++;
                         break;
                     case 2:
-                        if (ET.milliseconds() > 800) {
+                        if (ET.milliseconds() > 100) {
                             RailControl.SetTargetPosition(2125, -1, 1);
+                            ClawSetting = false;
+                            RightClaw.setPower(-1);
+                            LeftClaw.setPower(-1);
                             ET.reset();
                             targetJunction++;
                         }
@@ -320,6 +335,31 @@ public class SprintTeleop extends LinearOpMode {
                     case 16:
                         break;
 
+                    case 17:
+                        ET.reset();
+                        ClawSetting = true;
+                        RightClaw.setPower(-1);
+                        LeftClaw.setPower(-1);
+                        targetJunction++;
+                        break;
+                    case 18:
+                        if (ET.milliseconds() > 800) {
+                            RailControl.SetTargetPosition(2125, -1, 1);
+
+                            ET.reset();
+                            targetJunction++;
+                        }
+                        break;
+                    case 19:
+                        if (ET.milliseconds() > 500) {
+                            SetBasePosition(0);
+                            targetJunction++;
+                        }
+                        break;
+
+                    case 20:
+                        break;
+
                     default:
                         break;
 
@@ -370,12 +410,12 @@ public class SprintTeleop extends LinearOpMode {
                     if (!button_a_already_pressed2) {
                         if (gamepad2.a) {
                             //code for low junction when pressed
-                            ClawSetting = false;
+//                            ClawSetting = false;
                             lowJunctionResetMode = false;
 //                            RightClaw.setPosition(1);
 //                            LeftClaw.setPosition(1);
-                            RightClaw.setPower(-1);
-                            LeftClaw.setPower(-1);
+//                            RightClaw.setPower(-1);
+//                            LeftClaw.setPower(-1);
                             targetJunction = 1;
                             button_a_already_pressed2 = true;
                         }
@@ -393,7 +433,7 @@ public class SprintTeleop extends LinearOpMode {
 //                            LeftClaw.setPosition(1);
                             RightClaw.setPower(1);
                             LeftClaw.setPower(1);
-                            targetJunction = 1;
+                            targetJunction = 17;
                             button_a_already_pressed2 = true;
                         }
                     } else {

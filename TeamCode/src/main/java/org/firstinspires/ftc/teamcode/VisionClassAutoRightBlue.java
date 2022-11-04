@@ -51,10 +51,10 @@ public class VisionClassAutoRightBlue {
          */
 
         static final Point REGION1_TOPLEFT_ANCHOR_POINT = new Point(60,85);
-        static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(640,210);
+        static final Point REGION2_TOPLEFT_ANCHOR_POINT = new Point(660,260);
         static final Point REGION3_TOPLEFT_ANCHOR_POINT = new Point(1050,65);
-        static final int REGION_WIDTH = 40;
-        static final int REGION_HEIGHT = 40;
+        static final int REGION_WIDTH = 35;
+        static final int REGION_HEIGHT = 35;
 
         static final int SIGNAL_SLEEVE_THRESHOLD = 5;
 

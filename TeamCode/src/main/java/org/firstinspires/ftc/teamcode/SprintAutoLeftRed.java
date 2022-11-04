@@ -355,27 +355,25 @@ public class SprintAutoLeftRed extends LinearOpMode {
 //                        BackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                         programOrder++;
                     } else {
-                        FrontLeft.setPower(-0.25);
-                        FrontRight.setPower(0.25);
-                        BackLeft.setPower(0.25);
-                        BackRight.setPower(-0.25);
+                        FrontLeft.setPower(-0.3);
+                        FrontRight.setPower(0.3);
+                        BackLeft.setPower(0.3);
+                        BackRight.setPower(-0.3);
                     }
                     break;
 
                 case 14:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
-                            MechDrive.GetTaskState() == Task_State.DONE || MechDrive.GetTaskState() == Task_State.OVERRIDE) {
+                            MechDrive.GetTaskState() == Task_State.DONE) {
 //                              MechDrive.SetTargets(90, 920, 0.4, 1);
                         if (repeat == 0) {
-                            MechDrive.SetTargets(-88, 360, 0.4, 1);
+                            MechDrive.SetTargets(-88, 180, 0.4, 1);
                             ET.reset();
-                            programOrder++;
                         } else if (repeat == 1) {
-                            MechDrive.SetTargets(-88, 340, 0.4, 1);
+                            MechDrive.SetTargets(-88, 205, 0.4, 1);
                             ET.reset();
-                            programOrder++;
                         }
-//                        programOrder++;
+                        programOrder++;
                     }
                     break;
 

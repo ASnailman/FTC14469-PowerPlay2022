@@ -66,6 +66,7 @@ public class SprintAutoLeftBlue extends LinearOpMode {
     int programOrder = 0;
     int repeat = 0;
     ElapsedTime ET = new ElapsedTime();
+    ElapsedTime ERT = new ElapsedTime(); //Elapsed Reset Timer
 
     double current_value;
     double prev_value = 0;
@@ -169,6 +170,7 @@ public class SprintAutoLeftBlue extends LinearOpMode {
         waitForStart();
 
         ET.reset();
+        ERT.reset();
 
         while (opModeIsActive()) {
 
@@ -182,6 +184,7 @@ public class SprintAutoLeftBlue extends LinearOpMode {
                         LeftClaw.setPower(1);
                         RightClaw.setPower(1);
                         ET.reset();
+                        ERT.reset();
                     } else if (pipeline.type == VisionClassAutoLeftBlue.SignalDeterminationPipeline.SignalSleeveType.LocationTWO) {
                         posOne = false;
                         posTwo = true;
@@ -189,6 +192,7 @@ public class SprintAutoLeftBlue extends LinearOpMode {
                         LeftClaw.setPower(1);
                         RightClaw.setPower(1);
                         ET.reset();
+                        ERT.reset();
                     } else if (pipeline.type == VisionClassAutoLeftBlue.SignalDeterminationPipeline.SignalSleeveType.LocationTHREE) {
                         posOne = false;
                         posTwo = false;
@@ -196,6 +200,7 @@ public class SprintAutoLeftBlue extends LinearOpMode {
                         LeftClaw.setPower(1);
                         RightClaw.setPower(1);
                         ET.reset();
+                        ERT.reset();
                     } else {
                         posOne = false;
                         posTwo = true;
@@ -203,6 +208,7 @@ public class SprintAutoLeftBlue extends LinearOpMode {
                         LeftClaw.setPower(1);
                         RightClaw.setPower(1);
                         ET.reset();
+                        ERT.reset();
                     }
                     programOrder++;
                     break;
@@ -506,6 +512,10 @@ public class SprintAutoLeftBlue extends LinearOpMode {
 
                 default:
                     break;
+            }
+
+            if (ERT.milliseconds() > 28000) {
+                SetAttachmentPosition(0, -1020);
             }
 
             rightColorSensorLineDetector();
