@@ -62,7 +62,7 @@ public class SprintTeleop extends LinearOpMode {
 
     double l;
     double assist_gain = 0.02;
-    double assist_offset = 0.03;    // compensation - robot drifting to the right when base is 0 deg
+    double assist_offset = 0.05;    // compensation - robot drifting to the right when base is 0 deg
 
     //Gyrocontinuity Variables
     double current_value;
@@ -154,19 +154,25 @@ public class SprintTeleop extends LinearOpMode {
                 movement = 0.40;
             }
 
-            if (!button_bumper_right_already_pressed) {
-                if (gamepad1.right_bumper) {
-                    if (!PowerSetting) {
-                        PowerSetting = true;
-                    } else {
-                        PowerSetting = false;
-                    }
-                    button_bumper_right_already_pressed = true;
-                }
+//            if (!button_bumper_right_already_pressed) {
+//                if (gamepad1.right_bumper) {
+//                    if (!PowerSetting) {
+//                        PowerSetting = true;
+//                    } else {
+//                        PowerSetting = false;
+//                    }
+//                    button_bumper_right_already_pressed = true;
+//                }
+//            } else {
+//                if (!gamepad1.right_bumper) {
+//                    button_bumper_right_already_pressed = false;
+//                }
+//            }
+
+            if (gamepad1.right_bumper) {
+                PowerSetting = true;
             } else {
-                if (!gamepad1.right_bumper) {
-                    button_bumper_right_already_pressed = false;
-                }
+                PowerSetting = false;
             }
 
             /*****************************************************************
@@ -281,7 +287,7 @@ public class SprintTeleop extends LinearOpMode {
                         break;
                     case 7:
                         if (ET.milliseconds() > 500) {
-                            SetBasePosition(0);
+//                            SetBasePosition(0);
                             targetJunction++;
                         }
                         break;
@@ -304,7 +310,7 @@ public class SprintTeleop extends LinearOpMode {
 
                     case 11:
                         if (ET.milliseconds() > 500) {
-                            SetBasePosition(0);
+//                            SetBasePosition(0);
                             targetJunction++;
                         }
                         break;
@@ -786,6 +792,6 @@ public class SprintTeleop extends LinearOpMode {
     public void SetBasePosition(int position) {
         RotatingBase.setTargetPosition(position);
         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        RotatingBase.setPower(1);
+        RotatingBase.setPower(0.8);
     }
 }
