@@ -268,8 +268,8 @@ public class SprintAutoLeftBlue2 extends LinearOpMode {
                 case 6:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(90, 50, 0.4, 1);
-                        SetAttachmentPositionLowPower(4660, -1600);
+                        MechDrive.SetTargets(90, 65, 0.4, 1);
+                        SetAttachmentPositionLowPower(4710, -1650);
                         programOrder++;
                     }
                     break;
@@ -302,10 +302,10 @@ public class SprintAutoLeftBlue2 extends LinearOpMode {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
                             if (repeat == 0) {
-                                MechDrive.SetTargets(-92, 710, 0.4, 1);
+                                MechDrive.SetTargets(-92, 735, 0.4, 1);
                             }
                             else if (repeat == 1) {
-                                MechDrive.SetTargets(-92, 590, 0.4, 1);
+                                MechDrive.SetTargets(-92, 600, 0.4, 1);
                             }
                             programOrder++;
                         }
@@ -377,10 +377,10 @@ public class SprintAutoLeftBlue2 extends LinearOpMode {
                             MechDrive.GetTaskState() == Task_State.DONE) {
 //                              MechDrive.SetTargets(90, 920, 0.4, 1);
                         if (repeat == 0) {
-                            MechDrive.SetTargets(-92, 295, 0.4, 1);
+                            MechDrive.SetTargets(-92, 285, 0.4, 1);
                             ET.reset();
                         } else if (repeat == 1) {
-                            MechDrive.SetTargets(-92, 315, 0.4, 1);
+                            MechDrive.SetTargets(-92, 350, 0.4, 1);
                             ET.reset();
                         }
                         programOrder++;
@@ -423,12 +423,12 @@ public class SprintAutoLeftBlue2 extends LinearOpMode {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
                             if (repeat == 0) {
-                                MechDrive.SetTargets(88, 1100, 0.4, 1);
-                                SetAttachmentPositionLowPower(4660, -1665);
+                                MechDrive.SetTargets(88, 1225, 0.4, 1);
+                                SetAttachmentPositionLowPower(4660, -1680);
                             }
                             else if (repeat == 1) {
-                                MechDrive.SetTargets(88, 1100, 0.4, 1);
-                                SetAttachmentPositionLowPower(4660, -1665);
+                                MechDrive.SetTargets(88, 1225, 0.4, 1);
+                                SetAttachmentPositionLowPower(4660, -1680);
                             }
                             programOrder++;
                         }
@@ -489,13 +489,13 @@ public class SprintAutoLeftBlue2 extends LinearOpMode {
                                 MechDrive.GetTaskState() == Task_State.DONE) {
 
                             if (posThree) {
-                                MechDrive.SetTargets(88, 1400, 0.4, 1);
+                                MechDrive.SetTargets(88, 1350, 0.4, 1);
                                 SetAttachmentPosition(0, 0);
                             } else if (posTwo) {
                                 MechDrive.SetTargets(-92, 100, 0, 1);
                                 SetAttachmentPosition(0, -1020);
                             } else if (posOne) {
-                                MechDrive.SetTargets(-92, 1080, 0.4, 1);
+                                MechDrive.SetTargets(-92, 1230, 0.4, 1);
                                 SetAttachmentPosition(0, -1020);
                             }
                             programOrder++;

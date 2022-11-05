@@ -269,8 +269,8 @@ public class SprintAutoLeftRed2 extends LinearOpMode {
                 case 6:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(90, 50, 0.4, 1);
-                        SetAttachmentPositionLowPower(4660, -1600);
+                        MechDrive.SetTargets(90, 60, 0.4, 1);
+                        SetAttachmentPositionLowPower(4660, -1680);
                         programOrder++;
                     }
                     break;
@@ -377,10 +377,10 @@ public class SprintAutoLeftRed2 extends LinearOpMode {
                             MechDrive.GetTaskState() == Task_State.DONE) {
 //                              MechDrive.SetTargets(90, 920, 0.4, 1);
                         if (repeat == 0) {
-                            MechDrive.SetTargets(-92, 300, 0.4, 1);
+                            MechDrive.SetTargets(-92, 255, 0.4, 1);
                             ET.reset();
                         } else if (repeat == 1) {
-                            MechDrive.SetTargets(-92, 335, 0.4, 1);
+                            MechDrive.SetTargets(-92, 305, 0.4, 1);
                             ET.reset();
                         }
                         programOrder++;
@@ -430,12 +430,12 @@ public class SprintAutoLeftRed2 extends LinearOpMode {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
                             if (repeat == 0) {
-                                MechDrive.SetTargets(88, 1150, 0.4, 1);
-                                SetAttachmentPositionLowPower(4660, -1615);
+                                MechDrive.SetTargets(88, 1210, 0.4, 1);
+                                SetAttachmentPositionLowPower(4660, -1665);
                             }
                             else if (repeat == 1) {
-                                MechDrive.SetTargets(88, 1140, 0.4, 1);
-                                SetAttachmentPositionLowPower(4660, -1635);
+                                MechDrive.SetTargets(88, 1210, 0.4, 1);
+                                SetAttachmentPositionLowPower(4660, -1675);
                             }
                             programOrder++;
                         }
@@ -497,12 +497,12 @@ public class SprintAutoLeftRed2 extends LinearOpMode {
 
                             if (posThree) {
                                 MechDrive.SetTargets(88, 1220, 0.4, 1);
-                                SetAttachmentPosition(0, 510);
+                                SetAttachmentPosition(0, -2040);
                             } else if (posTwo) {
                                 MechDrive.SetTargets(-92, 100, 0, 1);
                                 SetAttachmentPosition(0, -1020);
                             } else if (posOne) {
-                                MechDrive.SetTargets(-92, 1150, 0.4, 1);
+                                MechDrive.SetTargets(-92, 1170, 0.4, 1);
                                 SetAttachmentPosition(0, -1020);
                             }
                             programOrder++;
