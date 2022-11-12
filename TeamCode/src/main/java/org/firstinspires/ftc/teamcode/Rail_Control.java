@@ -158,4 +158,9 @@ public class Rail_Control {
 
         return run_state;
     }
+
+    public void GetDoneState() {
+//        return Task_State.DONE;
+        run_state = Task_State.DONE;
+    }
 }

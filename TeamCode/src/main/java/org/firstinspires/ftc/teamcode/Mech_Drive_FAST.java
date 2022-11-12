@@ -152,6 +152,15 @@ public class Mech_Drive_FAST {
             }
         }
         else if (state == Task_State.DONE){
+            FrontLeft.setPower(0);
+            FrontRight.setPower(0);
+            BackLeft.setPower(0);
+            BackRight.setPower(0);
+
+            FrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            BackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            FrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            BackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             state = Task_State.READY;
         }
         else if (state == Task_State.OVERRIDE) {
@@ -171,6 +180,11 @@ public class Mech_Drive_FAST {
     public Task_State GetTaskState() {
 
         return state;
+    }
+
+    public void GetDoneState() {
+//        return Task_State.DONE;
+        state = Task_State.DONE;
     }
 
     private void SetDirection (MoveDirection direction) {
