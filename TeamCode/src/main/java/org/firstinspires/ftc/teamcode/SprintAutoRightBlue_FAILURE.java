@@ -24,8 +24,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "SprintAutoRightBlueV2", group = "MecanumDrive")
-public class SprintAutoRightBlue_V2 extends LinearOpMode {
+@Autonomous(name = "SprintAutoRightBlue_FAILURE", group = "MecanumDrive")
+public class SprintAutoRightBlue_FAILURE extends LinearOpMode {
 
     //Control Hub Orientation
     byte AXIS_MAP_CONFIG_BYTE = 0x06; //rotates control hub 90 degrees around y axis by swapping x and z axis
@@ -95,9 +95,19 @@ public class SprintAutoRightBlue_V2 extends LinearOpMode {
     boolean rightFrontDistanceCleared = false;
     boolean leftBackDistanceCleared = false;
     boolean rightBackDistanceCleared = false;
-    
-    double[] frontLeftDistanceSamples = {819, 819, 819, 819, 819};
-    int count = 0;
+
+    boolean frontLeftDistanceSamples_Reset = false;
+    double[] frontLeftDistanceSamples = {819, 819, 819};
+    boolean frontRightDistanceSamples_Reset = false;
+    double[] frontRightDistanceSamples = {819, 819, 819};
+    boolean backLeftDistanceSamples_Reset = false;
+    double[] backLeftDistanceSamples = {819, 819, 819};
+    boolean backRightDistanceSamples_Reset = false;
+    double[] backRightDistanceSamples = {819, 819, 819};
+    int frontLeftCount = 0;
+    int frontRightCount = 0;
+    int backLeftCount = 0;
+    int backRightCount = 0;
 
     public void runOpMode() {
 
@@ -190,33 +200,62 @@ public class SprintAutoRightBlue_V2 extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-//            switch (attachmentOrder) {
-//
-//                case 1:
-//                    RightClaw.setPower(-1);
-//                    LeftClaw.setPower(-1);
-//                    AET.reset();
-//                    attachmentOrder++;
-//                    break;
-//                case 2:
-//                    if (AET.milliseconds() > 1000) {
-//                        attachmentOrder++;
-//                    }
-//                    break;
-//                case 3:
-//                    SetAttachmentPosition(3475, 2040);
-//                    AET.reset();
-//                    attachmentOrder++;
-//                    break;
-//                case 4:
-//                    if (AET.milliseconds() > 2000) {
-//                        RightClaw.setPower(1);
-//                        LeftClaw.setPower(1);
-//                        SetAttachmentPosition(725, 1020);
-//                        AET.reset();
-//                        attachmentOrder++;
-//                    }
-//                    break;
+            switch (attachmentOrder) {
+
+                case 0:
+                    attachmentOrder++;
+                    break;
+                case 1:
+                    RightClaw.setPower(1);
+                    LeftClaw.setPower(1);
+                    AET.reset();
+                    attachmentOrder++;
+                    break;
+                case 2:
+                    if (AET.milliseconds() > 550) {
+                        SetAttachmentPosition(400, 620);
+                        attachmentOrder++;
+                    }
+                    break;
+                case 3:
+                    AET.reset();
+                    attachmentOrder++;
+                    break;
+                case 4:
+                    if (AET.milliseconds() > 600) {
+                        SetAttachmentPosition(400, 2040);
+                        AET.reset();
+                        attachmentOrder++;
+                    }
+                    break;
+                case 5:
+                    if (AET.milliseconds() > 500) {
+                        RightClaw.setPower(-1);
+                        LeftClaw.setPower(-1);
+                        SetAttachmentPosition(3475, 2040);
+                        AET.reset();
+                        attachmentOrder++;
+                    }
+                    break;
+                case 6:
+                    if (AET.milliseconds() > 5000) {
+                        RightClaw.setPower(-1);
+                        LeftClaw.setPower(-1);
+                        AET.reset();
+                        attachmentOrder++;
+                    }
+                    break;
+
+                case 7:
+                    if (AET.milliseconds() > 4000) {
+                        SetAttachmentPosition(725, 0);
+                        AET.reset();
+                        attachmentOrder++;
+                    }
+                    break;
+                default:
+                    break;
+            }
 //                case 5:
 //                    if (AET.milliseconds() > 1000) {
 //                        SetAttachmentPosition(725, 0);
@@ -349,11 +388,11 @@ public class SprintAutoRightBlue_V2 extends LinearOpMode {
                     break;
 
                 case 2:
-                    if (ET.milliseconds() > 1000) {
+                    if (ET.milliseconds() > 600) {
                         if (MechDrive.GetTaskState() == Task_State.INIT ||
                                 MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
-                            MechDrive.SetTargets(0, 1000, 0.36, 1);
+                            MechDrive.SetTargets(0, 1300, 0.36, 1);
                             ET.reset();
                             programOrder++;
                         }
@@ -361,8 +400,11 @@ public class SprintAutoRightBlue_V2 extends LinearOpMode {
                     break;
 
                 case 3:
-                    if (MechDrive.GetTaskState() == Task_State.DONE || MechDrive.GetTaskState() == Task_State.READY) {
-                        programOrder++;
+                    if (ET.milliseconds() > 3000) {
+                        if (MechDrive.GetTaskState() == Task_State.DONE || MechDrive.GetTaskState() == Task_State.READY) {
+                            frontLeftDistanceSamples_Reset = true;
+                            programOrder++;
+                        }
                     }
                     break;
 
@@ -376,26 +418,36 @@ public class SprintAutoRightBlue_V2 extends LinearOpMode {
                             ET.reset();
                             programOrder++;
                         } else {
-                            if (MechDrive.GetTaskState() == Task_State.READY ||
-                                    MechDrive.GetTaskState() == Task_State.DONE) {
-                                MechDrive.SetTargets(0, 1500, 0.2, 1);
-                            }
+//                            if (MechDrive.GetTaskState() == Task_State.READY ||
+//                                    MechDrive.GetTaskState() == Task_State.DONE) {
+//                                MechDrive.SetTargets(0, 1500, 0.2, 1);
+//                            }
+                            SetMotorPower(0.2);
                         }
                     }
                     break;
 
                 case 5:
-                    if (ET.milliseconds() > 200000) {
+                    if (MechDrive.GetTaskState() == Task_State.READY ||
+                            MechDrive.GetTaskState() == Task_State.DONE) {
+                        MechDrive.SetTargets(90, 150, 0.2, 1);
+                        ET.reset();
+                        programOrder++;
+                    }
+                    break;
+
+                case 6:
+                    if (ET.milliseconds() > 2000) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
-                            MechDrive.SetTargets(0, 700, 0.4, 1);
+                            MechDrive.SetTargets(0, 900, 0.4, 1);
                             ET.reset();
                             programOrder++;
                         }
                     }
                     break;
 
-                case 6:
+                case 7:
                     if (ET.milliseconds() > 1000) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
@@ -406,36 +458,32 @@ public class SprintAutoRightBlue_V2 extends LinearOpMode {
                     break;
 
 
-                case 7:
+                case 8:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
                         if (rightBlue || rightRed) {
                             MechDrive.GetDoneState();
-                            ET.reset();
+//                            SetMotorPower(0);
                             programOrder++;
                         } else {
-                            if (MechDrive.GetTaskState() == Task_State.READY ||
-                                    MechDrive.GetTaskState() == Task_State.DONE) {
-                                MechDrive.SetTargets(180, 1000, 0.2, 1);
-                            }
+//                            if (MechDrive.GetTaskState() == Task_State.READY ||
+//                                    MechDrive.GetTaskState() == Task_State.DONE) {
+//                                MechDrive.SetTargets(180, 1000, 0.2, 1);
+//                            }
+                            SetMotorPower(-0.2);
                         }
                     }
                     break;
 
 
-                case 8:
-//                    FrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//                    BackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//                    FrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//                    BackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                case 9:
+                    backLeftDistanceSamples_Reset = true;
+                    ET.reset();
                     programOrder++;
                     break;
 
-                case 9:
-//                    if (MechDrive.GetTaskState() == Task_State.READY ||
-//                            MechDrive.GetTaskState() == Task_State.DONE) {
-//                        MechDrive.SetTargets(90, 325, 0.4, 1);
-                    if (rightBackDistanceCleared) {
+                case 10:
+                    if (leftBackDistanceCleared) {
                         ET.reset();
                         MechDrive.GetDoneState();
                         programOrder++;
@@ -447,7 +495,7 @@ public class SprintAutoRightBlue_V2 extends LinearOpMode {
                     }
                     break;
 
-                case 10:
+                case 11:
                     if (ET.milliseconds() > 1000) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
@@ -458,7 +506,7 @@ public class SprintAutoRightBlue_V2 extends LinearOpMode {
                     }
                     break;
 
-                case 11:
+                case 12:
                     if (ET.milliseconds() > 1000) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
@@ -469,18 +517,19 @@ public class SprintAutoRightBlue_V2 extends LinearOpMode {
                     }
                     break;
 
-                case 12:
+                case 13:
                     if (ET.milliseconds() > 1000) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
                             MechDrive.SetTargets(-92, 270, 0.4, 1);
                             ET.reset();
+                            backRightDistanceSamples_Reset = true;
                             programOrder++;
                         }
                     }
                     break;
 
-                case 13:
+                case 14:
                     if (ET.milliseconds() > 1000) {
                         if (rightBackDistanceCleared) {
                             ET.reset();
@@ -495,7 +544,7 @@ public class SprintAutoRightBlue_V2 extends LinearOpMode {
                     }
                     break;
 
-                case 14:
+                case 15:
                     if (ET.milliseconds() > 1000) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
@@ -506,7 +555,7 @@ public class SprintAutoRightBlue_V2 extends LinearOpMode {
                     }
                     break;
 
-                case 15:
+                case 16:
                     if (ET.milliseconds() > 1000) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
@@ -516,7 +565,7 @@ public class SprintAutoRightBlue_V2 extends LinearOpMode {
                         }
                     }
 
-                case 16:
+                case 17:
                     if (ET.milliseconds() > 500) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
@@ -543,16 +592,16 @@ public class SprintAutoRightBlue_V2 extends LinearOpMode {
                 SetAttachmentPosition(0, 1020);
             }
 
-//            rightColorSensorLineDetector();
-//            leftColorSensorLineDetector();
-            backRightWallDetector();
-            backLeftWallDetector();
-            frontRightWallDetector();
-            frontLeftWallDetector();
+            rightColorSensorLineDetector();
+            leftColorSensorLineDetector();
+            backRightJunctionDetector();
+            backLeftJunctionDetector();
+            frontRightJunctionDetector();
+            frontLeftJunctionDetector();
             MechDrive.Task(GyroContinuity());
             RailControl.RailTask();
-            telemetry.addData("backright encoder", BackRight.getCurrentPosition());
-            telemetry.addData("gyro", GyroContinuity());
+//            telemetry.addData("backright encoder", BackRight.getCurrentPosition());
+//            telemetry.addData("gyro", GyroContinuity());
             telemetry.update();
         }
 
@@ -749,54 +798,111 @@ public class SprintAutoRightBlue_V2 extends LinearOpMode {
     }
 
     //From Back of robot
-    private void backRightWallDetector() {
-        backRightDistance = backRightDistanceSensor.getDistance(DistanceUnit.CM);
-        telemetry.addData("Back Right Distance Sensor", backRightDistance);
-        if (backRightDistance < 30) {
-            rightBackDistanceCleared = true;
-        } else {
-            rightBackDistanceCleared = false;
+    private void backRightJunctionDetector() {
+        if (backRightDistanceSamples_Reset) {
+            backRightDistanceSamples[0] = 819;
+            backRightDistanceSamples[1] = 819;
+            backRightDistanceSamples[2] = 819;
+            backRightDistanceSamples_Reset = false;
+        }
+        else {
+            backRightDistanceSamples[backRightCount] = backRightDistanceSensor.getDistance(DistanceUnit.CM);
+            backRightCount++;
+            backRightDistance = (backRightDistanceSamples[0] + backRightDistanceSamples[1] + backRightDistanceSamples[2]) / 3;
+
+            telemetry.addData("Back Right Distance Sensor", backRightDistance);
+            if (backRightDistance < 30) {
+                rightBackDistanceCleared = true;
+            } else {
+                rightBackDistanceCleared = false;
+            }
+
+            if (backRightCount > 2) {
+                backRightCount = 0;
+            }
         }
     }
 
     //From Back of robot
-    private void backLeftWallDetector() {
-        backLeftDistance = backLeftDistanceSensor.getDistance(DistanceUnit.CM);
-        telemetry.addData("Back Left Distance Sensor", backLeftDistance);
-        if (backLeftDistance < 30) {
-            leftBackDistanceCleared = true;
-        } else {
-            leftBackDistanceCleared = false;
+    private void backLeftJunctionDetector() {
+        if (backLeftDistanceSamples_Reset) {
+            backLeftDistanceSamples[0] = 819;
+            backLeftDistanceSamples[1] = 819;
+            backLeftDistanceSamples[2] = 819;
+            backLeftDistanceSamples_Reset = false;
+        }
+        else {
+            backLeftDistanceSamples[backLeftCount] = backLeftDistanceSensor.getDistance(DistanceUnit.CM);
+            backLeftCount++;
+            backLeftDistance = (backLeftDistanceSamples[0] + backLeftDistanceSamples[1] + backLeftDistanceSamples[2]) / 3;
+
+            telemetry.addData("Back Left Distance Sensor", backLeftDistance);
+            if (backLeftDistance < 30) {
+                leftBackDistanceCleared = true;
+            } else {
+                leftBackDistanceCleared = false;
+            }
+
+            if (backLeftCount > 2) {
+                backLeftCount = 0;
+            }
         }
     }
 
     //From Back of robot
-    private void frontRightWallDetector() {
-        frontRightDistance = frontRightDistanceSensor.getDistance(DistanceUnit.CM);
-        telemetry.addData("Front Right Distance Sensor", frontRightDistance);
-        if (frontRightDistance < 30) {
-            rightFrontDistanceCleared = true;
-        } else {
-            rightFrontDistanceCleared = false;
+    private void frontRightJunctionDetector() {
+        if (frontRightDistanceSamples_Reset) {
+            frontRightDistanceSamples[0] = 819;
+            frontRightDistanceSamples[1] = 819;
+            frontRightDistanceSamples[2] = 819;
+//            frontRightDistanceSamples[3] = 819;
+//            frontRightDistanceSamples[4] = 819;
+            frontRightDistanceSamples_Reset = false;
+        }
+        else {
+            frontRightDistanceSamples[frontRightCount] = frontRightDistanceSensor.getDistance(DistanceUnit.CM);
+            frontRightCount++;
+            frontRightDistance = (frontRightDistanceSamples[0] + frontRightDistanceSamples[1] + frontRightDistanceSamples[2]) / 3;
+
+            telemetry.addData("Front Right Distance Sensor", frontRightDistance);
+            if (frontRightDistance < 30) {
+                rightFrontDistanceCleared = true;
+            } else {
+                rightFrontDistanceCleared = false;
+            }
+
+            if (frontRightCount > 2) {
+                frontRightCount = 0;
+            }
         }
     }
 
     //From Back of robot
-    private void frontLeftWallDetector() {
-        frontLeftDistanceSamples[count] = frontLeftDistanceSensor.getDistance(DistanceUnit.CM);
-        count++;
-        frontLeftDistance = (frontLeftDistanceSamples[0] + frontLeftDistanceSamples[1] + frontLeftDistanceSamples[2] +
-                frontLeftDistanceSamples[3] + frontLeftDistanceSamples[4])/5;
+    private void frontLeftJunctionDetector() {
 
-        telemetry.addData("Front Left Distance Sensor", frontLeftDistance);
-        if (frontLeftDistance < 30) {
-            leftFrontDistanceCleared = true;
-        } else {
-            leftFrontDistanceCleared = false;
+        if (frontLeftDistanceSamples_Reset) {
+            frontLeftDistanceSamples[0] = 819;
+            frontLeftDistanceSamples[1] = 819;
+            frontLeftDistanceSamples[2] = 819;
+//            frontLeftDistanceSamples[3] = 819;
+//            frontLeftDistanceSamples[4] = 819;
+            frontLeftDistanceSamples_Reset = false;
         }
-        
-        if (count > 4) {
-            count = 0;
+        else {
+            frontLeftDistanceSamples[frontLeftCount] = frontLeftDistanceSensor.getDistance(DistanceUnit.CM);
+            frontLeftCount++;
+            frontLeftDistance = (frontLeftDistanceSamples[0] + frontLeftDistanceSamples[1] + frontLeftDistanceSamples[2]) / 3;
+
+            telemetry.addData("Front Left Distance Sensor", frontLeftDistance);
+            if (frontLeftDistance < 30) {
+                leftFrontDistanceCleared = true;
+            } else {
+                leftFrontDistanceCleared = false;
+            }
+
+            if (frontLeftCount > 2) {
+                frontLeftCount = 0;
+            }
         }
     }
 

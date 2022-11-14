@@ -49,8 +49,10 @@ public class SprintAutoRightBlue2 extends LinearOpMode {
 
     static NormalizedColorSensor rightColorsensor;
     static NormalizedColorSensor leftColorsensor;
-    static DistanceSensor rightDistanceSensor;
-    static DistanceSensor leftDistanceSensor;
+    static DistanceSensor frontRightDistanceSensor;
+    static DistanceSensor frontLeftDistanceSensor;
+    static DistanceSensor backRightDistanceSensor;
+    static DistanceSensor backLeftDistanceSensor;
 
     //Variables of Classes
     Methods motorMethods;
@@ -83,8 +85,27 @@ public class SprintAutoRightBlue2 extends LinearOpMode {
     boolean leftRed;
     boolean leftBlue;
     boolean leftUnknown;
-    double distance;
-    boolean distanceCleared = false;
+    double frontRightDistance;
+    double frontLeftDistance;
+    double backRightDistance;
+    double backLeftDistance;
+    boolean leftFrontDistanceCleared = false;
+    boolean rightFrontDistanceCleared = false;
+    boolean leftBackDistanceCleared = false;
+    boolean rightBackDistanceCleared = false;
+
+    boolean frontLeftDistanceSamples_Reset = false;
+    double[] frontLeftDistanceSamples = {819, 819, 819};
+    boolean frontRightDistanceSamples_Reset = false;
+    double[] frontRightDistanceSamples = {819, 819, 819};
+    boolean backLeftDistanceSamples_Reset = false;
+    double[] backLeftDistanceSamples = {122, 122, 122, 122, 122};
+    boolean backRightDistanceSamples_Reset = false;
+    double[] backRightDistanceSamples = {819, 819, 819};
+    int frontLeftCount = 0;
+    int frontRightCount = 0;
+    int backLeftCount = 0;
+    int backRightCount = 0;
 
     public void runOpMode() {
 
@@ -102,8 +123,10 @@ public class SprintAutoRightBlue2 extends LinearOpMode {
 
         rightColorsensor = hardwareMap.get(NormalizedColorSensor.class, "rightColorSensor");
         leftColorsensor = hardwareMap.get(NormalizedColorSensor.class, "leftColorSensor");
-        rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "rightDistanceSensor");
-        leftDistanceSensor = hardwareMap.get(DistanceSensor.class, "leftDistanceSensor");
+        frontRightDistanceSensor = hardwareMap.get(DistanceSensor.class, "frontRightDistanceSensor");
+        frontLeftDistanceSensor = hardwareMap.get(DistanceSensor.class, "frontLeftDistanceSensor");
+        backRightDistanceSensor = hardwareMap.get(DistanceSensor.class, "backRightDistanceSensor");
+        backLeftDistanceSensor = hardwareMap.get(DistanceSensor.class, "backLeftDistanceSensor");
 
         //Configure the control hub orientation
         IMU.write8(BNO055IMU.Register.OPR_MODE, BNO055IMU.SensorMode.CONFIG.bVal & 0x0F);
@@ -250,7 +273,7 @@ public class SprintAutoRightBlue2 extends LinearOpMode {
                     if (MechDrive.GetTaskState() == Task_State.INIT ||
                             MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(0, 1230, 0.4, 1);
+                        MechDrive.SetTargets(0, 1230, 0.5, 1);
                         programOrder++;
                     }
                     break;
@@ -268,7 +291,7 @@ public class SprintAutoRightBlue2 extends LinearOpMode {
                 case 6:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(-90, 130, 0.4, 1);
+                        MechDrive.SetTargets(-90, 50, 0.4, 1);
                         SetAttachmentPositionLowPower(4660, 1630);
                         programOrder++;
                     }
@@ -302,10 +325,10 @@ public class SprintAutoRightBlue2 extends LinearOpMode {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
                             if (repeat == 0) {
-                                MechDrive.SetTargets(88, 800, 0.4, 1);
+                                MechDrive.SetTargets(88, 800, 0.5, 1);
                             }
                             else if (repeat == 1) {
-                                MechDrive.SetTargets(88, 800, 0.4, 1);
+                                MechDrive.SetTargets(88, 800, 0.5, 1);
                             }
                             programOrder++;
                         }
@@ -351,47 +374,50 @@ public class SprintAutoRightBlue2 extends LinearOpMode {
 
 
                 case 13:
-//                    if (leftBlue || leftRed || ET.milliseconds() > 1500) {
-//                        SetMotorPower(0);
-//                        MechDrive.Override();
-//                        FrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//                        BackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//                        FrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//                        BackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    FrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    BackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    FrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    BackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    programOrder++;
-//                    } else {
-//                        FrontLeft.setPower(0.3);
-//                        FrontRight.setPower(-0.3);
-//                        BackLeft.setPower(-0.3);
-//                        BackRight.setPower(0.3);
-//                        if (MechDrive.GetTaskState() == Task_State.READY ||
-//                                MechDrive.GetTaskState() == Task_State.DONE) {
-//                            MechDrive.SetTargets(90, 500, 0.2, 1);
-//                            programOrder++;
-//                        }
-//                    }
-                    break;
-
-                case 14:
-                    if (MechDrive.GetTaskState() == Task_State.READY ||
-                            MechDrive.GetTaskState() == Task_State.DONE) {
-//                              MechDrive.SetTargets(90, 920, 0.4, 1);
-                        if (repeat == 0) {
-                            MechDrive.SetTargets(90, 325, 0.4, 1);
-                            ET.reset();
-                        } else if (repeat == 1) {
-                            MechDrive.SetTargets(90, 315, 0.4, 1);
-                            ET.reset();
-                        }
+//                    FrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                    BackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                    FrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//                    BackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    if (ET.milliseconds() > 500) {
+                        backLeftDistanceSamples_Reset = true;
                         programOrder++;
                     }
                     break;
 
+                case 14:
+                    if (MechDrive.GetTaskState() == Task_State.READY ||
+                            MechDrive.GetTaskState() == Task_State.DONE ||
+                            MechDrive.GetTaskState() == Task_State.RUN) {
+//                        if (repeat == 0) {
+//                            MechDrive.SetTargets(90, 325, 0.4, 1);
+//                            ET.reset();
+//                        } else if (repeat == 1) {
+//                            MechDrive.SetTargets(90, 315, 0.4, 1);
+//                            ET.reset();
+//                        }
+//                        programOrder++;
+                        if (leftBackDistanceCleared) {
+                            ET.reset();
+                            MechDrive.GetDoneState();
+                            programOrder++;
+                        } else {
+                            if (MechDrive.GetTaskState() == Task_State.READY ||
+                                    MechDrive.GetTaskState() == Task_State.DONE) {
+                                MechDrive.SetTargets(88, 1000, 0.2, 1);
+                            }
+                        }
+                    }
+                    break;
+
                 case 15:
+//                    if (MechDrive.GetTaskState() == Task_State.READY ||
+//                            MechDrive.GetTaskState() == Task_State.DONE) {
+//                        MechDrive.SetTargets(88, 50, 0.2, 1);
+                        programOrder++;
+//                    }
+                    break;
+
+                case 16:
                     if (RotatingBase.getCurrentPosition() < 50 && (MechDrive.GetTaskState() == Task_State.READY ||
                         MechDrive.GetTaskState() == Task_State.DONE)) {
 
@@ -404,7 +430,7 @@ public class SprintAutoRightBlue2 extends LinearOpMode {
                     }
                     break;
 
-                case 16:
+                case 17:
                     if (ET.milliseconds() > 800) {
                         if (RailControl.GetTaskState() == Task_State.DONE || RailControl.GetTaskState() == Task_State.READY) {
                             SetAttachmentPosition(4660, 0);
@@ -413,34 +439,59 @@ public class SprintAutoRightBlue2 extends LinearOpMode {
                     }
                     break;
 
-                case 17:
+                case 18:
                     if (RailRight.getCurrentPosition() > 2000) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
-                            MechDrive.SetTargets(0, 75, 0.4, 1);
-                            programOrder++;
-                        }
-                    }
-                    break;
-
-                case 18:
-                    if (RailRight.getCurrentPosition() > 4400) {
-                        if (MechDrive.GetTaskState() == Task_State.READY ||
-                                MechDrive.GetTaskState() == Task_State.DONE) {
-                            if (repeat == 0) {
-                                MechDrive.SetTargets(-92, 1040, 0.4, 1);
-                            }
-                            else if (repeat == 1) {
-                                MechDrive.SetTargets(-92, 1045, 0.4, 1);
-                            }
-//                            SetAttachmentPosition(4660, 1544);
-                            SetAttachmentPositionLowPower(4660, 1595);
+                            MechDrive.SetTargets(0, 50, 0.4, 1);
+                            ET.reset();
                             programOrder++;
                         }
                     }
                     break;
 
                 case 19:
+                    if (ET.milliseconds() > 500) {
+                        backRightDistanceSamples_Reset = true;
+                        programOrder++;
+                    }
+                    break;
+
+                case 20:
+                    if (MechDrive.GetTaskState() == Task_State.READY ||
+                            MechDrive.GetTaskState() == Task_State.DONE ||
+                            MechDrive.GetTaskState() == Task_State.RUN) {
+                        if (rightBackDistanceCleared) {
+                            ET.reset();
+                            MechDrive.GetDoneState();
+                            programOrder++;
+                        } else {
+                            if (MechDrive.GetTaskState() == Task_State.READY ||
+                                    MechDrive.GetTaskState() == Task_State.DONE) {
+                                MechDrive.SetTargets(-92, 1000, 0.3, 1);
+                            }
+                        }
+                    }
+                    break;
+
+                case 21:
+                    if (RailRight.getCurrentPosition() > 4400) {
+                        if (MechDrive.GetTaskState() == Task_State.READY ||
+                                MechDrive.GetTaskState() == Task_State.DONE) {
+                            if (repeat == 0) {
+                                MechDrive.SetTargets(-92, 420, 0.5, 1);
+                            }
+                            else if (repeat == 1) {
+                                MechDrive.SetTargets(-92, 420, 0.5, 1);
+                            }
+//                            SetAttachmentPosition(4660, 1544);
+                            SetAttachmentPositionLowPower(4660, 1655);
+                            programOrder++;
+                        }
+                    }
+                    break;
+
+                case 22:
 //                    if (RailControl.GetTaskState() == Task_State.DONE || RailControl.GetTaskState() == Task_State.READY && MechDrive.GetTaskState() == Task_State.READY ||
 //                            MechDrive.GetTaskState() == Task_State.DONE) {
 //
@@ -448,7 +499,7 @@ public class SprintAutoRightBlue2 extends LinearOpMode {
 //                    }
                     break;
 
-                case 20:
+                case 23:
 //                    if (RailRight.getCurrentPosition() > 3600) {
 //                        if (MechDrive.GetTaskState() == Task_State.READY ||
 //                                MechDrive.GetTaskState() == Task_State.DONE) {
@@ -465,7 +516,7 @@ public class SprintAutoRightBlue2 extends LinearOpMode {
 //                    }
                     break;
 
-                case 21:
+                case 24:
                     if (ET.milliseconds() > 1700) {
                         RightClaw.setPower(-1);
                         LeftClaw.setPower(-1);
@@ -476,7 +527,7 @@ public class SprintAutoRightBlue2 extends LinearOpMode {
                     }
                     break;
 
-                case 22:
+                case 25:
                     if (repeat == 1) {
                         programOrder++;
                         ET.reset();
@@ -488,7 +539,7 @@ public class SprintAutoRightBlue2 extends LinearOpMode {
                     }
                     break;
 
-                case 23:
+                case 26:
                     if (ET.milliseconds() > 800) {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
@@ -508,7 +559,7 @@ public class SprintAutoRightBlue2 extends LinearOpMode {
                     }
                     break;
 
-                case 24:
+                case 27:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
                         MechDrive.SetTargets(180, 250, 0.4, 1);
@@ -517,14 +568,14 @@ public class SprintAutoRightBlue2 extends LinearOpMode {
                     }
                     break;
 
-                case 25:
+                case 28:
                     if (RailControl.GetTaskState() == Task_State.DONE || RailControl.GetTaskState() == Task_State.READY) {
 //                        SetAttachmentPosition(4660, 1020);
                         programOrder++;
                     }
                     break;
 
-                case 26:
+                case 29:
                     if (RotatingBase.getCurrentPosition() > 970 && RotatingBase.getCurrentPosition() < 1070) {
 //                        SetAttachmentPosition(0, 1020);
                         programOrder++;
@@ -541,7 +592,10 @@ public class SprintAutoRightBlue2 extends LinearOpMode {
 
             rightColorSensorLineDetector();
             leftColorSensorLineDetector();
-            rightWallDetector();
+            frontRightJunctionDetector();
+            frontLeftJunctionDetector();
+            backRightJunctionDetector();
+            backLeftJunctionDetector();
             MechDrive.Task(GyroContinuity());
             RailControl.RailTask();
             telemetry.addData("backright encoder", BackRight.getCurrentPosition());
@@ -742,24 +796,113 @@ public class SprintAutoRightBlue2 extends LinearOpMode {
     }
 
     //From Back of robot
-    private void rightWallDetector() {
-        distance = rightDistanceSensor.getDistance(DistanceUnit.CM);
-        telemetry.addData("Right Distance Sensor", distance);
-        if (distance < 10) {
-            distanceCleared = true;
-        } else {
-            distanceCleared = false;
+    private void backRightJunctionDetector() {
+        if (backRightDistanceSamples_Reset) {
+            backRightDistanceSamples[0] = 819;
+            backRightDistanceSamples[1] = 819;
+            backRightDistanceSamples[2] = 819;
+            backRightDistanceSamples_Reset = false;
+        }
+        else {
+            backRightDistanceSamples[backRightCount] = backRightDistanceSensor.getDistance(DistanceUnit.CM);
+            backRightCount++;
+            backRightDistance = (backRightDistanceSamples[0] + backRightDistanceSamples[1] + backRightDistanceSamples[2]) / 3;
+
+            telemetry.addData("Back Right Distance Sensor", backRightDistance);
+            if (backRightDistance < 50) {
+                rightBackDistanceCleared = true;
+            } else {
+                rightBackDistanceCleared = false;
+            }
+
+            if (backRightCount > 2) {
+                backRightCount = 0;
+            }
         }
     }
 
     //From Back of robot
-    private void leftWallDetector() {
-        distance = leftDistanceSensor.getDistance(DistanceUnit.CM);
-        telemetry.addData("Left Distance Sensor", distance);
-        if (distance < 10) {
-            distanceCleared = true;
-        } else {
-            distanceCleared = false;
+    private void backLeftJunctionDetector() {
+        if (backLeftDistanceSamples_Reset) {
+            backLeftDistanceSamples[0] = 122;
+            backLeftDistanceSamples[1] = 122;
+            backLeftDistanceSamples[2] = 122;
+            backLeftDistanceSamples[3] = 122;
+            backLeftDistanceSamples[4] = 122;
+            backLeftDistanceSamples_Reset = false;
+        }
+        else {
+            backLeftDistanceSamples[backLeftCount] = backLeftDistanceSensor.getDistance(DistanceUnit.CM);
+            backLeftCount++;
+            backLeftDistance = (backLeftDistanceSamples[0] + backLeftDistanceSamples[1] + backLeftDistanceSamples[2] + backLeftDistanceSamples[3] + backLeftDistanceSamples[4]) / 5;
+
+            telemetry.addData("Back Left Distance Sensor", backLeftDistance);
+            if (backLeftDistance < 90) {
+                leftBackDistanceCleared = true;
+            } else {
+                leftBackDistanceCleared = false;
+            }
+
+            if (backLeftCount > 4) {
+                backLeftCount = 0;
+            }
+        }
+    }
+
+    //From Back of robot
+    private void frontRightJunctionDetector() {
+        if (frontRightDistanceSamples_Reset) {
+            frontRightDistanceSamples[0] = 819;
+            frontRightDistanceSamples[1] = 819;
+            frontRightDistanceSamples[2] = 819;
+//            frontRightDistanceSamples[3] = 819;
+//            frontRightDistanceSamples[4] = 819;
+            frontRightDistanceSamples_Reset = false;
+        }
+        else {
+            frontRightDistanceSamples[frontRightCount] = frontRightDistanceSensor.getDistance(DistanceUnit.CM);
+            frontRightCount++;
+            frontRightDistance = (frontRightDistanceSamples[0] + frontRightDistanceSamples[1] + frontRightDistanceSamples[2]) / 3;
+
+            telemetry.addData("Front Right Distance Sensor", frontRightDistance);
+            if (frontRightDistance < 50) {
+                rightFrontDistanceCleared = true;
+            } else {
+                rightFrontDistanceCleared = false;
+            }
+
+            if (frontRightCount > 2) {
+                frontRightCount = 0;
+            }
+        }
+    }
+
+    //From Back of robot
+    private void frontLeftJunctionDetector() {
+
+        if (frontLeftDistanceSamples_Reset) {
+            frontLeftDistanceSamples[0] = 819;
+            frontLeftDistanceSamples[1] = 819;
+            frontLeftDistanceSamples[2] = 819;
+//            frontLeftDistanceSamples[3] = 819;
+//            frontLeftDistanceSamples[4] = 819;
+            frontLeftDistanceSamples_Reset = false;
+        }
+        else {
+            frontLeftDistanceSamples[frontLeftCount] = frontLeftDistanceSensor.getDistance(DistanceUnit.CM);
+            frontLeftCount++;
+            frontLeftDistance = (frontLeftDistanceSamples[0] + frontLeftDistanceSamples[1] + frontLeftDistanceSamples[2]) / 3;
+
+            telemetry.addData("Front Left Distance Sensor", frontLeftDistance);
+            if (frontLeftDistance < 50) {
+                leftFrontDistanceCleared = true;
+            } else {
+                leftFrontDistanceCleared = false;
+            }
+
+            if (frontLeftCount > 2) {
+                frontLeftCount = 0;
+            }
         }
     }
 
