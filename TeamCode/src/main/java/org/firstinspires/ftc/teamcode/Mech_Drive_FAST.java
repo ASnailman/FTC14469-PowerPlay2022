@@ -69,6 +69,10 @@ public class Mech_Drive_FAST {
         state = Task_State.OVERRIDE;
     }
 
+    public void Done() {
+        state = Task_State.DONE;
+    }
+
     // THIS IS THE TASK THAT A STATE MACHINE OPMODE SHOULD CALL REPEATEDLY IN ITS LOOP
     public void Task (double gyro_Z_reading) {
 
