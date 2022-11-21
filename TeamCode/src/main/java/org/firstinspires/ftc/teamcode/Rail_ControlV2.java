@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-public class Rail_Control {
+public class Rail_ControlV2 {
 
     DcMotor motor_obj_left, motor_obj_right;                  // the motor connected to the rail
     PID pid_obj_left, pid_obj_right;
@@ -22,7 +22,7 @@ public class Rail_Control {
     Task_State run_state;               // This is used by the opmode to determine when this task has completed and proceed to the next task
 
     // CONSTRUCTOR
-    public Rail_Control(DcMotor motorLeft, DcMotor motorRight) {
+    public Rail_ControlV2(DcMotor motorLeft, DcMotor motorRight) {
 
         // Assign the motor connected to the bucket and initialize it
         motor_obj_left = motorLeft;
@@ -83,7 +83,7 @@ public class Rail_Control {
             // 0.07, 0.000001, 0.000005 (these are the best gains for accurate position and few jitters
             //cmd = pid_obj.PID_Control(target_position, 0.03, 0.000001, 0.000005, motor_obj.getCurrentPosition() );
             cmdLeft = pid_obj_left.PID_Control(target_position, 0.005, 0, 0, motor_obj_left.getCurrentPosition() );
-            cmdRight = pid_obj_right.PID_Control(target_position, 0.005, 0, 0, motor_obj_right.getCurrentPosition() );
+            cmdRight = pid_obj_right.PID_Control(-target_position, 0.005, 0, 0, motor_obj_right.getCurrentPosition() );
 
             // Don't let the motor run too fast. Otherwise, it will overshoot
             clipped_cmd_left = Range.clip(cmdLeft, min, max);
@@ -99,21 +99,21 @@ public class Rail_Control {
             // the next task in its list
             else if (run_state == Task_State.RUN) {
 
-                if (target_position > motor_obj_right.getCurrentPosition()) {
+                if (target_position > motor_obj_left.getCurrentPosition()) {
 
-                    if (motor_obj_right.getCurrentPosition() > (target_position - tolerance)) {
+                    if (motor_obj_left.getCurrentPosition() > (target_position - tolerance)) {
                         run_state = Task_State.DONE;
                     }
                 }
-                else if (target_position < motor_obj_right.getCurrentPosition()) {
+                else if (target_position < motor_obj_left.getCurrentPosition()) {
 
-                    if (motor_obj_right.getCurrentPosition() < (target_position + tolerance)) {
+                    if (motor_obj_left.getCurrentPosition() < (target_position + tolerance)) {
                         run_state = Task_State.DONE;
                     }
                 }
                 else {
-                    if (run_state != Task_State.READY && motor_obj_right.getCurrentPosition() > (target_position - tolerance) &&
-                            motor_obj_right.getCurrentPosition() < (target_position + tolerance)) {
+                    if (run_state != Task_State.READY && motor_obj_left.getCurrentPosition() > (target_position - tolerance) &&
+                            motor_obj_left.getCurrentPosition() < (target_position + tolerance)) {
                         run_state = Task_State.DONE;
                     }
                 }

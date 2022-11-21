@@ -25,6 +25,7 @@ public class TeleopTest extends LinearOpMode {
     static DcMotor RailLeft;
     static DcMotor RailRight;
     static DcMotor ExtendingRail;
+    static CRServo Claw;
 
     //Sensors
     BNO055IMU IMU;
@@ -32,7 +33,8 @@ public class TeleopTest extends LinearOpMode {
     //Variables of Classes
     Methods motorMethods;
     Mech_Drive_FAST MechDrive;
-    Rail_Control RailControl;
+//    Rail_Control RailControl;
+    Rail_ControlV2 RailControlV2;
 
     //Variables For IMU Gyro
     double globalangle;
@@ -53,6 +55,8 @@ public class TeleopTest extends LinearOpMode {
     boolean coneStackMode = false;
     boolean groundJunctionMode = false;
     int basePosition;
+
+    int extendingOrder;
 
     double l;
     double assist_gain = 0.02;
@@ -86,7 +90,8 @@ public class TeleopTest extends LinearOpMode {
         //Initialize the motors and sensors
         RailLeft = hardwareMap.get(DcMotor.class, "RailLeft");
         RailRight = hardwareMap.get(DcMotor.class, "RailRight");
-        ExtendingRail = hardwareMap.get(DcMotor.class, "ExtendingRail");
+//        ExtendingRail = hardwareMap.get(DcMotor.class, "ExtendingRail");
+        Claw = hardwareMap.get(CRServo.class, "Claw");
         IMU = hardwareMap.get(BNO055IMU.class, "imu");
 
         //Configure the control hub orientation
@@ -105,8 +110,11 @@ public class TeleopTest extends LinearOpMode {
         IMU.initialize(parameters);
         globalangle = 0;
 
+        Claw.setDirection(CRServo.Direction.FORWARD);
+//        Claw.setPower(-1);
+
         //Mechdrive Object
-        RailControl = new Rail_Control(RailLeft, RailRight);
+        RailControlV2 = new Rail_ControlV2(RailLeft, RailRight);
         //        motorMethods = new Methods(telemetry, IMU, orientation, FrontLeft, FrontRight, BackLeft, BackRight, MoveDirection.FORWARD);
 
         waitForStart();
@@ -115,9 +123,31 @@ public class TeleopTest extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-                if (!button_x_already_pressed2) {
+            if (!button_dpad_up_already_pressed2) {
+                if (gamepad2.dpad_up) {
+                    if (!ClawSetting) {
+                        ClawSetting = true;
+                    } else {
+                        ClawSetting = false;
+                    }
+                    button_dpad_up_already_pressed2 = true;
+                }
+            } else {
+                if (!gamepad2.dpad_up) {
+                    button_dpad_up_already_pressed2 = false;
+                }
+            }
+
+            if (!ClawSetting) {
+                Claw.setPower(1);
+            } else {
+                Claw.setPower(-1);
+            }
+
+            if (!button_x_already_pressed2) {
                     if (gamepad2.x) {
-                        RailControl.SetTargetPosition(0, -1, 1);
+                        RailControlV2.SetTargetPosition(0, -1, 1);
+//                        SetRailPosition(0, 1);
                         button_x_already_pressed2 = true;
                     }
                 } else {
@@ -128,7 +158,8 @@ public class TeleopTest extends LinearOpMode {
 
                 if (!button_a_already_pressed2) {
                     if (gamepad2.a) {
-                        RailControl.SetTargetPosition(2210, -1, 1);
+                        RailControlV2.SetTargetPosition(1910, -1, 1);
+//                        SetRailPosition(1910, 0.85);
                         button_a_already_pressed2 = true;
                     }
                 } else {
@@ -139,7 +170,8 @@ public class TeleopTest extends LinearOpMode {
 
                 if (!button_b_already_pressed2) {
                     if (gamepad2.b) {
-                        RailControl.SetTargetPosition(3614, -0.7, 0.7);
+                        RailControlV2.SetTargetPosition(2914, -1, 1);
+//                        SetRailPosition(2914, 0.85);
                         button_b_already_pressed2 = true;
                     }
                 } else {
@@ -150,7 +182,8 @@ public class TeleopTest extends LinearOpMode {
 
                 if (!button_y_already_pressed2) {
                     if (gamepad2.y) {
-                        RailControl.SetTargetPosition(4846, -0.7, 0.7);
+                        RailControlV2.SetTargetPosition(4146, -1, 1);
+//                        SetRailPosition(4146, 0.85);
                         button_y_already_pressed2 = true;
                     }
                 } else {
@@ -159,39 +192,40 @@ public class TeleopTest extends LinearOpMode {
                     }
                 }
 
-            if (!button_bumper_right_already_pressed2) {
-                if (gamepad2.right_bumper) {
-                    //
-                    ExtendingRail.setTargetPosition(1500);
-                    ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    ExtendingRail.setPower(0.2);
-                    button_bumper_right_already_pressed2 = true;
-                }
-            } else {
-                if (!gamepad2.right_bumper) {
-                    button_bumper_right_already_pressed2 = false;
-                }
-            }
+//            if (!button_bumper_right_already_pressed2) {
+//                if (gamepad2.right_bumper) {
+//                    //
+//                    ExtendingRail.setTargetPosition(400);
+//                    ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    ExtendingRail.setPower(0.3);
+//                    button_bumper_right_already_pressed2 = true;
+//                }
+//            } else {
+//                if (!gamepad2.right_bumper) {
+//                    button_bumper_right_already_pressed2 = false;
+//                }
+//            }
+//
+//            if (!button_bumper_left_already_pressed2) {
+//                if (gamepad2.left_bumper) {
+//                    ExtendingRail.setTargetPosition(0);
+//                    ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    ExtendingRail.setPower(0.3);
+//                    button_bumper_left_already_pressed2 = true;
+//                }
+//            } else {
+//                if (!gamepad2.left_bumper) {
+//                    button_bumper_left_already_pressed2 = false;
+//                }
+//            }
 
-            if (!button_bumper_left_already_pressed2) {
-                if (gamepad2.left_bumper) {
-                    ExtendingRail.setTargetPosition(0);
-                    ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    ExtendingRail.setPower(0.2);
-                    button_bumper_left_already_pressed2 = true;
-                }
-            } else {
-                if (!gamepad2.left_bumper) {
-                    button_bumper_left_already_pressed2 = false;
-                }
-            }
-
-            RailControl.RailTask();
-            telemetry.addData("LeftRail Power", RailLeft.getPower());
+//            RailControl.RailTask();
+            RailControlV2.RailTask();
+//            telemetry.addData("LeftRail Power", RailLeft.getPower());
             telemetry.addData("LeftRail Encoder", RailLeft.getCurrentPosition());
-            telemetry.addData("RightRail Power", RailRight.getPower());
+//            telemetry.addData("RightRail Power", RailRight.getPower());
             telemetry.addData("RightRail Encoder", RailRight.getCurrentPosition());
-            telemetry.addData("Extending Rail Encoder", ExtendingRail.getCurrentPosition());
+//            telemetry.addData("Extending Rail Encoder", ExtendingRail.getCurrentPosition());
             telemetry.update();
         }
     }
@@ -227,18 +261,18 @@ public class TeleopTest extends LinearOpMode {
         RailRight.setTargetPosition(0);
         RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        ExtendingRail.setDirection(DcMotorSimple.Direction.FORWARD);
-        ExtendingRail.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        ExtendingRail.setTargetPosition(0);
-        ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        ExtendingRail.setDirection(DcMotorSimple.Direction.FORWARD);
+//        ExtendingRail.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        ExtendingRail.setTargetPosition(0);
+//        ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    public void SetRailPosition(int position) {
+    public void SetRailPosition(int position, double power) {
         RailRight.setTargetPosition(-position);
         RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        RailRight.setPower(1);
+        RailRight.setPower(power);
         RailLeft.setTargetPosition(position);
         RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        RailLeft.setPower(1);
+        RailLeft.setPower(power);
     }
 }
