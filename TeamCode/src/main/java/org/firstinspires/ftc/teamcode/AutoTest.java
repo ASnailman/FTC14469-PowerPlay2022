@@ -274,10 +274,10 @@ public class AutoTest extends LinearOpMode {
                     break;
             }
 
-            rightColorSensorLineDetector();
+//            rightColorSensorLineDetector();
             leftColorSensorLineDetector();
             centerRightColorSensorLineDetector();
-            centerLeftColorSensorLineDetector();
+//            centerLeftColorSensorLineDetector();
 //            MechDrive.Task(GyroContinuity());
             telemetry.update();
         }

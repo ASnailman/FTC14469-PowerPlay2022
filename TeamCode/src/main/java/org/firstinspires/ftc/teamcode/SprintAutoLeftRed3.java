@@ -24,8 +24,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "SprintAutoRightBlue3", group = "MecanumDrive")
-public class SprintAutoRightBlue3 extends LinearOpMode {
+@Autonomous(name = "SprintAutoLeftRed3", group = "MecanumDrive")
+public class SprintAutoLeftRed3 extends LinearOpMode {
 
     //Control Hub Orientation
     byte AXIS_MAP_CONFIG_BYTE = 0x06; //rotates control hub 90 degrees around y axis by swapping x and z axis
@@ -45,7 +45,7 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
     //Sensors
     BNO055IMU IMU;
     OpenCvWebcam webcam;
-    VisionClassAutoRightBlue.SignalDeterminationPipeline pipeline;
+    VisionClassAutoLeftRed.SignalDeterminationPipeline pipeline;
 
     static NormalizedColorSensor rightColorsensor;
     static NormalizedColorSensor leftColorsensor;
@@ -178,7 +178,7 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
-        pipeline = new VisionClassAutoRightBlue.SignalDeterminationPipeline();
+        pipeline = new VisionClassAutoLeftRed.SignalDeterminationPipeline();
         webcam.setPipeline(pipeline);
         pipeline.InitTelemetry(telemetry);
 
@@ -213,7 +213,7 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
             switch (programOrder) {
 
                 case 0:
-                    if (pipeline.type == VisionClassAutoRightBlue.SignalDeterminationPipeline.SignalSleeveType.LocationONE) {
+                    if (pipeline.type == VisionClassAutoLeftRed.SignalDeterminationPipeline.SignalSleeveType.LocationONE) {
                         posOne = true;
                         posTwo = false;
                         posThree = false;
@@ -221,7 +221,7 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
                         RightClaw.setPower(1);
                         ET.reset();
                         ERT.reset();
-                    } else if (pipeline.type == VisionClassAutoRightBlue.SignalDeterminationPipeline.SignalSleeveType.LocationTWO) {
+                    } else if (pipeline.type == VisionClassAutoLeftRed.SignalDeterminationPipeline.SignalSleeveType.LocationTWO) {
                         posOne = false;
                         posTwo = true;
                         posThree = false;
@@ -229,7 +229,7 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
                         RightClaw.setPower(1);
                         ET.reset();
                         ERT.reset();
-                    } else if (pipeline.type == VisionClassAutoRightBlue.SignalDeterminationPipeline.SignalSleeveType.LocationTHREE) {
+                    } else if (pipeline.type == VisionClassAutoLeftRed.SignalDeterminationPipeline.SignalSleeveType.LocationTHREE) {
                         posOne = false;
                         posTwo = false;
                         posThree = true;
@@ -253,7 +253,7 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
                     if (ET.milliseconds() > 550) {
                         if (RailControl.GetTaskState() == Task_State.INIT || RailControl.GetTaskState() == Task_State.READY) {
 //                        SetAttachmentPosition(0, 4953);
-                            SetAttachmentPosition(500, 620);
+                            SetAttachmentPosition(500, -620);
                         } else if (RailControl.GetTaskState() == Task_State.DONE) {
                             programOrder++;
                         }
@@ -273,9 +273,9 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
 
                 case 3:
                     if (ET.milliseconds() > 600) {
-                        if (RotatingBase.getCurrentPosition() >= 570 && RotatingBase.getCurrentPosition() <= 670) {
+                        if (RotatingBase.getCurrentPosition() <= -570 && RotatingBase.getCurrentPosition() >= -670) {
                             if (RailControl.GetTaskState() == Task_State.DONE || RailControl.GetTaskState() == Task_State.READY) {
-                                SetAttachmentPosition(400, 1320);
+                                SetAttachmentPosition(400, -1320);
                                 programOrder++;
                                 ET.reset();
                             }
@@ -284,43 +284,46 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
                     break;
 
                 case 4:
-                    if (MechDrive.GetTaskState() == Task_State.INIT ||
-                            MechDrive.GetTaskState() == Task_State.READY ||
-                            MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(-1, 1250, 0.7, 1);
-                        SetAttachmentPosition(400, 1020);
-                        programOrder++;
+                    if (ET.milliseconds() > 200) {
+                        if (MechDrive.GetTaskState() == Task_State.INIT ||
+                                MechDrive.GetTaskState() == Task_State.READY ||
+                                MechDrive.GetTaskState() == Task_State.DONE) {
+                            MechDrive.SetTargets(1, 1210, 0.7, 1);
+                            SetAttachmentPosition(400, -1020);
+                            programOrder++;
+                        }
                     }
                     break;
 
                 case 5:
-                    if (RotatingBase.getCurrentPosition() >= 970 && RotatingBase.getCurrentPosition() <= 1070) {
+                    if (RotatingBase.getCurrentPosition() <= -970 && RotatingBase.getCurrentPosition() >= -1070) {
                         if (RailControl.GetTaskState() == Task_State.DONE || RailControl.GetTaskState() == Task_State.READY) {
 //                            SetAttachmentPosition(4660, 1020);
 //                            SetAttachmentPosition(4660, 1320);
-                            SetAttachmentPosition(4660, 1020);
+                            SetAttachmentPosition(4680, -1020);
                             programOrder++;
                         }
                     }
                     break;
 
                 case 6:
-                    if (MechDrive.GetTaskState() == Task_State.READY ||
-                            MechDrive.GetTaskState() == Task_State.DONE ||
-                            RailControl.GetTaskState() == Task_State.DONE ||
-                            RailControl.GetTaskState() == Task_State.READY) {
-                        MechDrive.SetTargets(-90, 0, 0.4, 1);
-                        SetAttachmentPositionLowPower(4660, 1640);
+//                    if ((MechDrive.GetTaskState() == Task_State.READY ||
+//                            MechDrive.GetTaskState() == Task_State.DONE) &&
+//                    (RailControl.GetTaskState() == Task_State.DONE ||
+//                            RailControl.GetTaskState() == Task_State.READY)) {
+                    if (RailRight.getCurrentPosition() > 3300) {
+                        MechDrive.SetTargets(90, 0, 0.4, 1);
+                        SetAttachmentPositionLowPower(4680, -1660);
                         ET.reset();
                         programOrder++;
                     }
                     break;
 
                 case 7:
-                    if (ET.milliseconds() > 1500) {
-                            if (RotatingBase.getCurrentPosition() >= 1630) {
+                    if (ET.milliseconds() > 1100) {
+                            if (RotatingBase.getCurrentPosition() <= -1650) {
                             ET.reset();
-                            SetAttachmentPositionLowPower(3860, 1620);
+                            SetAttachmentPositionLowPower(3860, -1660);
                             programOrder++;
                         }
                     }
@@ -340,7 +343,7 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
 
                 case 9:
                     if (ET.milliseconds() > 700) {
-                        SetAttachmentPositionLowPower(4660, 1620);
+                        SetAttachmentPositionLowPower(4660, -1660);
                         ET.reset();
                         programOrder++;
                     }
@@ -352,10 +355,10 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
                             if (repeat == 0) {
-                                MechDrive.SetTargets(88, 800, 0.4, 1);
+                                MechDrive.SetTargets(-92, 800, 0.4, 1);
                             }
                             else if (repeat == 1) {
-                                MechDrive.SetTargets(88, 820, 0.4, 1);
+                                MechDrive.SetTargets(-92, 820, 0.4, 1);
                             }
                             programOrder++;
                         }
@@ -378,7 +381,7 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
                 case 12:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
-                        if (rightBlue || rightRed) {
+                        if (leftBlue || leftRed) {
                             SetMotorPower(0);
                             MechDrive.Done();
                             ET.reset();
@@ -400,13 +403,13 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
                 case 14:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(90, 325, 0.4, 1);
+                        MechDrive.SetTargets(-90, 270, 0.4, 1);
                         programOrder++;
                     }
                     break;
 
                 case 15:
-                    if (centerLeftBlue || centerLeftRed) {
+                    if (centerRightRed) {
 //                        SetMotorPower(0);
                         MechDrive.Done();
                         FrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -439,11 +442,11 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
                         if (repeat == 0) {
 //                            MechDrive.SetTargets(90, 355, 0.4, 1);
 //                            MechDrive.SetTargets(90, 145, 0.4, 1);
-                            MechDrive.SetTargets(90, 155, 0.4, 1);
+                            MechDrive.SetTargets(-90, 70, 0.4, 1);
                             ET.reset();
                         } else if (repeat == 1) {
 //                            MechDrive.SetTargets(90, 335, 0.4, 1);
-                            MechDrive.SetTargets(90, 155, 0.4, 1);
+                            MechDrive.SetTargets(-90, 75, 0.4, 1);
                             ET.reset();
                         }
                         programOrder++;
@@ -451,7 +454,7 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
                     break;
 
                 case 17:
-                    if (RotatingBase.getCurrentPosition() < 50 && (MechDrive.GetTaskState() == Task_State.READY ||
+                    if ((RotatingBase.getCurrentPosition() < 50) && (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE)) {
 
                         RightClaw.setPower(1);
@@ -487,20 +490,20 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
                         if (MechDrive.GetTaskState() == Task_State.READY ||
                                 MechDrive.GetTaskState() == Task_State.DONE) {
                             if (repeat == 0) {
-                                MechDrive.SetTargets(-92, 1020, 0.5, 1);
+                                MechDrive.SetTargets(88, 1280, 0.5, 1);
                             }
                             else if (repeat == 1) {
-                                MechDrive.SetTargets(-92, 1020, 0.5, 1);
+                                MechDrive.SetTargets(88, 1260, 0.5, 1);
                             }
 //                            SetAttachmentPosition(4660, 1544);
-                            SetAttachmentPositionLowPower(4660, 1590);
+                            SetAttachmentPositionLowPower(4660, -1675);
                             programOrder++;
                         }
                     }
                     break;
 
                 case 21:
-                    if (RotatingBase.getCurrentPosition() > 1580 && RailRight.getCurrentPosition() > 1600) {
+                    if (RotatingBase.getCurrentPosition() < -1660 && RailRight.getCurrentPosition() > 1600) {
                         ET.reset();
                         programOrder++;
                     }
@@ -508,9 +511,9 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
 
                 case 22:
 
-                    if (ET.milliseconds() > 700) {
-                        if (RotatingBase.getCurrentPosition() >= 1580) {
-                            SetAttachmentPositionLowPower(3860, 1640);
+                    if (ET.milliseconds() > 600) {
+                        if (RotatingBase.getCurrentPosition() <= -1660) {
+                            SetAttachmentPositionLowPower(3860, -1675);
                             ET.reset();
                             programOrder++;
                         }
@@ -530,7 +533,7 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
 
                 case 24:
                     if (ET.milliseconds() > 600) {
-                        SetAttachmentPositionLowPower(4660, 1640);
+                        SetAttachmentPositionLowPower(4660, -1675);
                         ET.reset();
                         programOrder++;
                     }
@@ -554,14 +557,14 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
                                 MechDrive.GetTaskState() == Task_State.DONE) {
 
                             if (posOne) {
-                                MechDrive.SetTargets(-90, 1000, 0.8, 1);
-                                SetAttachmentPosition(0, 2040);
+                                MechDrive.SetTargets(-90, 1300, 0.7, 1);
+                                SetAttachmentPosition(0, -1020);
                             } else if (posTwo) {
-                                MechDrive.SetTargets(90, 100, 0, 1);
-                                SetAttachmentPosition(0, 1020);
+                                MechDrive.SetTargets(-90, 100, 0, 1);
+                                SetAttachmentPosition(0, -1020);
                             } else if (posThree) {
-                                MechDrive.SetTargets(90, 1300, 0.8, 1);
-                                SetAttachmentPosition(0, 1020);
+                                MechDrive.SetTargets(89, 1300, 0.7, 1);
+                                SetAttachmentPosition(0, -2040);
                             }
                             programOrder++;
                         }
@@ -577,7 +580,7 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
                     )
                     {
                         MechDrive.SetTargets(180, 250, 0.8, 1);
-                        SetAttachmentPosition(0, 1020);
+                        SetAttachmentPosition(0, -1020);
                         programOrder++;
                     }
                     break;
@@ -590,7 +593,7 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
                     break;
 
                 case 29:
-                    if (RotatingBase.getCurrentPosition() > 970 && RotatingBase.getCurrentPosition() < 1070) {
+                    if (RotatingBase.getCurrentPosition() < -970 && RotatingBase.getCurrentPosition() > -1070) {
 //                        SetAttachmentPosition(0, 1020);
                         programOrder++;
                     }
@@ -601,7 +604,7 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
             }
 
             if (ERT.milliseconds() > 29500) {
-                SetAttachmentPosition(0, 1020);
+                SetAttachmentPosition(0, -1020);
             }
 
             rightColorSensorLineDetector();
@@ -794,7 +797,7 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
             leftRed = false;
             leftUnknown = false;
             return lBlue;
-        } else if (lHSV[0] >= 10 && lHSV[0] <= 50) {
+        } else if (lHSV[0] >= 10 && lHSV[0] <= 110) {
             telemetry.addData("Color:", "Red");
             telemetry.update();
             leftBlue = false;
@@ -834,7 +837,7 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
             centerRightRed = false;
             centerRightUnknown = false;
             return centerRBlue;
-        } else if (centerRHSV[0] >= 10 && centerRHSV[0] <= 50) {
+        } else if (centerRHSV[0] >= 10 && centerRHSV[0] <= 110) {
             telemetry.addData("Color:", "Red");
             telemetry.update();
             centerRightBlue = false;
@@ -874,7 +877,7 @@ public class SprintAutoRightBlue3 extends LinearOpMode {
             centerLeftRed = false;
             centerLeftUnknown = false;
             return centerLBlue;
-        } else if (centerLHSV[0] >= 10 && centerLHSV[0] <= 50) {
+        } else if (centerLHSV[0] >= 10 && centerLHSV[0] <= 80) {
             telemetry.addData("Color:", "Red");
             telemetry.update();
             centerLeftBlue = false;
