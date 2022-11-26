@@ -88,8 +88,8 @@ public class Rail_ControlV2 {
             // Don't let the motor run too fast. Otherwise, it will overshoot
             clipped_cmd_left = Range.clip(cmdLeft, min, max);
             clipped_cmd_right = Range.clip(cmdRight, min, max);
-            motor_obj_left.setPower(clipped_cmd_left);
             motor_obj_right.setPower(clipped_cmd_right);
+            motor_obj_left.setPower(clipped_cmd_left);
 
             if (run_state == Task_State.DONE) {
                 run_state = Task_State.READY;

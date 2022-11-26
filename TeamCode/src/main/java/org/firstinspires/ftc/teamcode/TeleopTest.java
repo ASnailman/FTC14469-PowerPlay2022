@@ -139,9 +139,9 @@ public class TeleopTest extends LinearOpMode {
             }
 
             if (!ClawSetting) {
-                Claw.setPower(1);
+                Claw.setPower(0.6);
             } else {
-                Claw.setPower(-1);
+                Claw.setPower(-0.6);
             }
 
             if (!button_x_already_pressed2) {
@@ -182,7 +182,7 @@ public class TeleopTest extends LinearOpMode {
 
                 if (!button_y_already_pressed2) {
                     if (gamepad2.y) {
-                        RailControlV2.SetTargetPosition(4146, -0.4, 0.4);
+                        RailControlV2.SetTargetPosition(4146, -1, 1);
 //                        SetRailPosition(4146, 0.85);
                         button_y_already_pressed2 = true;
                     }
