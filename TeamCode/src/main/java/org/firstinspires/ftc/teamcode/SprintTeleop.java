@@ -248,128 +248,128 @@ public class SprintTeleop extends LinearOpMode {
                 LeftClaw.setPower(1);
             }
 
-                switch (targetJunction) {
-                    case 1:
-                        ET.reset();
-                        targetJunction++;
-                        break;
-                    case 2:
-                        if (ET.milliseconds() > 100) {
-                            RailControl.SetTargetPosition(2125, -1, 1);
-                            ClawSetting = false;
-                            RightClaw.setPower(-1);
-                            LeftClaw.setPower(-1);
-                            ET.reset();
-                            targetJunction++;
-                        }
-                        break;
-                    case 3:
-                        if (ET.milliseconds() > 500) {
-                            SetBasePosition(0);
-                            targetJunction++;
-                        }
-                        break;
-
-                    case 4:
-                        break;
-
-                    case 5:
-                        ET.reset();
-                        targetJunction++;
-                        break;
-
-                    case 6:
-                        if (ET.milliseconds() > 800) {
-                            RailControl.SetTargetPosition(3475, -1, 1);
-                            ET.reset();
-                            targetJunction++;
-                        }
-                        break;
-                    case 7:
-                        if (ET.milliseconds() > 500) {
-//                            SetBasePosition(0);
-                            targetJunction++;
-                        }
-                        break;
-
-                    case 8:
-                        break;
-
-                    case 9:
-                        ET.reset();
-                        targetJunction++;
-                        break;
-
-                    case 10:
-                        if (ET.milliseconds() > 800) {
-                            RailControl.SetTargetPosition(4825, -1, 1);
-                            ET.reset();
-                            targetJunction++;
-                        }
-                        break;
-
-                    case 11:
-                        if (ET.milliseconds() > 500) {
-//                            SetBasePosition(0);
-                            targetJunction++;
-                        }
-                        break;
-
-                    case 12:
-                        break;
-
-                    case 13:
-                        ET.reset();
-                        targetJunction++;
-                        break;
-
-                    case 14:
-                        if (ET.milliseconds() > 800) {
-                            RailControl.SetTargetPosition(300, -0.5, 0.5);
-                            ET.reset();
-                            targetJunction++;
-                        }
-                        break;
-
-                    case 15:
-                        if (ET.milliseconds() > 500) {
-                            SetBasePosition(0);
-                            targetJunction++;
-                        }
-                        break;
-
-                    case 16:
-                        break;
-
-                    case 17:
-                        ET.reset();
-                        ClawSetting = true;
+            switch (targetJunction) {
+                case 1:
+                    ET.reset();
+                    targetJunction++;
+                    break;
+                case 2:
+                    if (ET.milliseconds() > 100) {
+                        RailControl.SetTargetPosition(2125, -1, 1);
+                        ClawSetting = false;
                         RightClaw.setPower(-1);
                         LeftClaw.setPower(-1);
+                        ET.reset();
                         targetJunction++;
-                        break;
-                    case 18:
-                        if (ET.milliseconds() > 800) {
-                            RailControl.SetTargetPosition(2125, -1, 1);
+                    }
+                    break;
+                case 3:
+                    if (ET.milliseconds() > 500) {
+                        SetBasePosition(0);
+                        targetJunction++;
+                    }
+                    break;
 
-                            ET.reset();
-                            targetJunction++;
-                        }
-                        break;
-                    case 19:
-                        if (ET.milliseconds() > 500) {
-                            SetBasePosition(0);
-                            targetJunction++;
-                        }
-                        break;
+                case 4:
+                    break;
 
-                    case 20:
-                        break;
+                case 5:
+                    ET.reset();
+                    targetJunction++;
+                    break;
 
-                    default:
-                        break;
+                case 6:
+                    if (ET.milliseconds() > 800) {
+                        RailControl.SetTargetPosition(3475, -1, 1);
+                        ET.reset();
+                        targetJunction++;
+                    }
+                    break;
+                case 7:
+                    if (ET.milliseconds() > 500) {
+//                            SetBasePosition(0);
+                        targetJunction++;
+                    }
+                    break;
 
-                }
+                case 8:
+                    break;
+
+                case 9:
+                    ET.reset();
+                    targetJunction++;
+                    break;
+
+                case 10:
+                    if (ET.milliseconds() > 800) {
+                        RailControl.SetTargetPosition(4825, -1, 1);
+                        ET.reset();
+                        targetJunction++;
+                    }
+                    break;
+
+                case 11:
+                    if (ET.milliseconds() > 500) {
+//                            SetBasePosition(0);
+                        targetJunction++;
+                    }
+                    break;
+
+                case 12:
+                    break;
+
+                case 13:
+                    ET.reset();
+                    targetJunction++;
+                    break;
+
+                case 14:
+                    if (ET.milliseconds() > 800) {
+                        RailControl.SetTargetPosition(300, -0.5, 0.5);
+                        ET.reset();
+                        targetJunction++;
+                    }
+                    break;
+
+                case 15:
+                    if (ET.milliseconds() > 500) {
+                        SetBasePosition(0);
+                        targetJunction++;
+                    }
+                    break;
+
+                case 16:
+                    break;
+
+                case 17:
+                    ET.reset();
+                    ClawSetting = true;
+                    RightClaw.setPower(-1);
+                    LeftClaw.setPower(-1);
+                    targetJunction++;
+                    break;
+                case 18:
+                    if (ET.milliseconds() > 800) {
+                        RailControl.SetTargetPosition(2125, -1, 1);
+
+                        ET.reset();
+                        targetJunction++;
+                    }
+                    break;
+                case 19:
+                    if (ET.milliseconds() > 500) {
+                        SetBasePosition(0);
+                        targetJunction++;
+                    }
+                    break;
+
+                case 20:
+                    break;
+
+                default:
+                    break;
+
+            }
 
             if (!button_dpad_left_already_pressed2) {
                 if (gamepad2.dpad_left) {
@@ -515,7 +515,7 @@ public class SprintTeleop extends LinearOpMode {
                     }
                 }
 
-            //if cone stack mode is true, buttons a, b, and y will correspond to the height of the cone stack
+                //if cone stack mode is true, buttons a, b, and y will correspond to the height of the cone stack
             } else {
 
                 if (!button_x_already_pressed2) {
