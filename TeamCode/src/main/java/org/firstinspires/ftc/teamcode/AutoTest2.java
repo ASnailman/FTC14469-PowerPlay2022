@@ -24,8 +24,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "SprintAutoRightBlue", group = "MecanumDrive")
-public class SprintAutoRightBlue extends LinearOpMode {
+@Autonomous(name = "AutoTest2", group = "MecanumDrive")
+public class AutoTest2 extends LinearOpMode {
 
     //Control Hub Orientation
     byte AXIS_MAP_CONFIG_BYTE = 0x06; //rotates control hub 90 degrees around y axis by swapping x and z axis
@@ -73,7 +73,6 @@ public class SprintAutoRightBlue extends LinearOpMode {
     int repeat = 0;
     ElapsedTime ET = new ElapsedTime();
     ElapsedTime ERT = new ElapsedTime(); //Elapsed Reset Timer
-    int coneLevel = 0;
 
     int leftCenterTickCount;
 
@@ -218,254 +217,19 @@ public class SprintAutoRightBlue extends LinearOpMode {
             switch (programOrder) {
 
                 case 0:
-                    if (pipeline.type == VisionClassAutoRightBlue.SignalDeterminationPipeline.SignalSleeveType.LocationONE) {
-                        posOne = true;
-                        posTwo = false;
-                        posThree = false;
-                        Claw.setPower(1);
-                        ET.reset();
-                        ERT.reset();
-                    } else if (pipeline.type == VisionClassAutoRightBlue.SignalDeterminationPipeline.SignalSleeveType.LocationTWO) {
-                        posOne = false;
-                        posTwo = true;
-                        posThree = false;
-                        Claw.setPower(1);
-                        ET.reset();
-                        ERT.reset();
-                    } else if (pipeline.type == VisionClassAutoRightBlue.SignalDeterminationPipeline.SignalSleeveType.LocationTHREE) {
-                        posOne = false;
-                        posTwo = false;
-                        posThree = true;
-                        Claw.setPower(1);
-                        ET.reset();
-                        ERT.reset();
-                    } else {
-                        posOne = false;
-                        posTwo = true;
-                        posThree = false;
-                        Claw.setPower(1);
-                        ET.reset();
-                        ERT.reset();
-                    }
-                    programOrder++;
+                    DirectionControl.SetTargetDirection(0, 0.2);
                     break;
 
                 case 1:
-                    if (ET.milliseconds() > 550) {
-                        if (RailControlV2.GetTaskState() == Task_State.INIT || RailControlV2.GetTaskState() == Task_State.READY) {
-//                        SetAttachmentPosition(0, 4953);
-                            SetAttachment_LowPwr2Rail(3000, 1020);
-                            MechDrive.SetTargets(0, 2114, 0.6, 1);
-//                        } else if (RailControlV2.GetTaskState() == Task_State.DONE) {
-                            programOrder++;
-                        }
-                    }
-                    break;
-
-                case 2:
-//                    if (MechDrive.GetTaskState() == Task_State.INIT ||
-//                            MechDrive.GetTaskState() == Task_State.READY ||
-//                            MechDrive.GetTaskState() == Task_State.DONE) {
-//                        MechDrive.SetTargets(0, 994, 0.36, 1);
-//                        ET.reset();
-                        programOrder++;
-//                    }
-
-                    break;
-
-                case 3:
-//                    if (ET.milliseconds() > 600) {
-//                        if (RotatingBase.getCurrentPosition() >= 570 && RotatingBase.getCurrentPosition() <= 670) {
-//                            if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-//                                SetAttachmentPosition(420, 1320);
-                                programOrder++;
-//                                ET.reset();
-//                            }
-//                        }
-//                    }
-                    break;
-
-                case 4:
-//                    if (MechDrive.GetTaskState() == Task_State.INIT ||
-//                            MechDrive.GetTaskState() == Task_State.READY ||
-//                            MechDrive.GetTaskState() == Task_State.DONE) {
-//                        MechDrive.SetTargets(-1, 1050, 0.7, 1);
-//                    if ((RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY)) {
-//                        SetAttachmentPosition(2150, 1020);
-                        programOrder++;
-//                    }
-                    break;
-
-                case 5:
-                    if (RotatingBase.getCurrentPosition() >= 970 && RotatingBase.getCurrentPosition() <= 1070) {
-//
-//                            SetAttachmentPosition(3000, 1020);
-                            SetExtendingPosition(140);
-                            programOrder++;
-
-                    }
-                    break;
-
-                case 6:
-                    if (RailControlV2.GetTaskState() == Task_State.DONE ||
-                            RailControlV2.GetTaskState() == Task_State.READY) {
-//                        MechDrive.SetTargets(-90, 0, 0.4, 1);
-                        DirectionControl.SetTargetDirection(0, 0.2);
-                        SetAttachmentPositionLowPower(3000, 1475);
-                        ET.reset();
-                        programOrder++;
-                    }
-                    break;
-
-                case 7:
-//                    if (ET.milliseconds() > 1000) {
-                        if (RotatingBase.getCurrentPosition() >= 1460 && ET.milliseconds() > 1500) {
-                            SetAttachment_LowPwrRail(2690, 1475);
-                            ET.reset();
-//                            SetAttachmentPositionLowPower(2750, 1660);
-                            programOrder++;
-                        }
-//                    }
-                    break;
-
-                case 8:
-                    if (ET.milliseconds() > 500) {
-                        Claw.setPower(-1);
-                        if (Claw.getPower() < -0.95 && Claw.getPower() < -0.95) {
-                            programOrder++;
-                            ET.reset();
-//                        programOrder = 15;
-                        }
-                    }
-                    break;
-
-                case 9:
-                    if (coneLevel == 4) {
-                        ET.reset();
-                        programOrder = 17;
-                    } else {
-                        programOrder++;
-                        ET.reset();
-                    }
-                    break;
-
-                case 10:
-                    if (ET.milliseconds() > 200) {
-                        SetAttachmentPosition(2690, 0);
-                        SetExtendingPosition(140);
-                        programOrder++;
-                    }
-                    break;
-
-                case 11:
-                    if (RotatingBase.getCurrentPosition() < 1020) {
-                        if (coneLevel == 0) {
-                            SetAttachmentPositionLowPower(590, 0);
-                        }
-                        else if (coneLevel == 1) {
-                            SetAttachmentPositionLowPower(520, 0);
-                        }
-                        else if (coneLevel == 2) {
-                            SetAttachmentPositionLowPower(410, 0);
-                        }
-                        else if (coneLevel == 3) {
-                            SetAttachmentPositionLowPower(335, 0);
-                        }
-//                        else if (coneLevel == 4) {
-//                            SetAttachmentPositionLowPower(280, 0);
-//                        }
-                        programOrder++;
-                    }
-                    break;
-
-                case 12:
-                    if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPosition(587);
-                        ET.reset();
-                        programOrder++;
-                    }
-                    break;
-
-                case 13:
-                    if (ET.milliseconds() > 480) {
-                        Claw.setPower(1);
-                        ET.reset();
-                        programOrder++;
-                    }
-                    break;
-
-                case 14:
-                    if (ET.milliseconds() > 480) {
-                        SetAttachmentPosition(1200, 0);
-                        programOrder++;
-                    }
-                    break;
-
-                case 15:
-                    if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPosition(140);
-                        SetAttachmentPositionLowPower(3000, 1475);
-                        ET.reset();
-                        programOrder++;
-                    }
-                    break;
-
-                case 16:
-                    if (ET.milliseconds() > 100) {
-                        ET.reset();
-                        coneLevel++;
-                        if (coneLevel < 5) {
-                            programOrder = 7;
-                        }
-                    }
-                    break;
-
-                case 17:
-                    if (ET.milliseconds() > 200) {
-                        SetAttachmentPosition(0,0);
-                        programOrder++;
-                    }
-                    break;
-
-                case 18:
-                    if (posOne) {
-                        MechDrive.SetTargets(-90, 1000, 0.8, 1);
-                        SetAttachmentPosition(0,1020);
-                        ExtendingRail.setTargetPosition(0);
-                    } else if (posTwo) {
-                        MechDrive.SetTargets(90, 100, 0, 1);
-                        SetAttachmentPosition(0,1020);
-                        ExtendingRail.setTargetPosition(0);
-                    } else if (posThree) {
-                        MechDrive.SetTargets(90, 1470, 0.8, 1);
-                        SetAttachmentPosition(0,1020);
-                        ExtendingRail.setTargetPosition(0);
-                    }
-                    programOrder++;
                     break;
 
                 default:
                     break;
             }
 
-            if (ERT.milliseconds() > 29500) {
-                SetAttachmentPosition(0, 1020);
-            }
-
-            rightColorSensorLineDetector();
-            leftColorSensorLineDetector();
-            centerRightColorSensorLineDetector();
-            centerLeftColorSensorLineDetector();
-            backRightJunctionDetector();
-            backLeftJunctionDetector();
-//            frontRightJunctionDetector();
-//            frontLeftJunctionDetector();
             DirectionControl.GyroTask();
             MechDrive.Task(GyroContinuity());
-//            RailControl.RailTask();
             RailControlV2.RailTask();
-            telemetry.addData("LeftCenterTicks", leftCenterTickCount);
-//            telemetry.addData("backright encoder", BackRight.getCurrentPosition());
             telemetry.addData("gyro", GyroContinuity());
             telemetry.update();
         }
@@ -570,20 +334,6 @@ public class SprintAutoRightBlue extends LinearOpMode {
         ExtendingRail.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ExtendingRail.setTargetPosition(0);
         ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
-
-    public void SetAttachment_LowPwr2Rail(int railPos, int basePos) {
-        RailControlV2.SetTargetPosition(railPos, -0.95, 0.95);
-        RotatingBase.setTargetPosition(basePos);
-        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        RotatingBase.setPower(1);
-    }
-
-    public void SetAttachment_LowPwrRail(int railPos, int basePos) {
-        RailControlV2.SetTargetPosition(railPos, -0.8, 0.8);
-        RotatingBase.setTargetPosition(basePos);
-        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        RotatingBase.setPower(1);
     }
 
     public void SetAttachmentPosition(int railPos, int basePos) {
