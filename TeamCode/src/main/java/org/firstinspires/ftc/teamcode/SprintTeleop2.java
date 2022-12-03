@@ -7,8 +7,10 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -33,6 +35,8 @@ public class SprintTeleop2 extends LinearOpMode {
     //    static CRServo LeftClaw;
 //    static CRServo RightClaw;
     static CRServo Claw;
+
+    static VoltageSensor voltageSensor;
 
     //Sensors
     BNO055IMU IMU;
@@ -63,6 +67,7 @@ public class SprintTeleop2 extends LinearOpMode {
     boolean coneStackMode = false;
     boolean groundJunctionMode = false;
     int basePosition;
+    int readVoltOnce = 0;
 
     double l;
     double assist_gain = 0.02;
@@ -91,6 +96,8 @@ public class SprintTeleop2 extends LinearOpMode {
     boolean button_dpad_left_already_pressed2 = false;
     boolean button_dpad_up_already_pressed2 = false;
     boolean button_dpad_down_already_pressed2 = false;
+    boolean button_left_trigger_already_pressed = false;
+    boolean button_right_trigger_already_pressed = false;
     boolean button_left_trigger_already_pressed2 = false;
     boolean button_right_trigger_already_pressed2 = false;
     boolean double_trigger_already_pressed = false;
@@ -110,6 +117,8 @@ public class SprintTeleop2 extends LinearOpMode {
         ExtendingRail = hardwareMap.get(DcMotor.class, "ExtendingRail");
         RotatingBase = hardwareMap.get(DcMotor.class, "RotatingBase");
         IMU = hardwareMap.get(BNO055IMU.class, "imu");
+
+//        voltageSensor = hardwareMap.get(VoltageSensor.class, "Motor Controller 1");
 
         //Configure the control hub orientation
         IMU.write8(BNO055IMU.Register.OPR_MODE, BNO055IMU.SensorMode.CONFIG.bVal & 0x0F);
@@ -154,9 +163,9 @@ public class SprintTeleop2 extends LinearOpMode {
              *****************************************************************/
 
             if (PowerSetting) {
-                movement = 0.75;
+                movement = 0.85;
             } else {
-                movement = 0.40;
+                movement = 0.55;
             }
 
 //            if (!button_bumper_right_already_pressed) {
@@ -625,7 +634,7 @@ public class SprintTeleop2 extends LinearOpMode {
 
             if (!button_bumper_right_already_pressed2) {
                 if (gamepad2.right_bumper) {
-                    RotatingBase.setTargetPosition(-1040);
+                    RotatingBase.setTargetPosition(-1035);
                     RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     RotatingBase.setPower(1);
                     button_bumper_right_already_pressed2 = true;
@@ -642,7 +651,7 @@ public class SprintTeleop2 extends LinearOpMode {
 
             if (!button_bumper_left_already_pressed2) {
                 if (gamepad2.left_bumper) {
-                    RotatingBase.setTargetPosition(1040);
+                    RotatingBase.setTargetPosition(1035);
                     RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     RotatingBase.setPower(1);
                     button_bumper_left_already_pressed2 = true;
@@ -695,7 +704,7 @@ public class SprintTeleop2 extends LinearOpMode {
 //                    basePosition = basePosition + 25;
 //                    baseManualReset = 2;
                     RotatingBase.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    RotatingBase.setPower(0.15);
+                    RotatingBase.setPower(0.2);
 
                     button_left_trigger_already_pressed2 = true;
                 }
@@ -716,7 +725,7 @@ public class SprintTeleop2 extends LinearOpMode {
 //                    basePosition = basePosition - 25;
 //                    baseManualReset = 2;
                     RotatingBase.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    RotatingBase.setPower(-0.15);
+                    RotatingBase.setPower(-0.2);
 
                     button_right_trigger_already_pressed2 = true;
                 }
@@ -731,47 +740,83 @@ public class SprintTeleop2 extends LinearOpMode {
                 }
             }
 
-//            if (double_trigger_already_pressed == false) {
-//                if (gamepad2.right_trigger > 0 && gamepad2.left_trigger > 0) {
-////                    RotatingBase.setTargetPosition(0);
-////                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//                    RotatingBase.setPower(0);
-//                    RotatingBase.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//                    double_trigger_already_pressed = true;
-//                }
-//            } else {
-//                if (gamepad2.right_trigger == 0 && gamepad2.left_trigger == 0) {
-//                    double_trigger_already_pressed = false;
-//                }
-//            }
+            /******************************************
+             * Trigger (G1) Manual Calibration For Viper Slides
+             ******************************************/
 
-//            switch (baseManualReset) {
-//
-//                case 1:
-//
-//                    baseManualReset++;
-//                    break;
-//
-//                case 2:
-//                    RotatingBase.setTargetPosition(basePosition);
-//                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//                    RotatingBase.setPower(1);
-//                    baseManualReset++;
-//                    break;
-//
-//                default:
-//                    break;
-//            }
+            if (button_left_trigger_already_pressed == false) {
+                if (gamepad1.left_trigger > 0.4 && gamepad1.right_trigger <= 0.2) {
+
+                    RailRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    RailRight.setPower(-0.4);
+                    RailLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    RailLeft.setPower(0.4);
+
+                    button_left_trigger_already_pressed = true;
+                }
+            } else {
+                if (gamepad1.left_trigger <= 0.2) {
+                    RailRight.setPower(0);
+                    RailLeft.setPower(0);
+//                    RailRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                    RailRight.setTargetPosition(0);
+//                    RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    RailLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                    RailLeft.setTargetPosition(0);
+//                    RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    button_left_trigger_already_pressed = false;
+                }
+            }
+
+            if (button_right_trigger_already_pressed == false) {
+                if (gamepad1.right_trigger > 0.4 && gamepad1.left_trigger <= 0.2) {
+
+                    RailRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    RailRight.setPower(0.4);
+                    RailLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    RailLeft.setPower(-0.4);
+
+                    button_right_trigger_already_pressed = true;
+                }
+            } else {
+                if (gamepad1.right_trigger <= 0.2) {
+                    RailRight.setPower(0);
+                    RailLeft.setPower(0);
+//                    RailRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                    RailRight.setTargetPosition(0);
+//                    RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    RailLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                    RailLeft.setTargetPosition(0);
+//                    RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    button_right_trigger_already_pressed = false;
+                }
+            }
 
             RailControlV2.RailTask();
 //            ExtendingRailControl.ExtendingRailTask();
+//            telemetry.addData("Voltage", voltageSensor.getVoltage());
+            if (readVoltOnce == 0) {
+                telemetry.addData("voltage", "%.1f volts", new Func<Double>() { @Override public Double value() { return getBatteryVoltage(); } });
+                readVoltOnce++;
+            }
             telemetry.addData("LeftRail Power", RailLeft.getPower());
             telemetry.addData("LeftRail Encoder", RailLeft.getCurrentPosition());
             telemetry.addData("RightRail Power", RailRight.getPower());
             telemetry.addData("RightRail Encoder", RailRight.getCurrentPosition());
             telemetry.update();
         }
+    }
+
+
+    double getBatteryVoltage() {
+        double result = Double.POSITIVE_INFINITY;
+        for (VoltageSensor sensor : hardwareMap.voltageSensor) {
+            double voltage = sensor.getVoltage();
+            if (voltage > 0) {
+                result = Math.min(result, voltage);
+            }
+        }
+        return result;
     }
 
     private double GyroContinuity() {
@@ -796,14 +841,14 @@ public class SprintTeleop2 extends LinearOpMode {
 
     public void AttachmentMotorPresets() {
         RailLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        RailLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        RailLeft.setTargetPosition(0);
-        RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        RailLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        RailLeft.setTargetPosition(0);
+//        RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         RailRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        RailRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        RailRight.setTargetPosition(0);
-        RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        RailRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        RailRight.setTargetPosition(0);
+//        RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         RotatingBase.setDirection(DcMotorSimple.Direction.FORWARD);
         RotatingBase.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

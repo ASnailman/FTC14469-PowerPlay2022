@@ -62,6 +62,7 @@ public class AutoTest2 extends LinearOpMode {
 //    Rail_Control RailControl;
     Rail_ControlV2 RailControlV2;
     Direction_Control DirectionControl;
+    Base_Control BaseControl;
 
     //Variables For IMU Gyro
     double globalangle;
@@ -171,6 +172,7 @@ public class AutoTest2 extends LinearOpMode {
         RailControlV2 = new Rail_ControlV2(RailLeft, RailRight);
         //        motorMethods = new Methods(telemetry, IMU, orientation, FrontLeft, FrontRight, BackLeft, BackRight, MoveDirection.FORWARD);
         DirectionControl = new Direction_Control(IMU, FrontLeft, FrontRight, BackLeft, BackRight);
+        BaseControl = new Base_Control(RotatingBase);
 
         //Zero Power Behavior
         BackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -217,7 +219,7 @@ public class AutoTest2 extends LinearOpMode {
             switch (programOrder) {
 
                 case 0:
-                    DirectionControl.SetTargetDirection(0, 0.2);
+                    BaseControl.SetTargetPosition(1020, -0.7, 0.7);
                     break;
 
                 case 1:
@@ -227,6 +229,7 @@ public class AutoTest2 extends LinearOpMode {
                     break;
             }
 
+            BaseControl.RotatingBaseTask();
             DirectionControl.GyroTask();
             MechDrive.Task(GyroContinuity());
             RailControlV2.RailTask();
