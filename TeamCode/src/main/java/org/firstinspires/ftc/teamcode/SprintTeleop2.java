@@ -692,14 +692,20 @@ public class SprintTeleop2 extends LinearOpMode {
             if (button_left_trigger_already_pressed2 == false) {
                 if (gamepad2.left_trigger > 0 && gamepad2.right_trigger == 0) {
 
-                    basePosition = basePosition - 10;
-                    baseManualReset = 1;
+//                    basePosition = basePosition + 25;
+//                    baseManualReset = 2;
+                    RotatingBase.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    RotatingBase.setPower(0.15);
 
                     button_left_trigger_already_pressed2 = true;
                 }
             } else {
                 if (gamepad2.left_trigger == 0) {
-                    baseManualReset = 0;
+//                    baseManualReset = 0;
+                    RotatingBase.setPower(0);
+                    RotatingBase.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    RotatingBase.setTargetPosition(0);
+                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     button_left_trigger_already_pressed2 = false;
                 }
             }
@@ -707,50 +713,56 @@ public class SprintTeleop2 extends LinearOpMode {
             if (button_right_trigger_already_pressed2 == false) {
                 if (gamepad2.right_trigger > 0 && gamepad2.left_trigger == 0) {
 
-                    basePosition = basePosition + 10;
-                    baseManualReset = 1;
+//                    basePosition = basePosition - 25;
+//                    baseManualReset = 2;
+                    RotatingBase.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    RotatingBase.setPower(-0.15);
 
                     button_right_trigger_already_pressed2 = true;
                 }
             } else {
                 if (gamepad2.right_trigger == 0) {
-                    baseManualReset = 0;
+//                    baseManualReset = 0;
+                    RotatingBase.setPower(0);
+                    RotatingBase.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    RotatingBase.setTargetPosition(0);
+                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     button_right_trigger_already_pressed2 = false;
                 }
             }
 
-            if (double_trigger_already_pressed == false) {
-                if (gamepad2.right_trigger > 0 && gamepad2.left_trigger > 0) {
-//                    RotatingBase.setTargetPosition(0);
+//            if (double_trigger_already_pressed == false) {
+//                if (gamepad2.right_trigger > 0 && gamepad2.left_trigger > 0) {
+////                    RotatingBase.setTargetPosition(0);
+////                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    RotatingBase.setPower(0);
+//                    RotatingBase.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    RotatingBase.setPower(0);
-                    RotatingBase.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    double_trigger_already_pressed = true;
-                }
-            } else {
-                if (gamepad2.right_trigger == 0 && gamepad2.left_trigger == 0) {
-                    double_trigger_already_pressed = false;
-                }
-            }
+//                    double_trigger_already_pressed = true;
+//                }
+//            } else {
+//                if (gamepad2.right_trigger == 0 && gamepad2.left_trigger == 0) {
+//                    double_trigger_already_pressed = false;
+//                }
+//            }
 
-            switch (baseManualReset) {
-
-                case 1:
-
-                    baseManualReset++;
-                    break;
-
-                case 2:
-                    RotatingBase.setTargetPosition(basePosition);
-                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    RotatingBase.setPower(1);
-                    baseManualReset++;
-                    break;
-
-                default:
-                    break;
-            }
+//            switch (baseManualReset) {
+//
+//                case 1:
+//
+//                    baseManualReset++;
+//                    break;
+//
+//                case 2:
+//                    RotatingBase.setTargetPosition(basePosition);
+//                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    RotatingBase.setPower(1);
+//                    baseManualReset++;
+//                    break;
+//
+//                default:
+//                    break;
+//            }
 
             RailControlV2.RailTask();
 //            ExtendingRailControl.ExtendingRailTask();
