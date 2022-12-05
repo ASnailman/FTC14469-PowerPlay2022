@@ -26,8 +26,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "SprintAutoRightBlue", group = "MecanumDrive")
-public class SprintAutoRightBlue extends LinearOpMode {
+@Autonomous(name = "SprintAutoRightRed", group = "MecanumDrive")
+public class SprintAutoRightRed extends LinearOpMode {
 
     //Control Hub Orientation
     byte AXIS_MAP_CONFIG_BYTE = 0x06; //rotates control hub 90 degrees around y axis by swapping x and z axis
@@ -81,7 +81,6 @@ public class SprintAutoRightBlue extends LinearOpMode {
     int coneLevel = 0;
     int readVoltOnce = 0;
     int angleAdjustment;
-    int extendingAdjustment;
 
     int leftCenterTickCount;
 
@@ -238,7 +237,6 @@ public class SprintAutoRightBlue extends LinearOpMode {
             readVoltOnce++;
 
         }
-        telemetry.update();
 
         while (opModeIsActive()) {
 
