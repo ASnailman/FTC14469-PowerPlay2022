@@ -229,7 +229,7 @@ public class SprintAutoRightRed extends LinearOpMode {
                 angleAdjustment = -20;
             }
             else if (getBatteryVoltage() > 12.7) {
-                angleAdjustment = -10;
+                angleAdjustment = -8;
             }
             else {
                 angleAdjustment = 0;
@@ -325,7 +325,7 @@ public class SprintAutoRightRed extends LinearOpMode {
                     if (RotatingBase.getCurrentPosition() >= 970 && RotatingBase.getCurrentPosition() <= 1070) {
 
 //                            SetAttachmentPosition(2980, 1020);
-                            SetExtendingPosition(110);
+                            SetExtendingPosition(100);
                             programOrder++;
 
                     }
@@ -337,25 +337,25 @@ public class SprintAutoRightRed extends LinearOpMode {
                     if (MechDrive.GetTaskState() == Task_State.DONE) {
 //                        MechDrive.SetTargets(-90, 0, 0.4, 1);
                         DirectionControl.SetTargetDirection(0, 0.2);
-                        SetAttachmentPositionLowPower(2970, 1370 + angleAdjustment);
+                        SetAttachmentPositionLowPower(2970, 1365 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
                     break;
 
                 case 7:
-                        if (RotatingBase.getCurrentPosition() >= 1360 + angleAdjustment && (RailControlV2.GetTaskState() == Task_State.DONE ||
+                        if (RotatingBase.getCurrentPosition() >= 1355 + angleAdjustment && (RailControlV2.GetTaskState() == Task_State.DONE ||
                                 RailControlV2.GetTaskState() == Task_State.READY)) {
                             if (coneLevel == 0) {
                                 if (ET.milliseconds() > 200) {
-                                    SetAttachment_LowPwrRail(2690, 1370 + angleAdjustment);
+                                    SetAttachment_LowPwrRail(2690, 1365 + angleAdjustment);
                                     ET.reset();
                                     programOrder++;
                                 }
                             }
                             else {
                                 if (ET.milliseconds() > 400) {
-                                    SetAttachment_LowPwrRail(2690, 1405 + angleAdjustment);
+                                    SetAttachment_LowPwrRail(2690, 1395 + angleAdjustment);
                                     ET.reset();
                                     programOrder++;
                                 }
@@ -386,7 +386,7 @@ public class SprintAutoRightRed extends LinearOpMode {
                 case 10:
                     if (ET.milliseconds() > 200) {
                         SetAttachmentPosition(2690, 0);
-                        SetExtendingPosition(110);
+                        SetExtendingPosition(0);
                         programOrder++;
                     }
                     break;
@@ -414,7 +414,7 @@ public class SprintAutoRightRed extends LinearOpMode {
 
                 case 12:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPosition(610);
+                        SetExtendingPosition(595);
                         ET.reset();
                         programOrder++;
                     }
@@ -438,7 +438,7 @@ public class SprintAutoRightRed extends LinearOpMode {
                 case 15:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
                         SetExtendingPosition(75);
-                        SetAttachmentPositionLowPower(3025, 1405 + angleAdjustment);
+                        SetAttachmentPositionLowPower(3025, 1395 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -478,7 +478,7 @@ public class SprintAutoRightRed extends LinearOpMode {
                             SetExtendingPosition(0);
                             ET.reset();
                         } else if (posThree) {
-                            MechDrive.SetTargets(90, 1500, 0.7, 1);
+                            MechDrive.SetTargets(90, 1400, 0.7, 1);
                             SetAttachmentPosition(0, 1020);
                             SetExtendingPosition(0);
                             ET.reset();

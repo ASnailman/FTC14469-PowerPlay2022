@@ -327,7 +327,7 @@ public class SprintAutoRightBlue extends LinearOpMode {
                     if (RotatingBase.getCurrentPosition() >= 970 && RotatingBase.getCurrentPosition() <= 1070) {
 
 //                            SetAttachmentPosition(2980, 1020);
-                            SetExtendingPosition(110);
+                            SetExtendingPosition(100);
                             programOrder++;
 
                     }
@@ -388,7 +388,7 @@ public class SprintAutoRightBlue extends LinearOpMode {
                 case 10:
                     if (ET.milliseconds() > 200) {
                         SetAttachmentPosition(2690, 0);
-                        SetExtendingPosition(110);
+                        SetExtendingPosition(0);
                         programOrder++;
                     }
                     break;
