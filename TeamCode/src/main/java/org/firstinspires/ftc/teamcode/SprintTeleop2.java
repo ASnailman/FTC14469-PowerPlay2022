@@ -70,8 +70,8 @@ public class SprintTeleop2 extends LinearOpMode {
     int readVoltOnce = 0;
 
     double l;
-    double assist_gain = 0.03;
-    double assist_offset = 0.1;    // compensation - robot drifting to the right when base is 0 deg
+//    double assist_gain = 0.03;
+//    double assist_offset = 0.1;    // compensation - robot drifting to the right when base is 0 deg
 
     //Gyrocontinuity Variables
     double current_value;
@@ -143,7 +143,7 @@ public class SprintTeleop2 extends LinearOpMode {
         MechDrive = new Mech_Drive_FAST(FrontRight, FrontLeft, BackRight, BackLeft, MoveDirection.FORWARD, telemetry);
 //        RailControl = new Rail_Control(RailLeft, RailRight);
         RailControlV2 = new Rail_ControlV2(RailLeft, RailRight);
-//        ExtendingRailControl = new ExtendingRail_Control(ExtendingRail);
+        ExtendingRailControl = new ExtendingRail_Control(ExtendingRail);
         //        motorMethods = new Methods(telemetry, IMU, orientation, FrontLeft, FrontRight, BackLeft, BackRight, MoveDirection.FORWARD);
 
         //Zero Power Behavior
@@ -198,28 +198,29 @@ public class SprintTeleop2 extends LinearOpMode {
             double x = gamepad1.left_stick_x * movement;
             double rx = gamepad1.right_stick_x * movement;
 
-            if (y < 0.1 && y > -0.1 || x < 0.1 && x > -0.1) {
-                l = 0;
-            }
-            else if ((y > 0.45 && y < 0.55) && (x > 0.45 && x < 0.55)) {
-                l = 0;
-            }
-            else if ((y > 0.45 && y < 0.55) && (x < -0.45 && x > -0.55)) {
-                l = 0;
-            }
-            else if ((y < -0.45 && y > -0.55) && (x < -0.45 && x > -0.55)) {
-                l = 0;
-            }
-            else if ((y < -0.45 && y > -0.55) && (x > 0.45 && x < 0.55)) {
-                l = 0;
-            }
-            else {
-                l = assist_gain * (RotatingBase.getCurrentPosition() / 1020f) - assist_offset;
-            }
-
-            if (y < 0) {
-                l = l * -1;
-            }
+//            if (y < 0.1 && y > -0.1 || x < 0.1 && x > -0.1) {
+//                l = 0;
+//            }
+//            else if ((y > 0.45 && y < 0.55) && (x > 0.45 && x < 0.55)) {
+//                l = 0;
+//            }
+//            else if ((y > 0.45 && y < 0.55) && (x < -0.45 && x > -0.55)) {
+//                l = 0;
+//            }
+//            else if ((y < -0.45 && y > -0.55) && (x < -0.45 && x > -0.55)) {
+//                l = 0;
+//            }
+//            else if ((y < -0.45 && y > -0.55) && (x > 0.45 && x < 0.55)) {
+//                l = 0;
+//            }
+//            else {
+//                l = assist_gain * (RotatingBase.getCurrentPosition() / 1020f);
+//                        //- assist_offset;
+//            }
+//
+//            if (y < 0) {
+//                l = l * -1;
+//            }
 
             double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
             double FLPower = (y + x + rx + l) / denominator;
@@ -531,7 +532,7 @@ public class SprintTeleop2 extends LinearOpMode {
                         ClawSetting = false;
                         coneStackMode = false;
                         Claw.setPower(-1);
-                        RailControlV2.SetTargetPosition(179, -1, 1);
+                        RailControlV2.SetTargetPosition(139, -1, 1);
                         SetBasePosition(0);
                         button_x_already_pressed2 = true;
                     }
@@ -547,7 +548,7 @@ public class SprintTeleop2 extends LinearOpMode {
                         ClawSetting = false;
                         coneStackMode = false;
                         Claw.setPower(-1);
-                        RailControlV2.SetTargetPosition(286, -1, 1);
+                        RailControlV2.SetTargetPosition(246, -1, 1);
                         SetBasePosition(0);
                         button_a_already_pressed2 = true;
                     }
@@ -563,7 +564,7 @@ public class SprintTeleop2 extends LinearOpMode {
                         ClawSetting = false;
                         coneStackMode = false;
                         Claw.setPower(-1);
-                        RailControlV2.SetTargetPosition(411, -1, 1);
+                        RailControlV2.SetTargetPosition(371, -1, 1);
                         SetBasePosition(0);
                         button_b_already_pressed2 = true;
                     }
@@ -579,7 +580,7 @@ public class SprintTeleop2 extends LinearOpMode {
                         ClawSetting = false;
                         coneStackMode = false;
                         Claw.setPower(-1);
-                        RailControlV2.SetTargetPosition(519, -1, 1);
+                        RailControlV2.SetTargetPosition(479, -1, 1);
                         SetBasePosition(0);
                         button_y_already_pressed2 = true;
                     }
@@ -675,9 +676,9 @@ public class SprintTeleop2 extends LinearOpMode {
             if (!button_a_already_pressed) {
                 if (gamepad1.a) {
 //                    ExtendingRailControl.SetTargetPosition(400, -0.6, 0.6);
-                    ExtendingRail.setTargetPosition(400);
+                    ExtendingRail.setTargetPosition(610);
                     ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    ExtendingRail.setPower(0.4);
+                    ExtendingRail.setPower(0.6);
                     button_a_already_pressed = true;
                 }
             } else {
@@ -688,6 +689,7 @@ public class SprintTeleop2 extends LinearOpMode {
 
             if (!button_x_already_pressed) {
                 if (gamepad1.x) {
+//                    ExtendingRailControl.SetTargetPosition(0, -0.01, 0.01);
                     ExtendingRail.setTargetPosition(0);
                     ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     ExtendingRail.setPower(0.6);
@@ -865,6 +867,7 @@ public class SprintTeleop2 extends LinearOpMode {
         ExtendingRail.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ExtendingRail.setTargetPosition(0);
         ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        ExtendingRail.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void SetRailPosition(int position) {

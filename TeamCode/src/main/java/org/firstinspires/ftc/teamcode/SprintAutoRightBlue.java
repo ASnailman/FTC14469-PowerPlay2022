@@ -81,6 +81,7 @@ public class SprintAutoRightBlue extends LinearOpMode {
     int coneLevel = 0;
     int readVoltOnce = 0;
     int angleAdjustment;
+    int tickAdjustment;
     int extendingAdjustment;
 
     int leftCenterTickCount;
@@ -226,14 +227,21 @@ public class SprintAutoRightBlue extends LinearOpMode {
 
         if (readVoltOnce == 0) {
             telemetry.addData("voltage", "%.1f volts", new Func<Double>() { @Override public Double value() { return getBatteryVoltage(); } });
-            if (getBatteryVoltage() > 13.2) {
-                angleAdjustment = -20;
+            if (getBatteryVoltage() > 13.7) {
+                angleAdjustment = -22;
+                tickAdjustment = -8;
+            }
+            else if (getBatteryVoltage() > 13.2) {
+                angleAdjustment = -12;
+                tickAdjustment = -2;
             }
             else if (getBatteryVoltage() > 12.7) {
-                angleAdjustment = -10;
+                angleAdjustment = 5;
+                tickAdjustment = -2;
             }
             else {
-                angleAdjustment = 0;
+                angleAdjustment = 5;
+                tickAdjustment = 5;
             }
             readVoltOnce++;
 
@@ -327,7 +335,7 @@ public class SprintAutoRightBlue extends LinearOpMode {
                     if (RotatingBase.getCurrentPosition() >= 970 && RotatingBase.getCurrentPosition() <= 1070) {
 
 //                            SetAttachmentPosition(2980, 1020);
-                            SetExtendingPosition(100);
+                            SetExtendingPosition(100 + tickAdjustment);
                             programOrder++;
 
                     }
@@ -416,7 +424,7 @@ public class SprintAutoRightBlue extends LinearOpMode {
 
                 case 12:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPosition(610);
+                        SetExtendingPosition(610 + tickAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -439,7 +447,7 @@ public class SprintAutoRightBlue extends LinearOpMode {
 
                 case 15:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPosition(75);
+                        SetExtendingPosition(75 + tickAdjustment);
                         SetAttachmentPositionLowPower(3025, 1405 + angleAdjustment);
                         ET.reset();
                         programOrder++;
@@ -522,6 +530,7 @@ public class SprintAutoRightBlue extends LinearOpMode {
 //            telemetry.addData("Voltage", voltageSensor.getVoltage());
             telemetry.addData("LeftCenterTicks", leftCenterTickCount);
 //            telemetry.addData("backright encoder", BackRight.getCurrentPosition());
+            telemetry.addData("ExtendingRail", ExtendingRail.getCurrentPosition());
             telemetry.addData("gyro", GyroContinuity());
             telemetry.update();
         }
