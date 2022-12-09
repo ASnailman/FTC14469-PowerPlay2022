@@ -502,6 +502,7 @@ public class SprintAutoRightBlue extends LinearOpMode {
                             MechDrive.GetTaskState() == Task_State.DONE) {
                         SetAttachmentPosition(0, 1020);
                         MechDrive.SetTargets(180, 200, 0.3, 1);
+                        DirectionControl.SetTargetDirection(0, 0.2);
                         programOrder++;
                     }
                     break;

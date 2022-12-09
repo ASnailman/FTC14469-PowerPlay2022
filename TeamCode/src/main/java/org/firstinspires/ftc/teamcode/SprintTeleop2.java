@@ -47,6 +47,7 @@ public class SprintTeleop2 extends LinearOpMode {
     //    Rail_Control RailControl;
     Rail_ControlV2 RailControlV2;
     ExtendingRail_Control ExtendingRailControl;
+    Direction_Control DirectionControl;
 
     //Variables For IMU Gyro
     double globalangle;
@@ -144,6 +145,7 @@ public class SprintTeleop2 extends LinearOpMode {
 //        RailControl = new Rail_Control(RailLeft, RailRight);
         RailControlV2 = new Rail_ControlV2(RailLeft, RailRight);
         ExtendingRailControl = new ExtendingRail_Control(ExtendingRail);
+        DirectionControl = new Direction_Control(IMU, FrontLeft, FrontRight, BackLeft, BackRight);
         //        motorMethods = new Methods(telemetry, IMU, orientation, FrontLeft, FrontRight, BackLeft, BackRight, MoveDirection.FORWARD);
 
         //Zero Power Behavior
@@ -806,6 +808,7 @@ public class SprintTeleop2 extends LinearOpMode {
                 telemetry.addData("voltage", "%.1f volts", new Func<Double>() { @Override public Double value() { return getBatteryVoltage(); } });
                 readVoltOnce++;
             }
+            DirectionControl.GyroTask();
             telemetry.addData("LeftRail Power", RailLeft.getPower());
             telemetry.addData("LeftRail Encoder", RailLeft.getCurrentPosition());
             telemetry.addData("RightRail Power", RailRight.getPower());

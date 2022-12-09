@@ -80,7 +80,10 @@ public class SprintAutoLeftBlue extends LinearOpMode {
     ElapsedTime ERT = new ElapsedTime(); //Elapsed Reset Timer
     int coneLevel = 0;
     int readVoltOnce = 0;
+    int firstConeAdjustment;
     int angleAdjustment;
+    int tickAdjustment;
+    int resetOffset;
 
     int leftCenterTickCount;
 
@@ -225,14 +228,25 @@ public class SprintAutoLeftBlue extends LinearOpMode {
 
         if (readVoltOnce == 0) {
             telemetry.addData("voltage", "%.1f volts", new Func<Double>() { @Override public Double value() { return getBatteryVoltage(); } });
-            if (getBatteryVoltage() > 13.2) {
+            if (getBatteryVoltage() > 13.7) {
+                firstConeAdjustment = 100;
                 angleAdjustment = 20;
+                tickAdjustment = -15;
+            }
+            else if (getBatteryVoltage() > 13.2) {
+                firstConeAdjustment = 100;
+                angleAdjustment = 12;
+                tickAdjustment = -10;
             }
             else if (getBatteryVoltage() > 12.7) {
-                angleAdjustment = 10;
+                firstConeAdjustment = 100;
+                angleAdjustment = 5;
+                tickAdjustment = -5;
             }
             else {
-                angleAdjustment = 0;
+                firstConeAdjustment = 100;
+                angleAdjustment = -5;
+                tickAdjustment = 0;
             }
             readVoltOnce++;
 
@@ -337,19 +351,22 @@ public class SprintAutoLeftBlue extends LinearOpMode {
                     if (MechDrive.GetTaskState() == Task_State.DONE) {
 //                        MechDrive.SetTargets(-90, 0, 0.4, 1);
                         DirectionControl.SetTargetDirection(0, 0.2);
-                        SetAttachmentPositionLowPower(2970, -1370 + angleAdjustment);
+                        SetAttachmentPositionLowPower(2970, -1370 + firstConeAdjustment);
+                        resetOffset = -1360 + firstConeAdjustment;
                         ET.reset();
                         programOrder++;
                     }
                     break;
 
                 case 7:
-                        if (RotatingBase.getCurrentPosition() <= -1360 + angleAdjustment && (RailControlV2.GetTaskState() == Task_State.DONE ||
+                        if (RotatingBase.getCurrentPosition() <= resetOffset && (RailControlV2.GetTaskState() == Task_State.DONE ||
                                 RailControlV2.GetTaskState() == Task_State.READY)) {
                             if (coneLevel == 0) {
                                 if (ET.milliseconds() > 200) {
-                                    SetAttachment_LowPwrRail(2690, -1370 + angleAdjustment);
+                                    SetAttachment_LowPwrRail(2690, -1370 + firstConeAdjustment);
                                     ET.reset();
+//                                    resetOffset = -1360 + angleAdjustment;
+                                    resetOffset = -1390 + angleAdjustment;
                                     programOrder++;
                                 }
                             }
@@ -394,16 +411,16 @@ public class SprintAutoLeftBlue extends LinearOpMode {
                 case 11:
                     if (RotatingBase.getCurrentPosition() < 1020) {
                         if (coneLevel == 0) {
-                            SetAttachmentPositionLowPower(600, 0);
+                            SetAttachmentPositionLowPower(575, 0);
                         }
                         else if (coneLevel == 1) {
-                            SetAttachmentPositionLowPower(520, 0);
+                            SetAttachmentPositionLowPower(495, 0);
                         }
                         else if (coneLevel == 2) {
-                            SetAttachmentPositionLowPower(410, 0);
+                            SetAttachmentPositionLowPower(385, 0);
                         }
                         else if (coneLevel == 3) {
-                            SetAttachmentPositionLowPower(325, 0);
+                            SetAttachmentPositionLowPower(300, 0);
                         }
 //                        else if (coneLevel == 4) {
 //                            SetAttachmentPositionLowPower(280, 0);
@@ -414,7 +431,7 @@ public class SprintAutoLeftBlue extends LinearOpMode {
 
                 case 12:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPosition(610);
+                        SetExtendingPosition(620);
                         ET.reset();
                         programOrder++;
                     }
@@ -458,17 +475,22 @@ public class SprintAutoLeftBlue extends LinearOpMode {
 //                    if (ET.milliseconds() > 200) {
 //                        SetAttachmentPosition(0,0);
 //                        MechDrive.SetTargets(0, 50, 0.3, 1);
-                        DirectionControl.Override();
-                        programOrder++;
+                    DirectionControl.Override();
+                    programOrder++;
 //                    }
                     break;
 
                 case 18:
+                    MechDrive.SetTargets(0, 140, 0.4, 1);
+                    programOrder++;
+                    break;
+
+                case 19:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
 
                         if (posOne) {
-                            MechDrive.SetTargets(-90, 1500, 0.7, 1);
+                            MechDrive.SetTargets(-90, 1270, 0.7, 1);
                             SetAttachmentPosition(0, -1020);
                             SetExtendingPosition(0);
                             ET.reset();
@@ -478,8 +500,8 @@ public class SprintAutoLeftBlue extends LinearOpMode {
                             SetExtendingPosition(0);
                             ET.reset();
                         } else if (posThree) {
-                            MechDrive.SetTargets(90, 1000, 0.7, 1);
-                            SetAttachmentPosition(0, 0);
+                            MechDrive.SetTargets(90, 2100, 0.6, 1);
+                            SetAttachmentPosition(2970, -1020);
                             SetExtendingPosition(0);
                             ET.reset();
                         }
@@ -487,11 +509,12 @@ public class SprintAutoLeftBlue extends LinearOpMode {
                     }
                     break;
 
-                case 19:
+                case 20:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
                         SetAttachmentPosition(0, -1020);
                         MechDrive.SetTargets(180, 200, 0.3, 1);
+                        DirectionControl.SetTargetDirection(0, 0.2);
                         programOrder++;
                     }
                     break;
