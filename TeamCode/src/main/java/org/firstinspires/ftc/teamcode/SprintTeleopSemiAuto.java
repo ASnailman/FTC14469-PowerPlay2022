@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -16,8 +15,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-@TeleOp(name = "SprintTeleop2",  group = "MecanumDrive")
-public class SprintTeleop2 extends LinearOpMode {
+@TeleOp(name = "SprintTeleopSemiAuto",  group = "MecanumDrive")
+public class SprintTeleopSemiAuto extends LinearOpMode {
 
     //Control Hub Orientation
     byte AXIS_MAP_CONFIG_BYTE = 0x06; //rotates control hub 90 degrees around y axis by swapping x and z axis
@@ -65,8 +64,10 @@ public class SprintTeleop2 extends LinearOpMode {
     boolean lowJunctionResetMode;
     boolean PowerSetting = true;
     boolean ClawSetting = false;
+    boolean originalMode = false;
     boolean coneStackMode = false;
     boolean groundJunctionMode = false;
+    boolean semiAutoMode = false;
     int basePosition;
     int readVoltOnce = 0;
 
@@ -92,7 +93,10 @@ public class SprintTeleop2 extends LinearOpMode {
     boolean button_bumper_right_already_pressed = false;
     boolean button_bumper_left_already_pressed2 = false;
     boolean button_bumper_right_already_pressed2 = false;
+    boolean button_dpad_right_already_pressed = false;
+    boolean button_dpad_left_already_pressed = false;
     boolean button_dpad_up_already_pressed = false;
+    boolean button_dpad_down_already_pressed = false;
     boolean button_dpad_right_already_pressed2 = false;
     boolean button_dpad_left_already_pressed2 = false;
     boolean button_dpad_up_already_pressed2 = false;
@@ -102,6 +106,22 @@ public class SprintTeleop2 extends LinearOpMode {
     boolean button_left_trigger_already_pressed2 = false;
     boolean button_right_trigger_already_pressed2 = false;
     boolean double_trigger_already_pressed = false;
+
+    int semi_auto_sc_blitz_step = 0;
+    int blitzAdjustSequence = 0;
+    ElapsedTime SC_Blitz_Timer = new ElapsedTime();
+    ElapsedTime SCBlitzET = new ElapsedTime();
+    int SC_ConeLevel = 0;
+    int SC_AngleAdjustment;
+//    int SC_LeftAngleAdjustment;
+    boolean OpenClaw;
+    boolean runBlitz = false;
+
+    int R_semi_auto_sc_blitz_step = 0;
+    int R_blitzAdjustSequence = 0;
+    int R_SC_ConeLevel = 0;
+//    int SC_RightAngleAdjustment;
+    boolean R_runBlitz = false;
 
     public void runOpMode() {
 
@@ -158,6 +178,7 @@ public class SprintTeleop2 extends LinearOpMode {
         waitForStart();
 
         ET.reset();
+        SC_Blitz_Timer.reset();
 
         while (opModeIsActive()) {
 
@@ -385,10 +406,13 @@ public class SprintTeleop2 extends LinearOpMode {
 
             }
 
+            //Set mode to cone stack mode and turn off all other modes
             if (!button_dpad_left_already_pressed2) {
                 if (gamepad2.dpad_left) {
                     if (!coneStackMode) {
                         coneStackMode = true;
+                        semiAutoMode = false;
+
                     } else {
                         coneStackMode = false;
                     }
@@ -400,9 +424,27 @@ public class SprintTeleop2 extends LinearOpMode {
                 }
             }
 
+            //set mode to semi auto mode and turn off all other modes
+            if (!button_dpad_left_already_pressed) {
+                if (gamepad1.dpad_left) {
+                    if (!semiAutoMode) {
+                        coneStackMode = false;
+                        semiAutoMode = true;
+
+                    } else {
+                        semiAutoMode = false;
+                    }
+                    button_dpad_left_already_pressed = true;
+                }
+            } else {
+                if (!gamepad1.dpad_left) {
+                    button_dpad_left_already_pressed = false;
+                }
+            }
+
             //If cone stack mode is false, then buttons a, b, and y will correspond to the height of the junctions
             //If ground junction mode is true, then button a will not close claw when moving to low junction position
-            if (!coneStackMode) {
+            if (!coneStackMode && !semiAutoMode) {
 
                 /*****************************************************************
                  * Button A (G2) : Set Rail height to place on the low junction
@@ -504,7 +546,8 @@ public class SprintTeleop2 extends LinearOpMode {
                 }
 
                 /*****************************************************************
-                 * Button X (G2) : Reset Rail and Base from any height to original position
+                 * Button X (G2) : Reset Rail and Base from any height
+                 * to original position
                  *****************************************************************/
 
                 if (!button_x_already_pressed2) {
@@ -525,8 +568,13 @@ public class SprintTeleop2 extends LinearOpMode {
                     }
                 }
 
-                //if cone stack mode is true, buttons a, b, and y will correspond to the height of the cone stack
-            } else {
+            //if cone stack mode is true, buttons a, b, and y will correspond to the height of the cone stack
+            } else if (coneStackMode && !semiAutoMode) {
+
+                /*****************************************************************
+                 * Button A,B,X,Y (G2) : In Cone Stack Mode, buttons will
+                 * set heights for cones on stack
+                 *****************************************************************/
 
                 if (!button_x_already_pressed2) {
                     if (gamepad2.x) {
@@ -591,7 +639,116 @@ public class SprintTeleop2 extends LinearOpMode {
                         button_y_already_pressed2 = false;
                     }
                 }
+            }
 
+            //if semiAutoMode is on, pressing dpad up on G1 will enable the mid rank sequence to start
+            else if (semiAutoMode && !coneStackMode) {
+
+                //Dpad right during semiAutoMode continues the sequence of the SemiAutoSCBlitz_Left() method
+                //Opens claw while rails are above the junction to continue
+                if (!button_dpad_right_already_pressed) {
+                    if (gamepad1.dpad_right) {
+                        OpenClaw = true;
+                        button_dpad_right_already_pressed = true;
+                    }
+                } else {
+                    if (!gamepad1.dpad_right) {
+                        OpenClaw = false;
+                        button_dpad_right_already_pressed = false;
+                    }
+                }
+
+                //Dpad up starts the SemiAutoSCBlitz_Left() method
+                if (!button_dpad_up_already_pressed) {
+                    if (gamepad1.dpad_up) {
+                        runBlitz = true;
+                        button_dpad_up_already_pressed = true;
+                    }
+                } else {
+                    if (!gamepad1.dpad_up) {
+                        button_dpad_up_already_pressed = false;
+                    }
+                }
+
+                //Dpad down starts the SemiAutoSCBlitz_Left() method
+                if (!button_dpad_down_already_pressed) {
+                    if (gamepad1.dpad_down) {
+                        R_runBlitz = true;
+                        button_dpad_down_already_pressed = true;
+                    }
+                } else {
+                    if (!gamepad1.dpad_down) {
+                        button_dpad_down_already_pressed = false;
+                    }
+                }
+
+                //Run the blitz for left or right side
+                if (runBlitz) {
+                    R_runBlitz = false;
+                    SemiAutoSCBlitz_Left();
+                }
+
+                if (R_runBlitz) {
+                    runBlitz = false;
+                    SemiAutoSCBlitz_Right();
+                }
+
+                //Manually turn base during semi auto mode
+                if (button_right_trigger_already_pressed2 == false) {
+                    if (gamepad2.right_trigger > 0) {
+
+                        blitzAdjustSequence = 1;
+
+                        button_right_trigger_already_pressed2 = true;
+                    }
+                } else {
+                    if (gamepad2.right_trigger == 0) {
+                        button_right_trigger_already_pressed2 = false;
+                    }
+                }
+
+                if (button_left_trigger_already_pressed2 == false) {
+                    if (gamepad2.left_trigger > 0) {
+
+                        blitzAdjustSequence = 4;
+
+                        button_left_trigger_already_pressed2 = true;
+                    }
+                } else {
+                    if (gamepad2.left_trigger == 0) {
+                        button_left_trigger_already_pressed2 = false;
+                    }
+                }
+
+                switch (blitzAdjustSequence) {
+                    case 1:
+                        SCBlitzET.reset();
+                        blitzAdjustSequence++;
+                        break;
+                    case 2:
+                        if (SCBlitzET.milliseconds() > 100) {
+                            SC_AngleAdjustment = SC_AngleAdjustment - 40;
+                            blitzAdjustSequence++;
+                        }
+                        break;
+
+                    case 3:
+                        break;
+                    case 4:
+                        SCBlitzET.reset();
+                        blitzAdjustSequence++;
+                        break;
+                    case 5:
+                        if (SCBlitzET.milliseconds() > 100) {
+                            SC_AngleAdjustment = SC_AngleAdjustment + 40;
+                            blitzAdjustSequence++;
+                        }
+                        break;
+
+
+                    default:
+                        break;
+                }
             }
 
             ///////////////////////////////////////////////////////////////////////////
@@ -694,7 +851,7 @@ public class SprintTeleop2 extends LinearOpMode {
 //                    ExtendingRailControl.SetTargetPosition(0, -0.01, 0.01);
                     ExtendingRail.setTargetPosition(0);
                     ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    ExtendingRail.setPower(0.6);
+                    ExtendingRail.setPower(0);
                     button_x_already_pressed = true;
                 }
             } else {
@@ -805,7 +962,12 @@ public class SprintTeleop2 extends LinearOpMode {
 //            ExtendingRailControl.ExtendingRailTask();
 //            telemetry.addData("Voltage", voltageSensor.getVoltage());
             if (readVoltOnce == 0) {
-                telemetry.addData("voltage", "%.1f volts", new Func<Double>() { @Override public Double value() { return getBatteryVoltage(); } });
+                telemetry.addData("voltage", "%.1f volts", new Func<Double>() {
+                    @Override
+                    public Double value() {
+                        return getBatteryVoltage();
+                    }
+                });
                 readVoltOnce++;
             }
             DirectionControl.GyroTask();
@@ -892,5 +1054,233 @@ public class SprintTeleop2 extends LinearOpMode {
         ExtendingRail.setTargetPosition(extendingPos);
         ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ExtendingRail.setPower(0.6);
+    }
+
+    public void SemiAutoSCBlitz_Left() {
+        switch (semi_auto_sc_blitz_step) {
+
+            case 0:
+                if ((RotatingBase.getCurrentPosition() >= 1000) &&
+                        (RailControlV2.GetTaskState() == Task_State.INIT || RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY)) {
+                    if (SC_Blitz_Timer.milliseconds() > 400) {
+                        RailControlV2.SetTargetPosition(575, -1, 1);
+                        SetBasePosition(1020);
+                        SC_Blitz_Timer.reset();
+                        semi_auto_sc_blitz_step++;
+                    }
+                }
+                break;
+            case 1:
+                if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
+                    SetExtendingPosition(620);
+                    SC_Blitz_Timer.reset();
+                    semi_auto_sc_blitz_step++;
+                }
+                break;
+            case 2:
+                if (SC_Blitz_Timer.milliseconds() > 480) {
+                    ClawSetting = true;
+                    Claw.setPower(1);
+                    SC_Blitz_Timer.reset();
+                    semi_auto_sc_blitz_step++;
+                }
+                break;
+            case 3:
+                if (SC_Blitz_Timer.milliseconds() > 480) {
+                    RailControlV2.SetTargetPosition(1200, -1, 1);
+                    semi_auto_sc_blitz_step++;
+                }
+                break;
+            case 4:
+                if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
+                    SetExtendingPosition(75);
+                    RailControlV2.SetTargetPosition(3025, -1, 1);
+                    SetBasePosition(-385 + SC_AngleAdjustment);
+                    SC_Blitz_Timer.reset();
+                    semi_auto_sc_blitz_step++;
+                }
+                break;
+            case 5:
+                if ((RotatingBase.getCurrentPosition() <= -350) &&
+                        (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY)) {
+                    if (OpenClaw) {
+                        SC_Blitz_Timer.reset();
+                        semi_auto_sc_blitz_step++;
+                    } else {
+                        SetBasePosition(-385 + SC_AngleAdjustment);
+                    }
+                }
+                break;
+            case 6:
+                RailControlV2.SetTargetPosition(2690, -1, 1);
+                SC_Blitz_Timer.reset();
+                semi_auto_sc_blitz_step++;
+                break;
+            case 7:
+                if (SC_Blitz_Timer.milliseconds() > 500) {
+                    ClawSetting = false;
+                    Claw.setPower(-1);
+                    if (Claw.getPower() < -0.95) {
+                        semi_auto_sc_blitz_step++;
+                        SC_Blitz_Timer.reset();
+                    }
+                }
+                break;
+            case 8:
+                SC_ConeLevel++;
+                if (SC_ConeLevel >= 4) {
+                    RailControlV2.SetTargetPosition(0, -1, 1);
+                    SetBasePosition(0);
+                    SetExtendingPosition(0);
+                    semi_auto_sc_blitz_step = 11;
+                } else {
+                    semi_auto_sc_blitz_step++;
+                    SC_Blitz_Timer.reset();
+                }
+                break;
+            case 9:
+                if (SC_Blitz_Timer.milliseconds() > 200) {
+                    RailControlV2.SetTargetPosition(2690, -1, 1);
+                    SetBasePosition(1020);
+                    SetExtendingPosition(0);
+                    semi_auto_sc_blitz_step++;
+                }
+                break;
+            case 10:
+                if (RotatingBase.getCurrentPosition() > 0) {
+
+                    if (SC_ConeLevel == 1) {
+                        RailControlV2.SetTargetPosition(495, -1, 1);
+                        semi_auto_sc_blitz_step = 1;
+                    } else if (SC_ConeLevel == 2) {
+                        RailControlV2.SetTargetPosition(385, -1, 1);
+                        semi_auto_sc_blitz_step = 1;
+                    } else if (SC_ConeLevel == 3) {
+                        RailControlV2.SetTargetPosition(300, -1, 1);
+                        semi_auto_sc_blitz_step = 1;
+                    } else {
+                        semi_auto_sc_blitz_step++;
+                    }
+                }
+                break;
+            case 11:
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void SemiAutoSCBlitz_Right() {
+        switch (R_semi_auto_sc_blitz_step) {
+
+            case 0:
+                if ((RotatingBase.getCurrentPosition() <= -1000) &&
+                        (RailControlV2.GetTaskState() == Task_State.INIT || RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY)) {
+                    if (SC_Blitz_Timer.milliseconds() > 400) {
+                        RailControlV2.SetTargetPosition(575, -1, 1);
+                        SetBasePosition(-1020);
+                        SC_Blitz_Timer.reset();
+                        R_semi_auto_sc_blitz_step++;
+                    }
+                }
+                break;
+            case 1:
+                if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
+                    SetExtendingPosition(600);
+                    SC_Blitz_Timer.reset();
+                    R_semi_auto_sc_blitz_step++;
+                }
+                break;
+            case 2:
+                if (SC_Blitz_Timer.milliseconds() > 480) {
+                    ClawSetting = true;
+                    Claw.setPower(1);
+                    SC_Blitz_Timer.reset();
+                    R_semi_auto_sc_blitz_step++;
+                }
+                break;
+            case 3:
+                if (SC_Blitz_Timer.milliseconds() > 480) {
+                    RailControlV2.SetTargetPosition(1200, -1, 1);
+                    R_semi_auto_sc_blitz_step++;
+                }
+                break;
+            case 4:
+                if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
+                    SetExtendingPosition(75);
+                    RailControlV2.SetTargetPosition(3025, -1, 1);
+                    SetBasePosition(385 + SC_AngleAdjustment);
+                    SC_Blitz_Timer.reset();
+                    R_semi_auto_sc_blitz_step++;
+                }
+                break;
+            case 5:
+                if ((RotatingBase.getCurrentPosition() >= 350) &&
+                        (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY)) {
+                    if (OpenClaw) {
+                        SC_Blitz_Timer.reset();
+                        R_semi_auto_sc_blitz_step++;
+                    } else {
+                        SetBasePosition(385 + SC_AngleAdjustment);
+                    }
+                }
+                break;
+            case 6:
+                RailControlV2.SetTargetPosition(2690, -1, 1);
+                SC_Blitz_Timer.reset();
+                R_semi_auto_sc_blitz_step++;
+                break;
+            case 7:
+                if (SC_Blitz_Timer.milliseconds() > 500) {
+                    ClawSetting = false;
+                    Claw.setPower(-1);
+                    if (Claw.getPower() < -0.95) {
+                        R_semi_auto_sc_blitz_step++;
+                        SC_Blitz_Timer.reset();
+                    }
+                }
+                break;
+            case 8:
+                R_SC_ConeLevel++;
+                if (R_SC_ConeLevel >= 4) {
+                    RailControlV2.SetTargetPosition(0, -1, 1);
+                    SetBasePosition(0);
+                    SetExtendingPosition(0);
+                    R_semi_auto_sc_blitz_step = 11;
+                } else {
+                    R_semi_auto_sc_blitz_step++;
+                    SC_Blitz_Timer.reset();
+                }
+                break;
+            case 9:
+                if (SC_Blitz_Timer.milliseconds() > 200) {
+                    RailControlV2.SetTargetPosition(2690, -1, 1);
+                    SetBasePosition(-1020);
+                    SetExtendingPosition(0);
+                    R_semi_auto_sc_blitz_step++;
+                }
+                break;
+            case 10:
+                if (RotatingBase.getCurrentPosition() > 0) {
+
+                    if (R_SC_ConeLevel == 1) {
+                        RailControlV2.SetTargetPosition(495, -1, 1);
+                        R_semi_auto_sc_blitz_step = 1;
+                    } else if (R_SC_ConeLevel == 2) {
+                        RailControlV2.SetTargetPosition(385, -1, 1);
+                        R_semi_auto_sc_blitz_step = 1;
+                    } else if (R_SC_ConeLevel == 3) {
+                        RailControlV2.SetTargetPosition(300, -1, 1);
+                        R_semi_auto_sc_blitz_step = 1;
+                    } else {
+                        R_semi_auto_sc_blitz_step++;
+                    }
+                }
+                break;
+            case 11:
+                break;
+            default:
+                break;
+        }
     }
 }

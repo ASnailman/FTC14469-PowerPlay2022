@@ -83,6 +83,7 @@ public class SprintAutoBlueMedium extends LinearOpMode {
     int angleAdjustment;
     int tickAdjustment;
     int extendingAdjustment;
+    int trueAdjust;
 
     int leftCenterTickCount;
 
@@ -354,7 +355,7 @@ public class SprintAutoBlueMedium extends LinearOpMode {
                     break;
 
                 case 7:
-                        if (RotatingBase.getCurrentPosition() >= 2455 + angleAdjustment && (RailControlV2.GetTaskState() == Task_State.DONE ||
+                        if (RotatingBase.getCurrentPosition() >= 2455 + angleAdjustment + trueAdjust && (RailControlV2.GetTaskState() == Task_State.DONE ||
                                 RailControlV2.GetTaskState() == Task_State.READY)) {
                             if (coneLevel == 0) {
                                 if (ET.milliseconds() > 200) {
@@ -431,7 +432,7 @@ public class SprintAutoBlueMedium extends LinearOpMode {
                     break;
 
                 case 13:
-                    if (ET.milliseconds() > 480) {
+                    if (ET.milliseconds() > 480 && ExtendingRail.getCurrentPosition() > 600) {
                         Claw.setPower(1);
                         ET.reset();
                         programOrder++;
@@ -459,6 +460,7 @@ public class SprintAutoBlueMedium extends LinearOpMode {
                         SetExtendingPosition(90 + tickAdjustment);
                         ET.reset();
                         coneLevel++;
+                        trueAdjust = 20;
                         if (coneLevel < 5) {
                             programOrder = 7;
                         }
