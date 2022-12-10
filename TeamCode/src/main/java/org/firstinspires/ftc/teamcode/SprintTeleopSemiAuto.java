@@ -123,6 +123,8 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 //    int SC_RightAngleAdjustment;
     boolean R_runBlitz = false;
 
+    boolean directionControl = false;
+
     public void runOpMode() {
 
         //Initialize the motors and sensors
@@ -244,6 +246,34 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 //            if (y < 0) {
 //                l = l * -1;
 //            }
+
+            if (!button_bumper_left_already_pressed) {
+                if (gamepad1.left_bumper) {
+                    if (!directionControl) {
+                        directionControl = true;
+                    } else {
+                        directionControl = false;
+                    }
+                    button_bumper_left_already_pressed = true;
+                }
+            } else {
+                if (!gamepad1.left_bumper) {
+                    button_bumper_left_already_pressed = false;
+                }
+            }
+
+            if (!directionControl) {
+                l = 0;
+            } else {
+                DirectionControl.SetTargetDirection(0, 0.17);
+                l = DirectionControl.GyroTask_TeleOp();
+            }
+
+            //if turning, set the gains to 0
+            if (rx != 0) {
+//                l = DirectionControl.GyroTask_TeleOp() * 0;
+                directionControl = false;
+            }
 
             double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
             double FLPower = (y + x + rx + l) / denominator;
@@ -970,7 +1000,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 });
                 readVoltOnce++;
             }
-            DirectionControl.GyroTask();
+            //DirectionControl.GyroTask();
             telemetry.addData("LeftRail Power", RailLeft.getPower());
             telemetry.addData("LeftRail Encoder", RailLeft.getCurrentPosition());
             telemetry.addData("RightRail Power", RailRight.getPower());

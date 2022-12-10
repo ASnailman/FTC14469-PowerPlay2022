@@ -229,24 +229,24 @@ public class SprintAutoLeftBlue extends LinearOpMode {
         if (readVoltOnce == 0) {
             telemetry.addData("voltage", "%.1f volts", new Func<Double>() { @Override public Double value() { return getBatteryVoltage(); } });
             if (getBatteryVoltage() > 13.7) {
-                firstConeAdjustment = 70;
-                angleAdjustment = 15;
-                tickAdjustment = 10;
+                firstConeAdjustment = 55;
+                angleAdjustment = 5;
+                tickAdjustment = -10;
             }
             else if (getBatteryVoltage() > 13.2) {
-                firstConeAdjustment = 70;
-                angleAdjustment = 12;
-                tickAdjustment = 10;
+                firstConeAdjustment = 50;
+                angleAdjustment = 2;
+                tickAdjustment = -20;
             }
             else if (getBatteryVoltage() > 12.7) {
-                firstConeAdjustment = 70;
-                angleAdjustment = 5;
-                tickAdjustment = 5;
+                firstConeAdjustment = 55;
+                angleAdjustment = -10;
+                tickAdjustment = -20;
             }
             else {
-                firstConeAdjustment = 70;
-                angleAdjustment = 5;
-                tickAdjustment = 0;
+                firstConeAdjustment = 50;
+                angleAdjustment = -10;
+                tickAdjustment = -12;
             }
             readVoltOnce++;
 
@@ -489,7 +489,7 @@ public class SprintAutoLeftBlue extends LinearOpMode {
                             MechDrive.GetTaskState() == Task_State.DONE) {
 
                         if (posOne) {
-                            MechDrive.SetTargets(-90, 2070, 0.5, 1);
+                            MechDrive.SetTargets(-90, 1970, 0.5, 1);
                             SetAttachmentPosition(0, -1020);
                             SetExtendingPosition(0);
                             ET.reset();
@@ -499,7 +499,7 @@ public class SprintAutoLeftBlue extends LinearOpMode {
                             SetExtendingPosition(0);
                             ET.reset();
                         } else if (posThree) {
-                            MechDrive.SetTargets(90, 2150, 0.6, 1);
+                            MechDrive.SetTargets(90, 2350, 0.6, 1);
                             SetAttachmentPosition(2970, -1020);
                             SetExtendingPosition(0);
                             ET.reset();

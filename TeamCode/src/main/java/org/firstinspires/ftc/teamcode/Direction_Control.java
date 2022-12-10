@@ -92,6 +92,56 @@ public class Direction_Control {
         }
     }
 
+    public double GyroTask_TeleOp() {
+
+        double command = 0;
+
+        //Continuously turn to the direction chosen with the specified amount of power
+        if (run_state == Task_State.RUN) {
+
+            if (((Angle + 2) > GyroContinuity()) || ((Angle - 2) > GyroContinuity()) || turnright) {
+
+                turnright = true;
+
+                if (GyroContinuity() < Angle) {
+                    command = pwr;
+                } else {
+                    command = 0;
+                    turnright = false;
+
+//                while (frontRight.getCurrentPosition() != 0) {
+//                    frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                }
+//                frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                }
+
+            } else if (((Angle + 2) < GyroContinuity()) || ((Angle - 2) < GyroContinuity()) || turnleft) {
+
+                turnleft = true;
+
+                if (GyroContinuity() > Angle) {
+                    command = -pwr;
+                } else {
+                    command = 0;
+                    turnleft = false;
+
+//                while (frontRight.getCurrentPosition() != 0) {
+//                    frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                }
+//                frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                }
+            }
+        }
+        //Force Stop
+        else if (run_state == Task_State.OVERRIDE) {
+            command = 0;
+            pwr = 0;
+            run_state = Task_State.DONE;
+        }
+
+        return command;
+    }
+
     public Task_State GetTaskState() {
         return run_state;
     }
