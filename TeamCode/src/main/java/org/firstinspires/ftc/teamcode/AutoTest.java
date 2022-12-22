@@ -11,8 +11,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -38,27 +40,33 @@ public class AutoTest extends LinearOpMode {
     static DcMotor FrontRight;
     static DcMotor RailRight;
     static DcMotor RailLeft;
+    static DcMotor ExtendingRail;
     static DcMotor RotatingBase;
-    static CRServo LeftClaw;
-    static CRServo RightClaw;
+    static CRServo Claw;
 
-    static NormalizedColorSensor rightColorsensor;
-    static NormalizedColorSensor leftColorsensor;
-    static NormalizedColorSensor centerRightColorsensor;
-    static NormalizedColorSensor centerLeftColorsensor;
-    //    static DistanceSensor frontRightDistanceSensor;
-//    static DistanceSensor frontLeftDistanceSensor;
-    static DistanceSensor backRightDistanceSensor;
-    static DistanceSensor backLeftDistanceSensor;
+    static VoltageSensor voltageSensor;
 
     //Sensors
     BNO055IMU IMU;
     OpenCvWebcam webcam;
     VisionClassAutoRightBlue.SignalDeterminationPipeline pipeline;
 
+    static NormalizedColorSensor rightColorsensor;
+    static NormalizedColorSensor leftColorsensor;
+    static NormalizedColorSensor centerRightColorsensor;
+    static NormalizedColorSensor centerLeftColorsensor;
+//    static DistanceSensor frontRightDistanceSensor;
+//    static DistanceSensor frontLeftDistanceSensor;
+    static DistanceSensor backRightDistanceSensor;
+    static DistanceSensor backLeftDistanceSensor;
+
     //Variables of Classes
     Methods motorMethods;
     Mech_Drive_FAST MechDrive;
+//    Rail_Control RailControl;
+    Rail_ControlV2 RailControlV2;
+    Direction_Control DirectionControl;
+    Base_Control BaseControl;
 
     //Variables For IMU Gyro
     double globalangle;
@@ -67,6 +75,17 @@ public class AutoTest extends LinearOpMode {
 
     //Variables
     int programOrder = 0;
+    int repeat = 0;
+    ElapsedTime ET = new ElapsedTime();
+    ElapsedTime ERT = new ElapsedTime(); //Elapsed Reset Timer
+    int coneLevel = 0;
+    int readVoltOnce = 0;
+    int angleAdjustment;
+    int tickAdjustment;
+    int extendingAdjustment;
+
+    int leftCenterTickCount;
+
     double current_value;
     double prev_value = 0;
     double final_value;
@@ -89,6 +108,7 @@ public class AutoTest extends LinearOpMode {
     boolean centerLeftBlue;
     boolean centerLeftUnknown;
     double distance;
+    boolean distanceCleared = false;
 
     double frontRightDistance;
     double frontLeftDistance;
@@ -112,8 +132,6 @@ public class AutoTest extends LinearOpMode {
     int backLeftCount = 0;
     int backRightCount = 0;
 
-    ElapsedTime ET = new ElapsedTime();
-
     public void runOpMode() {
 
         //Initialize the motors and sensors
@@ -121,10 +139,10 @@ public class AutoTest extends LinearOpMode {
         BackRight = hardwareMap.get(DcMotor.class, "BackRight");
         FrontLeft = hardwareMap.get(DcMotor.class, "FrontLeft");
         FrontRight = hardwareMap.get(DcMotor.class, "FrontRight");
-        LeftClaw = hardwareMap.get(CRServo.class, "leftClaw");
-        RightClaw = hardwareMap.get(CRServo.class, "rightClaw");
+        Claw = hardwareMap.get(CRServo.class, "Claw");
         RailRight = hardwareMap.get(DcMotor.class, "RailRight");
         RailLeft = hardwareMap.get(DcMotor.class, "RailLeft");
+        ExtendingRail = hardwareMap.get(DcMotor.class, "ExtendingRail");
         RotatingBase = hardwareMap.get(DcMotor.class, "RotatingBase");
         IMU = hardwareMap.get(BNO055IMU.class, "imu");
 
@@ -136,6 +154,8 @@ public class AutoTest extends LinearOpMode {
 //        frontLeftDistanceSensor = hardwareMap.get(DistanceSensor.class, "frontLeftDistanceSensor");
         backRightDistanceSensor = hardwareMap.get(DistanceSensor.class, "backRightDistanceSensor");
         backLeftDistanceSensor = hardwareMap.get(DistanceSensor.class, "backLeftDistanceSensor");
+
+//        voltageSensor = hardwareMap.get(VoltageSensor.class, "VoltageSensor");
 
         //Configure the control hub orientation
         IMU.write8(BNO055IMU.Register.OPR_MODE, BNO055IMU.SensorMode.CONFIG.bVal & 0x0F);
@@ -149,9 +169,8 @@ public class AutoTest extends LinearOpMode {
         AttachmentMotorPresets();
 
         //Claw Presets
-//        Claw.setDirection(Servo.Direction.FORWARD);
-//        Claw.scaleRange(0, 1);
-//        Claw.setPosition(1);
+        Claw.setDirection(CRServo.Direction.FORWARD);
+        Claw.setPower(0);
 
         //Configrue IMU for GyroTurning
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -160,7 +179,17 @@ public class AutoTest extends LinearOpMode {
 
         //Mechdrive Object
         MechDrive = new Mech_Drive_FAST(FrontRight, FrontLeft, BackRight, BackLeft, MoveDirection.FORWARD, telemetry);
-//        motorMethods = new Methods(telemetry, IMU, orientation, FrontLeft, FrontRight, BackLeft, BackRight, MoveDirection.FORWARD);
+//        RailControl = new Rail_Control(RailLeft, RailRight);
+        RailControlV2 = new Rail_ControlV2(RailLeft, RailRight);
+        //        motorMethods = new Methods(telemetry, IMU, orientation, FrontLeft, FrontRight, BackLeft, BackRight, MoveDirection.FORWARD);
+        DirectionControl = new Direction_Control(IMU, FrontLeft, FrontRight, BackLeft, BackRight);
+        BaseControl = new Base_Control(RotatingBase);
+
+        //Zero Power Behavior
+        BackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        BackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        FrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        FrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         //Webcam
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -194,94 +223,242 @@ public class AutoTest extends LinearOpMode {
         waitForStart();
 
         ET.reset();
+        ERT.reset();
+
+        if (readVoltOnce == 0) {
+            telemetry.addData("voltage", "%.1f volts", new Func<Double>() { @Override public Double value() { return getBatteryVoltage(); } });
+            if (getBatteryVoltage() > 13.7) {
+                angleAdjustment = -22;
+                tickAdjustment = -5;
+            }
+            else if (getBatteryVoltage() > 13.2) {
+                angleAdjustment = -12;
+                tickAdjustment = 5;
+            }
+            else if (getBatteryVoltage() > 12.7) {
+                angleAdjustment = 5;
+                tickAdjustment = 5;
+            }
+            else {
+                angleAdjustment = 5;
+                tickAdjustment = 5;
+            }
+            readVoltOnce++;
+
+        }
+        telemetry.update();
 
         while (opModeIsActive()) {
 
             switch (programOrder) {
 
                 case 0:
-//                    if (pipeline.type == VisionClass.SignalDeterminationPipeline.SignalSleeveType.LocationONE) {
-//                        posOne = true;
-//                        posTwo = false;
-//                        posThree = false;
-//                    }
-//                    else if (pipeline.type == VisionClass.SignalDeterminationPipeline.SignalSleeveType.LocationTWO) {
-//                        posOne = false;
-//                        posTwo = true;
-//                        posThree = false;
-//                    }
-//                    else if (pipeline.type == VisionClass.SignalDeterminationPipeline.SignalSleeveType.LocationTHREE) {
-//                        posOne = false;
-//                        posTwo = false;
-//                        posThree = true;
-//                    } else {
-//                        posOne = true;
-//                        posTwo = false;
-//                        posThree = false;
-//                    }
-//                    programOrder++;
+                    Claw.setPower(1);
+                    ET.reset();
+                    ERT.reset();
+                    programOrder++;
                     break;
 
                 case 1:
-//                    SetAttachmentPosition(9520, 0);
-//                    if (RailRight.getCurrentPosition() > 9400) {
-//                        GyroTurn(90, 0.2);
-                    programOrder = 2;
-//                    }
+                    if (ET.milliseconds() > 550) {
+                        if (RailControlV2.GetTaskState() == Task_State.INIT || RailControlV2.GetTaskState() == Task_State.READY) {
+//                        SetAttachmentPosition(0, 4953);
+                            SetAttachment_LowPwr2Rail(2970, 1020);
+//                            MechDrive.SetTargets(0, 2109, 0.6, 1);
+//                        } else if (RailControlV2.GetTaskState() == Task_State.DONE) {
+                            programOrder++;
+                        }
+                    }
                     break;
 
                 case 2:
-                    if (MechDrive.GetTaskState() == Task_State.INIT ||
-                            MechDrive.GetTaskState() == Task_State.READY ||
-                            MechDrive.GetTaskState() == Task_State.DONE) {
-                        MechDrive.SetTargets(-90, 10000, 0.25, 1);
+                    programOrder++;
+                    break;
+
+                case 3:
+                    programOrder++;
+                    break;
+
+                case 4:
+                    programOrder++;
+                    break;
+
+                case 5:
+                    if (RotatingBase.getCurrentPosition() >= 970 && RotatingBase.getCurrentPosition() <= 1070) {
+                        SetExtendingPosition(100 + tickAdjustment);
+                        ET.reset();
                         programOrder++;
                     }
                     break;
 
-                case 3:
-//                    if (MechDrive.GetTaskState() == Task_State.READY ||
-//                            MechDrive.GetTaskState() == Task_State.DONE) {
-//                        MechDrive.SetTargets(90, 10000, 0.25, 1);
-//                        programOrder++;
-//                    }
+                case 6:
+                    if (ET.milliseconds() > 1000) {
+                        DirectionControl.SetTargetDirection(0, 0.2);
+                        SetAttachmentPositionLowPower(2970, 1530 + angleAdjustment);
+                        ET.reset();
+                        programOrder++;
+                    }
                     break;
 
-                case 4:
+                case 7:
+//                        if (RotatingBase.getCurrentPosition() >= 1510 + angleAdjustment && (RailControlV2.GetTaskState() == Task_State.DONE ||
+//                                RailControlV2.GetTaskState() == Task_State.READY)) {
+                    if (BaseControl.GetTaskState() == Task_State.READY || BaseControl.GetTaskState() == Task_State.DONE) {
+                            if (coneLevel == 0) {
+                                if (ET.milliseconds() > 400) {
+                                    SetAttachment_LowPwrRail(2690, 1530 + angleAdjustment);
+                                    ET.reset();
+                                    programOrder++;
+                                }
+                            }
+                            else {
+                                if (ET.milliseconds() > 400) {
+                                    SetAttachment_LowPwrRail(2690, 1530 + angleAdjustment);
+                                    ET.reset();
+                                    programOrder++;
+                                }
+                            }
+                        }
+                    break;
 
+                case 8:
+                    if (ET.milliseconds() > 500) {
+                        Claw.setPower(-1);
+                        if (Claw.getPower() < -0.95) {
+                            programOrder++;
+                            ET.reset();
+                        }
+                    }
+                    break;
+
+                case 9:
+                    if (coneLevel == 4) {
+                        ET.reset();
+                        programOrder = 17;
+                    } else {
+                        programOrder++;
+                        ET.reset();
+                    }
+                    break;
+
+                case 10:
+                    if (ET.milliseconds() > 200) {
+                        SetAttachmentPosition(2690, 0);
+                        SetExtendingPosition(0);
+                        programOrder++;
+                    }
+                    break;
+
+                case 11:
+                    if (RotatingBase.getCurrentPosition() < 1020) {
+                        if (coneLevel == 0) {
+                            SetAttachmentPositionLowPower(600, 0);
+                        }
+                        else if (coneLevel == 1) {
+                            SetAttachmentPositionLowPower(520, 0);
+                        }
+                        else if (coneLevel == 2) {
+                            SetAttachmentPositionLowPower(410, 0);
+                        }
+                        else if (coneLevel == 3) {
+                            SetAttachmentPositionLowPower(325, 0);
+                        }
+//                        else if (coneLevel == 4) {
+//                            SetAttachmentPositionLowPower(280, 0);
+//                        }
+                        programOrder++;
+                    }
+                    break;
+
+                case 12:
+                    if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
+                        SetExtendingPosition(610 + tickAdjustment);
+                        ET.reset();
+                        programOrder++;
+                    }
+                    break;
+
+                case 13:
+                    if (ET.milliseconds() > 480) {
+                        Claw.setPower(1);
+                        ET.reset();
+                        programOrder++;
+                    }
+                    break;
+
+                case 14:
+                    if (ET.milliseconds() > 480) {
+                        SetAttachmentPosition(1200, 0);
+                        programOrder++;
+                    }
+                    break;
+
+                case 15:
+                    if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
+                        SetExtendingPosition(90 + tickAdjustment);
+                        SetAttachmentPositionLowPower(3025, 1530 + angleAdjustment);
+                        ET.reset();
+                        programOrder++;
+                    }
+                    break;
+
+                case 16:
+                    if (ET.milliseconds() > 100) {
+                        ET.reset();
+                        coneLevel++;
+                        if (coneLevel < 5) {
+                            programOrder = 7;
+                        }
+                    }
+                    break;
+
+                case 17:
+                    DirectionControl.Override();
+                    SetAttachmentPosition(0, 0);
+                    SetExtendingPosition(0);
                     programOrder++;
                     break;
-
-//                case 10:
-//                    if (MechDrive.GetTaskState() == Task_State.INIT ||
-//                            MechDrive.GetTaskState() == Task_State.READY ||
-//                            MechDrive.GetTaskState() == Task_State.DONE) {
-//
-//                        if (posOne) {
-//                            MechDrive.SetTargets(-90, 800, 0.7, 0);
-//                        }
-//                        else if (posTwo) {
-//                            MechDrive.SetTargets(0, 0, 0.1, 0);
-//                        }
-//                        else if (posThree) {
-//                            MechDrive.SetTargets(90, 800, 0.7, 0);
-//                        }
-//                        programOrder++;
-//                    }
-//                    break;
 
                 default:
                     break;
             }
 
-//            rightColorSensorLineDetector();
+            if (ERT.milliseconds() > 29500) {
+                SetAttachmentPosition(0, 0);
+            }
+
+            rightColorSensorLineDetector();
             leftColorSensorLineDetector();
             centerRightColorSensorLineDetector();
-//            centerLeftColorSensorLineDetector();
-//            MechDrive.Task(GyroContinuity());
+            centerLeftColorSensorLineDetector();
+            backRightJunctionDetector();
+            backLeftJunctionDetector();
+//            frontRightJunctionDetector();
+//            frontLeftJunctionDetector();
+            DirectionControl.GyroTask();
+            MechDrive.Task(GyroContinuity());
+//            RailControl.RailTask();
+            RailControlV2.RailTask();
+            BaseControl.RotatingBaseTask();
+//            telemetry.addData("Voltage", voltageSensor.getVoltage());
+            telemetry.addData("LeftCenterTicks", leftCenterTickCount);
+//            telemetry.addData("backright encoder", BackRight.getCurrentPosition());
+            telemetry.addData("ExtendingRail", ExtendingRail.getCurrentPosition());
+            telemetry.addData("gyro", GyroContinuity());
             telemetry.update();
         }
 
+    }
+
+    double getBatteryVoltage() {
+        double result = Double.POSITIVE_INFINITY;
+        for (VoltageSensor sensor : hardwareMap.voltageSensor) {
+            double voltage = sensor.getVoltage();
+            if (voltage > 0) {
+                result = Math.min(result, voltage);
+            }
+        }
+        return result;
     }
 
     public void GyroTurn (double angledegree, double power) {
@@ -377,19 +554,49 @@ public class AutoTest extends LinearOpMode {
         RotatingBase.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         RotatingBase.setTargetPosition(0);
         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        ExtendingRail.setDirection(DcMotorSimple.Direction.FORWARD);
+        ExtendingRail.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        ExtendingRail.setTargetPosition(0);
+        ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public void SetAttachment_LowPwr2Rail(int railPos, int basePos) {
+        RailControlV2.SetTargetPosition(railPos, -0.95, 0.95);
+//        RotatingBase.setTargetPosition(basePos);
+//        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        RotatingBase.setPower(1);
+        BaseControl.SetTargetPosition(basePos, -1, 1);
+    }
+
+    public void SetAttachment_LowPwrRail(int railPos, int basePos) {
+        RailControlV2.SetTargetPosition(railPos, -0.5, 0.5);
+//        RotatingBase.setTargetPosition(basePos);
+//        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        RotatingBase.setPower(1);
+        BaseControl.SetTargetPosition(basePos, -1, 1);
     }
 
     public void SetAttachmentPosition(int railPos, int basePos) {
-        RailRight.setTargetPosition(railPos);
-        RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        RailRight.setPower(1);
-        RailLeft.setTargetPosition(-railPos);
-        RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        RailLeft.setPower(1);
-        RotatingBase.setTargetPosition(basePos);
-        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        RotatingBase.setPower(1);
+        RailControlV2.SetTargetPosition(railPos, -1, 1);
+//        RotatingBase.setTargetPosition(basePos);
+//        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        RotatingBase.setPower(1);
+        BaseControl.SetTargetPosition(basePos, -1, 1);
+    }
 
+    public void SetExtendingPosition(int extendingPos) {
+        ExtendingRail.setTargetPosition(extendingPos);
+        ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ExtendingRail.setPower(0.6);
+    }
+
+    public void SetAttachmentPositionLowPower(int railPos, int basePos) {
+        RailControlV2.SetTargetPosition(railPos, -1, 1);
+//        RotatingBase.setTargetPosition(basePos);
+//        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        RotatingBase.setPower(0.5);
+        BaseControl.SetTargetPosition(basePos, -0.9, 0.9);
     }
 
     private int rightColorSensorLineDetector() {
@@ -408,7 +615,7 @@ public class AutoTest extends LinearOpMode {
         int rUnknown = 0;
 
         //Right Colorsensor from back of Robot
-        if (rHSV[0] >= 200 && rHSV[0] <= 230) {
+        if (rHSV[0] >= 170 && rHSV[0] <= 240) {
             telemetry.addData("Color:", "Blue");
 //            telemetry.update();
             rightBlue = true;
@@ -448,7 +655,7 @@ public class AutoTest extends LinearOpMode {
         int lUnknown = 0;
 
         //Left Colorsensor from back of Robot
-        if (lHSV[0] >= 190 && lHSV[0] <= 240) {
+        if (lHSV[0] >= 170 && lHSV[0] <= 240) {
             telemetry.addData("Color:", "Blue");
             telemetry.update();
             leftBlue = true;
@@ -488,7 +695,7 @@ public class AutoTest extends LinearOpMode {
         int centerRUnknown = 0;
 
         //Center Right Colorsensor from back of Robot
-        if (centerRHSV[0] >= 190 && centerRHSV[0] <= 240) {
+        if (centerRHSV[0] >= 170 && centerRHSV[0] <= 240) {
             telemetry.addData("Color:", "Blue");
             telemetry.update();
             centerRightBlue = true;
@@ -528,7 +735,7 @@ public class AutoTest extends LinearOpMode {
         int centerLUnknown = 0;
 
         //Center Left Colorsensor from back of Robot
-        if (centerLHSV[0] >= 190 && centerLHSV[0] <= 240) {
+        if (centerLHSV[0] >= 170 && centerLHSV[0] <= 240) {
             telemetry.addData("Color:", "Blue");
             telemetry.update();
             centerLeftBlue = true;
@@ -663,6 +870,4 @@ public class AutoTest extends LinearOpMode {
         }
     }
 
-
 }
-
