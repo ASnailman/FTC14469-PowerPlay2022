@@ -47,6 +47,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
     Rail_ControlV2 RailControlV2;
     ExtendingRail_Control ExtendingRailControl;
     Direction_Control DirectionControl;
+    Base_Control BaseControl;
 
     //Variables For IMU Gyro
     double globalangle;
@@ -169,6 +170,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
         ExtendingRailControl = new ExtendingRail_Control(ExtendingRail);
         DirectionControl = new Direction_Control(IMU, FrontLeft, FrontRight, BackLeft, BackRight);
         //        motorMethods = new Methods(telemetry, IMU, orientation, FrontLeft, FrontRight, BackLeft, BackRight, MoveDirection.FORWARD);
+        BaseControl = new Base_Control(RotatingBase);
 
         //Zero Power Behavior
         BackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -989,6 +991,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             }
 
             RailControlV2.RailTask();
+            BaseControl.RotatingBaseTask();
 //            ExtendingRailControl.ExtendingRailTask();
 //            telemetry.addData("Voltage", voltageSensor.getVoltage());
             if (readVoltOnce == 0) {
@@ -1075,9 +1078,10 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
     }
 
     public void SetBasePosition(int position) {
-        RotatingBase.setTargetPosition(position);
-        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        RotatingBase.setPower(0.8);
+//        RotatingBase.setTargetPosition(position);
+//        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        RotatingBase.setPower(0.8);
+        BaseControl.SetTargetPosition(position, -0.8, 0.8);
     }
 
     public void SetExtendingPosition(int extendingPos) {
