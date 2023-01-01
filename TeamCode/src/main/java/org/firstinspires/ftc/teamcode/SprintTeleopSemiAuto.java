@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -34,6 +35,8 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
     //    static CRServo LeftClaw;
 //    static CRServo RightClaw;
     static CRServo Claw;
+
+    static RevBlinkinLedDriver LightStrip;
 
     static VoltageSensor voltageSensor;
 
@@ -140,6 +143,9 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
         RailRight = hardwareMap.get(DcMotor.class, "RailRight");
         ExtendingRail = hardwareMap.get(DcMotor.class, "ExtendingRail");
         RotatingBase = hardwareMap.get(DcMotor.class, "RotatingBase");
+
+//        LightStrip = hardwareMap.get(RevBlinkinLedDriver.class, "LightStrip");
+
         IMU = hardwareMap.get(BNO055IMU.class, "imu");
 
 //        voltageSensor = hardwareMap.get(VoltageSensor.class, "Motor Controller 1");
@@ -316,6 +322,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             switch (targetJunction) {
                 case 1:
                     ET.reset();
+//                    LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
                     targetJunction++;
                     break;
                 case 2:
@@ -340,6 +347,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
                 case 5:
                     ET.reset();
+//                    LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
                     targetJunction++;
                     break;
 
@@ -363,6 +371,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
                 case 9:
                     ET.reset();
+//                    LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
                     targetJunction++;
                     break;
 
@@ -412,6 +421,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     ET.reset();
                     ClawSetting = true;
                     Claw.setPower(1);
+//                    LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
                     targetJunction++;
                     break;
                 case 18:
@@ -590,6 +600,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                         groundJunctionMode = false;
                         lowJunctionResetMode = false;
                         Claw.setPower(-1);
+//                        LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
                         RailControlV2.SetTargetPosition(0, -1, 1);
 //                        SetExtendingPosition(0);
                         button_x_already_pressed2 = true;
@@ -1056,7 +1067,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 //        RailRight.setTargetPosition(0);
 //        RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        RotatingBase.setDirection(DcMotorSimple.Direction.FORWARD);
+        RotatingBase.setDirection(DcMotorSimple.Direction.REVERSE);
         RotatingBase.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         RotatingBase.setTargetPosition(0);
         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);

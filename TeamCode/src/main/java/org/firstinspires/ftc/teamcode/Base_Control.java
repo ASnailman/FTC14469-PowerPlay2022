@@ -25,7 +25,7 @@ public class Base_Control {
 
         // Assign the motor connected to the bucket and initialize it
         motor_obj = motor;
-        motor_obj.setDirection(DcMotorSimple.Direction.FORWARD);
+        motor_obj.setDirection(DcMotorSimple.Direction.REVERSE);
         motor_obj.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor_obj.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -74,7 +74,7 @@ public class Base_Control {
 
             // 0.07, 0.000001, 0.000005 (these are the best gains for accurate position and few jitters
             //cmd = pid_obj.PID_Control(target_position, 0.03, 0.000001, 0.000005, motor_obj.getCurrentPosition() );
-            cmd = pid_obj.PID_Control(target_position, 0.0024, 0.00001, 0.0035, motor_obj.getCurrentPosition() );
+            cmd = pid_obj.PID_Control(target_position, 0.0022, 0.00002, 0.0037, motor_obj.getCurrentPosition() );
 
             // Don't let the motor run too fast. Otherwise, it will overshoot
             clipped_cmd = Range.clip(cmd, min, max);
