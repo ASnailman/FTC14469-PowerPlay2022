@@ -316,7 +316,7 @@ public class SprintAutoRight extends LinearOpMode {
                 case 6:
                     if (MechDrive.GetTaskState() == Task_State.DONE) {
                         DirectionControl.SetTargetDirection(0, 0.2);
-                        SetAttachmentPositionLowPower(2970, 1450 + angleAdjustment);
+                        SetAttachmentPositionLowPower(2970, 1440 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -328,14 +328,14 @@ public class SprintAutoRight extends LinearOpMode {
                     if (BaseControl.GetTaskState() == Task_State.READY || BaseControl.GetTaskState() == Task_State.DONE) {
                             if (coneLevel == 0) {
                                 if (ET.milliseconds() > 400) {
-                                    SetAttachment_LowPwrRail(2690, 1450 + angleAdjustment);
+                                    SetAttachment_LowPwrRail(2690, 1460 + angleAdjustment);
                                     ET.reset();
                                     programOrder++;
                                 }
                             }
                             else {
                                 if (ET.milliseconds() > 400) {
-                                    SetAttachment_LowPwrRail(2690, 1450 + angleAdjustment);
+                                    SetAttachment_LowPwrRail(2690, 1440 + angleAdjustment);
                                     ET.reset();
                                     programOrder++;
                                 }
@@ -374,16 +374,16 @@ public class SprintAutoRight extends LinearOpMode {
                 case 11:
                     if (RotatingBase.getCurrentPosition() < 1020) {
                         if (coneLevel == 0) {
-                            SetAttachmentPositionLowPower(580, 0);
+                            SetAttachmentPositionLowPower(570, 0);
                         }
                         else if (coneLevel == 1) {
-                            SetAttachmentPositionLowPower(500, 0);
+                            SetAttachmentPositionLowPower(490, 0);
                         }
                         else if (coneLevel == 2) {
-                            SetAttachmentPositionLowPower(390, 0);
+                            SetAttachmentPositionLowPower(380, 0);
                         }
                         else if (coneLevel == 3) {
-                            SetAttachmentPositionLowPower(305, 0);
+                            SetAttachmentPositionLowPower(295, 0);
                         }
                         else if (coneLevel == 4) {
                             SetAttachmentPositionLowPower(180, 0);
@@ -418,7 +418,7 @@ public class SprintAutoRight extends LinearOpMode {
                 case 15:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
                         SetExtendingPosition(75 + tickAdjustment);
-                        SetAttachmentPositionLowPower(3025, 1450 + angleAdjustment);
+                        SetAttachmentPositionLowPower(3025, 1440 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
