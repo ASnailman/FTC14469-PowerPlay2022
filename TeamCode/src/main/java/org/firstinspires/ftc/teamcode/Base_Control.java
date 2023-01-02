@@ -72,9 +72,12 @@ public class Base_Control {
         // Always run this PID control when in RUN, DONE or READY mode
         if (run_state == Task_State.RUN || run_state == Task_State.DONE || run_state == Task_State.READY) {
 
-            // 0.07, 0.000001, 0.000005 (these are the best gains for accurate position and few jitters
-            //cmd = pid_obj.PID_Control(target_position, 0.03, 0.000001, 0.000005, motor_obj.getCurrentPosition() );
+            //correct numbers
+//            cmd = pid_obj.PID_Control(target_position, 0.0022, 0.00002, 0.0037, motor_obj.getCurrentPosition() );
+
+            //testing
             cmd = pid_obj.PID_Control(target_position, 0.0022, 0.00002, 0.0037, motor_obj.getCurrentPosition() );
+
 
             // Don't let the motor run too fast. Otherwise, it will overshoot
             clipped_cmd = Range.clip(cmd, min, max);
