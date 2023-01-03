@@ -374,19 +374,19 @@ public class SprintAutoRight extends LinearOpMode {
                 case 11:
                     if (RotatingBase.getCurrentPosition() < 1020) {
                         if (coneLevel == 0) {
-                            SetAttachmentPositionLowPower(570, 0);
+                            SetAttachmentPosition(570, 0);
                         }
                         else if (coneLevel == 1) {
-                            SetAttachmentPositionLowPower(490, 0);
+                            SetAttachmentPosition(490, 0);
                         }
                         else if (coneLevel == 2) {
-                            SetAttachmentPositionLowPower(380, 0);
+                            SetAttachmentPosition(380, 0);
                         }
                         else if (coneLevel == 3) {
-                            SetAttachmentPositionLowPower(295, 0);
+                            SetAttachmentPosition(295, 0);
                         }
                         else if (coneLevel == 4) {
-                            SetAttachmentPositionLowPower(180, 0);
+                            SetAttachmentPosition(180, 0);
                         }
                         programOrder++;
                     }
@@ -654,7 +654,7 @@ public class SprintAutoRight extends LinearOpMode {
 //        RotatingBase.setTargetPosition(basePos);
 //        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //        RotatingBase.setPower(0.5);
-        BaseControl.SetTargetPosition(basePos, -0.7, 0.7);
+        BaseControl.SetTargetPosition(basePos, -0.5, 0.5);
     }
 
 //    private int rightColorSensorLineDetector() {

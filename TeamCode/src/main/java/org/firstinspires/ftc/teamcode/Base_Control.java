@@ -76,7 +76,7 @@ public class Base_Control {
 //            cmd = pid_obj.PID_Control(target_position, 0.0022, 0.00002, 0.0037, motor_obj.getCurrentPosition() );
 
             //testing
-            cmd = pid_obj.PID_Control(target_position, 0.0022, 0.00002, 0.0037, motor_obj.getCurrentPosition() );
+            cmd = pid_obj.PID_Control(target_position, 0.0021, 0.00003, 0.0039, motor_obj.getCurrentPosition() );
 
 
             // Don't let the motor run too fast. Otherwise, it will overshoot
