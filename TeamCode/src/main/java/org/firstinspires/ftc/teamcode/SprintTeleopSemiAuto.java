@@ -133,7 +133,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
     //Semi-Auto Blitz for Substation High Junction Vars
     boolean HJBlitz = false;
     boolean dropCone;
-    boolean HJAutoBlitzReady;
+    boolean HJAutoBlitzReady = true;
     int semi_auto_HJ_blitz_order = 0;
 
     public void runOpMode() {
@@ -828,20 +828,40 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     button_a_already_pressed = true;
                 }
             } else {
-                if (!gamepad1.a) {
+                if (gamepad1.a) {
+                    HJBlitz = false;
                     button_a_already_pressed = false;
                 }
             }
 
-            if (gamepad1.b) {
-                dropCone = true;
+            if (!button_b_already_pressed) {
+                if (gamepad1.b) {
+                    dropCone = true;
+                    button_b_already_pressed = true;
+                }
+            } else {
+                if (!gamepad1.b) {
+                    dropCone = false;
+                    button_b_already_pressed = false;
+                }
             }
 
             if (HJBlitz) {
-                HJBlitz = false;
-                HJAutoBlitzReady = true;
                 SemiAutoHJBlitz();
             }
+
+            if (!button_x_already_pressed) {
+                if (gamepad1.x) {
+                    HJAutoBlitzReady = false;
+                    button_x_already_pressed = true;
+                }
+            } else {
+                if (!gamepad1.x) {
+                    HJAutoBlitzReady = true;
+                    button_x_already_pressed = false;
+                }
+            }
+
 
             /*****************************************************************
              * Button Dpad Right (G1) : Bring rail down without opening claw
@@ -939,9 +959,9 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 }
             }
 
-            /*****************************************************************
-             * Button X (G1) : Reset Rail
-             *****************************************************************/
+//            /*****************************************************************
+//             * Button X (G1) : Reset Rail
+//             *****************************************************************/
 
 //            if (!button_a_already_pressed) {
 //                if (gamepad1.a) {
@@ -957,19 +977,19 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 //                }
 //            }
 
-            if (!button_x_already_pressed) {
-                if (gamepad1.x) {
-//                    ExtendingRailControl.SetTargetPosition(0, -0.01, 0.01);
-                    ExtendingRail.setTargetPosition(0);
-                    ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    ExtendingRail.setPower(0);
-                    button_x_already_pressed = true;
-                }
-            } else {
-                if (!gamepad1.x) {
-                    button_x_already_pressed = false;
-                }
-            }
+//            if (!button_x_already_pressed) {
+//                if (gamepad1.x) {
+////                    ExtendingRailControl.SetTargetPosition(0, -0.01, 0.01);
+//                    ExtendingRail.setTargetPosition(0);
+//                    ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    ExtendingRail.setPower(0);
+//                    button_x_already_pressed = true;
+//                }
+//            } else {
+//                if (!gamepad1.x) {
+//                    button_x_already_pressed = false;
+//                }
+//            }
 
             /******************************************
              * Trigger (G2) Manual Calibration For Rotating Base
@@ -1184,7 +1204,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             case 0:
                 if (RailControlV2.GetTaskState() == Task_State.INIT || RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
                     if (SC_Blitz_Timer.milliseconds() > 400) {
-                        RailControlV2.SetTargetPosition(575, -1, 1);
+                        RailControlV2.SetTargetPosition(570, -1, 1);
                         SetBasePosition(1020);
                         SC_Blitz_Timer.reset();
                         semi_auto_sc_blitz_step++;
@@ -1214,7 +1234,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 break;
             case 4:
                 if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                    SetExtendingPosition(75);
+                    SetExtendingPosition(100);
                     RailControlV2.SetTargetPosition(3025, -1, 1);
                     SetBasePosition(-385 + SC_AngleAdjustment);
                     SC_Blitz_Timer.reset();
@@ -1271,13 +1291,13 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 if (RotatingBase.getCurrentPosition() > 0) {
 
                     if (SC_ConeLevel == 1) {
-                        RailControlV2.SetTargetPosition(495, -1, 1);
+                        RailControlV2.SetTargetPosition(490, -1, 1);
                         semi_auto_sc_blitz_step = 1;
                     } else if (SC_ConeLevel == 2) {
-                        RailControlV2.SetTargetPosition(385, -1, 1);
+                        RailControlV2.SetTargetPosition(380, -1, 1);
                         semi_auto_sc_blitz_step = 1;
                     } else if (SC_ConeLevel == 3) {
-                        RailControlV2.SetTargetPosition(300, -1, 1);
+                        RailControlV2.SetTargetPosition(295, -1, 1);
                         semi_auto_sc_blitz_step = 1;
                     } else {
                         semi_auto_sc_blitz_step++;
@@ -1297,7 +1317,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             case 0:
                 if (RailControlV2.GetTaskState() == Task_State.INIT || RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
                     if (SC_Blitz_Timer.milliseconds() > 400) {
-                        RailControlV2.SetTargetPosition(575, -1, 1);
+                        RailControlV2.SetTargetPosition(570, -1, 1);
                         SetBasePosition(-1020);
                         SC_Blitz_Timer.reset();
                         R_semi_auto_sc_blitz_step++;
@@ -1327,7 +1347,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 break;
             case 4:
                 if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                    SetExtendingPosition(75);
+                    SetExtendingPosition(100);
                     RailControlV2.SetTargetPosition(3025, -1, 1);
                     SetBasePosition(385 + SC_AngleAdjustment);
                     SC_Blitz_Timer.reset();
@@ -1384,13 +1404,13 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 if (RotatingBase.getCurrentPosition() > 0) {
 
                     if (R_SC_ConeLevel == 1) {
-                        RailControlV2.SetTargetPosition(495, -1, 1);
+                        RailControlV2.SetTargetPosition(490, -1, 1);
                         R_semi_auto_sc_blitz_step = 1;
                     } else if (R_SC_ConeLevel == 2) {
-                        RailControlV2.SetTargetPosition(385, -1, 1);
+                        RailControlV2.SetTargetPosition(380, -1, 1);
                         R_semi_auto_sc_blitz_step = 1;
                     } else if (R_SC_ConeLevel == 3) {
-                        RailControlV2.SetTargetPosition(300, -1, 1);
+                        RailControlV2.SetTargetPosition(295, -1, 1);
                         R_semi_auto_sc_blitz_step = 1;
                     } else {
                         R_semi_auto_sc_blitz_step++;
@@ -1409,43 +1429,57 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
         switch (semi_auto_HJ_blitz_order) {
             case 0:
                 if (HJAutoBlitzReady) {
-                    HJAutoBlitzReady = false;
+                    SetExtendingPosition(400);
+                    semi_auto_HJ_blitz_order++;
+                }
+                break;
+
+            case 1:
+                if (ExtendingRail.getCurrentPosition() > 398) {
                     ClawSetting = true;
                     HJBET.reset();
                     semi_auto_HJ_blitz_order++;
                 }
                 break;
 
-            case 1:
+            case 2:
                 if (HJBET.milliseconds() > 450) {
                     RailControlV2.SetTargetPosition(2925, -0.7, 0.7);
-                    MechDrive.SetTargets(0, 1750, 1, 1);
+                    SetBasePosition(1020);
+                    SetExtendingPosition(75);
                     semi_auto_HJ_blitz_order++;
                 }
                 break;
 
-            case 2:
-//                if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                    if (dropCone) {
-                        dropCone = false;
-                        RailControlV2.SetTargetPosition(2700, -0.7, 0.7);
-                        semi_auto_HJ_blitz_order++;
-                    }
-//                }
-                break;
-
             case 3:
                 if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
+                    if (dropCone) {
+                        RailControlV2.SetTargetPosition(2700, -0.7, 0.7);
+                        HJBET.reset();
+                        semi_auto_HJ_blitz_order++;
+                    }
+                }
+                break;
+
+            case 4:
+                if (HJBET.milliseconds() > 300) {
                     ClawSetting = false;
                     HJBET.reset();
                     semi_auto_HJ_blitz_order++;
                 }
                 break;
 
-            case 4:
+            case 5:
                 if (HJBET.milliseconds() > 250) {
+                    SetExtendingPosition(0);
                     RailControlV2.SetTargetPosition(0, -0.7, 0.7);
-                    MechDrive.SetTargets(180, 1750, 0.7, 1);
+                    SetBasePosition(-1020);
+                    semi_auto_HJ_blitz_order++;
+                }
+                break;
+
+            case 6:
+                if (RotatingBase.getCurrentPosition() < -1000) {
                     semi_auto_HJ_blitz_order = 0;
                 }
                 break;
