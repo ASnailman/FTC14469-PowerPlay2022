@@ -335,7 +335,7 @@ public class SprintAutoRightMedium extends LinearOpMode {
                     if (RotatingBase.getCurrentPosition() >= 2220 && RotatingBase.getCurrentPosition() <= 2320) {
 
 //                            SetAttachmentPosition(2980, 1020);
-                            SetExtendingPosition(100 + tickAdjustment);
+                            SetExtendingPosition(110 + tickAdjustment);
                             programOrder++;
 
                     }
@@ -467,7 +467,7 @@ public class SprintAutoRightMedium extends LinearOpMode {
 
                 case 16:
                     if (ET.milliseconds() > 100 && RotatingBase.getCurrentPosition() > 1900) {
-                        SetExtendingPosition(85 + tickAdjustment);
+                        SetExtendingPosition(130 + tickAdjustment);
                         ET.reset();
                         coneLevel++;
                         if (sixCones) {
