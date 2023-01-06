@@ -3,9 +3,11 @@ package org.firstinspires.ftc.teamcode;
 import android.graphics.Color;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -43,7 +45,9 @@ public class SprintAutoLeft extends LinearOpMode {
     static DcMotor ExtendingRail;
     static DcMotor RotatingBase;
     static CRServo Claw;
-
+    static ColorSensor rightColorSensor;
+    static ColorSensor leftColorSensor;
+    static RevBlinkinLedDriver LightStrip;
     static VoltageSensor voltageSensor;
 
     //Sensors
@@ -143,6 +147,9 @@ public class SprintAutoLeft extends LinearOpMode {
         ExtendingRail = hardwareMap.get(DcMotor.class, "ExtendingRail");
         RotatingBase = hardwareMap.get(DcMotor.class, "RotatingBase");
         IMU = hardwareMap.get(BNO055IMU.class, "imu");
+        rightColorSensor = hardwareMap.get(ColorSensor.class, "rightColorSensor");
+        leftColorSensor = hardwareMap.get(ColorSensor.class, "leftColorSensor");
+        LightStrip = hardwareMap.get(RevBlinkinLedDriver.class, "LightStrip");
 
 //        rightColorsensor = hardwareMap.get(NormalizedColorSensor.class, "rightColorSensor");
 //        leftColorsensor = hardwareMap.get(NormalizedColorSensor.class, "leftColorSensor");
@@ -245,6 +252,8 @@ public class SprintAutoLeft extends LinearOpMode {
         telemetry.update();
 
         while (opModeIsActive()) {
+
+            LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE);
 
             switch (programOrder) {
 

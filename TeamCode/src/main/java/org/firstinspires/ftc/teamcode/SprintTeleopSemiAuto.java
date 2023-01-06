@@ -1,10 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.ColorSpace;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -35,6 +38,8 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
     //    static CRServo LeftClaw;
 //    static CRServo RightClaw;
     static CRServo Claw;
+    static ColorSensor rightColorSensor;
+    static ColorSensor leftColorSensor;
 
     static RevBlinkinLedDriver LightStrip;
 
@@ -76,6 +81,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
     int basePosition;
     int readVoltOnce = 0;
     boolean directionControl = false;
+    boolean manualRotateBase;
 
     double l;
 //    double assist_gain = 0.03;
@@ -150,8 +156,9 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
         RailRight = hardwareMap.get(DcMotor.class, "RailRight");
         ExtendingRail = hardwareMap.get(DcMotor.class, "ExtendingRail");
         RotatingBase = hardwareMap.get(DcMotor.class, "RotatingBase");
-
-//        LightStrip = hardwareMap.get(RevBlinkinLedDriver.class, "LightStrip");
+        rightColorSensor = hardwareMap.get(ColorSensor.class, "rightColorSensor");
+        leftColorSensor = hardwareMap.get(ColorSensor.class, "leftColorSensor");
+        LightStrip = hardwareMap.get(RevBlinkinLedDriver.class, "LightStrip");
 
         IMU = hardwareMap.get(BNO055IMU.class, "imu");
 
@@ -204,7 +211,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
              *****************************************************************/
 
             if (PowerSetting) {
-                movement = 0.8;
+                movement = 1;
             } else {
                 movement = 0.5;
             }
@@ -289,6 +296,10 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 //                l = DirectionControl.GyroTask_TeleOp() * 0;
                 directionControl = false;
             }
+
+//            LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_RAINBOW_PALETTE);
+            LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE);
+//            LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_LAVA_PALETTE);
 
             double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
             double FLPower = (y + x + rx + l) / denominator;
@@ -824,12 +835,15 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             if (!button_a_already_pressed) {
                 if (gamepad1.a) {
-                    HJBlitz = true;
+                    if (!HJBlitz) {
+                        HJBlitz = true;
+                    } else {
+                        HJBlitz = false;
+                    }
                     button_a_already_pressed = true;
                 }
             } else {
-                if (gamepad1.a) {
-                    HJBlitz = false;
+                if (!gamepad1.a) {
                     button_a_already_pressed = false;
                 }
             }
@@ -852,16 +866,18 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             if (!button_x_already_pressed) {
                 if (gamepad1.x) {
-                    HJAutoBlitzReady = false;
+                    if (HJAutoBlitzReady) {
+                        HJAutoBlitzReady = false;
+                    } else {
+                        HJAutoBlitzReady = true;
+                    }
                     button_x_already_pressed = true;
                 }
             } else {
                 if (!gamepad1.x) {
-                    HJAutoBlitzReady = true;
                     button_x_already_pressed = false;
                 }
             }
-
 
             /*****************************************************************
              * Button Dpad Right (G1) : Bring rail down without opening claw
@@ -874,8 +890,6 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     ClawSetting = true;
                     coneStackMode = false;
                     groundJunctionMode = false;
-//                    RightClaw.setPosition(0);
-//                    LeftClaw.setPosition(0);
                     Claw.setPower(1);
                     RailControlV2.SetTargetPosition(0, -1, 1);
                     button_dpad_right_already_pressed2 = true;
@@ -896,8 +910,6 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     ClawSetting = true;
                     coneStackMode = false;
                     groundJunctionMode = true;
-//                    RightClaw.setPosition(1);
-//                    LeftClaw.setPosition(1);
                     Claw.setPower(1);
                     targetJunction = 13;
                     button_dpad_down_already_pressed2 = true;
@@ -905,6 +917,27 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             } else {
                 if (!gamepad2.dpad_down) {
                     button_dpad_down_already_pressed2 = false;
+                }
+            }
+
+            /*****************************************************************
+             * Bumper Right (G1) : Reset Rail to 0
+             *****************************************************************/
+
+            if (!button_bumper_right_already_pressed) {
+                if (gamepad1.right_bumper) {
+//                    ExtendingRail.setTargetPosition(0);
+//                    ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    ExtendingRail.setPower(1);
+                    ExtendingRail.setPower(0);
+                    ExtendingRail.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    ExtendingRail.setTargetPosition(0);
+                    ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    button_bumper_right_already_pressed = true;
+                }
+            } else {
+                if (!gamepad1.right_bumper) {
+                    button_bumper_right_already_pressed = false;
                 }
             }
 
@@ -995,54 +1028,52 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
              * Trigger (G2) Manual Calibration For Rotating Base
              ******************************************/
 
-            if (button_left_trigger_already_pressed2 == false) {
-                if (gamepad2.left_trigger > 0 && gamepad2.right_trigger == 0) {
+//            if (manualRotateBase) {
+                if (button_left_trigger_already_pressed2 == false) {
+                    if (gamepad2.left_trigger > 0 && gamepad2.right_trigger == 0) {
+                        RotatingBase.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                        RotatingBase.setPower(0.2);
 
-//                    basePosition = basePosition + 25;
-//                    baseManualReset = 2;
-                    RotatingBase.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    RotatingBase.setPower(0.2);
-
-                    button_left_trigger_already_pressed2 = true;
+                        button_left_trigger_already_pressed2 = true;
+                    }
+                } else {
+                    if (gamepad2.left_trigger == 0) {
+                        RotatingBase.setPower(0);
+                        RotatingBase.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                        RotatingBase.setTargetPosition(0);
+                        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        button_left_trigger_already_pressed2 = false;
+                    }
                 }
-            } else {
-                if (gamepad2.left_trigger == 0) {
-//                    baseManualReset = 0;
-                    RotatingBase.setPower(0);
-                    RotatingBase.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    RotatingBase.setTargetPosition(0);
-                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    button_left_trigger_already_pressed2 = false;
-                }
-            }
 
-            if (button_right_trigger_already_pressed2 == false) {
-                if (gamepad2.right_trigger > 0 && gamepad2.left_trigger == 0) {
+                if (button_right_trigger_already_pressed2 == false) {
+                    if (gamepad2.right_trigger > 0 && gamepad2.left_trigger == 0) {
+                        RotatingBase.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                        RotatingBase.setPower(-0.2);
 
-//                    basePosition = basePosition - 25;
-//                    baseManualReset = 2;
-                    RotatingBase.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    RotatingBase.setPower(-0.2);
-
-                    button_right_trigger_already_pressed2 = true;
+                        button_right_trigger_already_pressed2 = true;
+                    }
+                } else {
+                    if (gamepad2.right_trigger == 0) {
+                        RotatingBase.setPower(0);
+                        RotatingBase.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                        RotatingBase.setTargetPosition(0);
+                        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        button_right_trigger_already_pressed2 = false;
+                    }
                 }
-            } else {
-                if (gamepad2.right_trigger == 0) {
-//                    baseManualReset = 0;
-                    RotatingBase.setPower(0);
-                    RotatingBase.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    RotatingBase.setTargetPosition(0);
-                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    button_right_trigger_already_pressed2 = false;
-                }
-            }
+//            }
 
             /******************************************
              * Trigger (G1) Manual Calibration For Viper Slides
              ******************************************/
 
             if (button_left_trigger_already_pressed == false) {
-                if (gamepad1.left_trigger > 0.4 && gamepad1.right_trigger <= 0.2) {
+
+                RailRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                RailLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                if (gamepad1.left_trigger > 0.4 && gamepad1.right_trigger == 0) {
 
                     RailRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     RailRight.setPower(-0.4);
@@ -1052,21 +1083,22 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     button_left_trigger_already_pressed = true;
                 }
             } else {
-                if (gamepad1.left_trigger <= 0.2) {
+                if (gamepad1.left_trigger == 0) {
+                    ET.reset();
                     RailRight.setPower(0);
                     RailLeft.setPower(0);
-//                    RailRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//                    RailRight.setTargetPosition(0);
-//                    RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//                    RailLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//                    RailLeft.setTargetPosition(0);
-//                    RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    RailRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    RailLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     button_left_trigger_already_pressed = false;
                 }
             }
 
             if (button_right_trigger_already_pressed == false) {
-                if (gamepad1.right_trigger > 0.4 && gamepad1.left_trigger <= 0.2) {
+
+                RailRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                RailLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                if (gamepad1.right_trigger > 0.4 && gamepad1.left_trigger == 0) {
 
                     RailRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     RailRight.setPower(0.4);
@@ -1076,18 +1108,25 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     button_right_trigger_already_pressed = true;
                 }
             } else {
-                if (gamepad1.right_trigger <= 0.2) {
+                if (gamepad1.right_trigger == 0) {
+                    ET.reset();
                     RailRight.setPower(0);
                     RailLeft.setPower(0);
-//                    RailRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//                    RailRight.setTargetPosition(0);
-//                    RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//                    RailLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//                    RailLeft.setTargetPosition(0);
-//                    RailLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    RailRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    RailLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     button_right_trigger_already_pressed = false;
                 }
             }
+
+//            if (runBlitz || R_runBlitz || HJBlitz) {
+//                RotatingBase.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//                BaseControl.RotatingBaseTask();
+//            } else if (gamepad2.right_trigger > 0 || gamepad2.left_trigger > 0) {
+//               manualRotateBase = true;
+//            } else {
+//                manualRotateBase = false;
+//                RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            }
 
 //            MechDrive.Task(GyroContinuity());
             RailControlV2.RailTask();
@@ -1159,9 +1198,9 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 //        RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         RotatingBase.setDirection(DcMotorSimple.Direction.REVERSE);
-        RotatingBase.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        RotatingBase.setTargetPosition(0);
-        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        RotatingBase.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        RotatingBase.setTargetPosition(0);
+//        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         ExtendingRail.setDirection(DcMotorSimple.Direction.FORWARD);
         ExtendingRail.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -1183,12 +1222,13 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
         RotatingBase.setTargetPosition(position);
         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         RotatingBase.setPower(0.7);
+//        BaseControl.SetTargetPosition(position, -0.8, 0.8);
     }
 
     public void SetBasePosition(int position) {
         RotatingBase.setTargetPosition(position);
         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        RotatingBase.setPower(0.7);
+        RotatingBase.setPower(0.5);
 //        BaseControl.SetTargetPosition(position, -0.8, 0.8);
     }
 
@@ -1199,6 +1239,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
     }
 
     public void SemiAutoSCBlitz_Left() {
+
         switch (semi_auto_sc_blitz_step) {
 
             case 0:
@@ -1305,6 +1346,8 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 }
                 break;
             case 11:
+                runBlitz = false;
+                semi_auto_sc_blitz_step++;
                 break;
             default:
                 break;
@@ -1312,6 +1355,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
     }
 
     public void SemiAutoSCBlitz_Right() {
+
         switch (R_semi_auto_sc_blitz_step) {
 
             case 0:
@@ -1418,6 +1462,8 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 }
                 break;
             case 11:
+                R_runBlitz = false;
+                R_semi_auto_sc_blitz_step++;
                 break;
             default:
                 break;
@@ -1429,13 +1475,15 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
         switch (semi_auto_HJ_blitz_order) {
             case 0:
                 if (HJAutoBlitzReady) {
-                    SetExtendingPosition(400);
+                    ExtendingRail.setTargetPosition(370);
+                    ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    ExtendingRail.setPower(1);
                     semi_auto_HJ_blitz_order++;
                 }
                 break;
 
             case 1:
-                if (ExtendingRail.getCurrentPosition() > 398) {
+                if (ExtendingRail.getCurrentPosition() > 355) {
                     ClawSetting = true;
                     HJBET.reset();
                     semi_auto_HJ_blitz_order++;
@@ -1443,10 +1491,13 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 break;
 
             case 2:
-                if (HJBET.milliseconds() > 450) {
-                    RailControlV2.SetTargetPosition(2925, -0.7, 0.7);
-                    SetBasePosition(1020);
-                    SetExtendingPosition(75);
+                if (HJBET.milliseconds() > 440) {
+                    RailControlV2.SetTargetPosition(2925, -1, 1);
+                    RotatingBase.setTargetPosition(1020);
+                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    RotatingBase.setPower(0.57);
+//                    BaseControl.SetTargetPosition(1020, -0.57, 0.57);
+                    SetExtendingPosition(0);
                     semi_auto_HJ_blitz_order++;
                 }
                 break;
@@ -1454,7 +1505,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             case 3:
                 if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
                     if (dropCone) {
-                        RailControlV2.SetTargetPosition(2700, -0.7, 0.7);
+                        RailControlV2.SetTargetPosition(2725, -1, 1);
                         HJBET.reset();
                         semi_auto_HJ_blitz_order++;
                     }
@@ -1462,7 +1513,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 break;
 
             case 4:
-                if (HJBET.milliseconds() > 300) {
+                if (HJBET.milliseconds() > 250) {
                     ClawSetting = false;
                     HJBET.reset();
                     semi_auto_HJ_blitz_order++;
@@ -1470,15 +1521,24 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 break;
 
             case 5:
-                if (HJBET.milliseconds() > 250) {
+                if (HJBET.milliseconds() > 180) {
                     SetExtendingPosition(0);
-                    RailControlV2.SetTargetPosition(0, -0.7, 0.7);
-                    SetBasePosition(-1020);
+                    RotatingBase.setTargetPosition(-1020);
+                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    RotatingBase.setPower(1);
+//                    BaseControl.SetTargetPosition(1020, -1, 1);
                     semi_auto_HJ_blitz_order++;
                 }
                 break;
 
             case 6:
+                if (RotatingBase.getCurrentPosition() < -300) {
+                    RailControlV2.SetTargetPosition(0, -1, 1);
+                    semi_auto_HJ_blitz_order++;
+                }
+                break;
+
+            case 7:
                 if (RotatingBase.getCurrentPosition() < -1000) {
                     semi_auto_HJ_blitz_order = 0;
                 }

@@ -3,9 +3,11 @@ package org.firstinspires.ftc.teamcode;
 import android.graphics.Color;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -43,7 +45,9 @@ public class SprintAutoRightMedium extends LinearOpMode {
     static DcMotor ExtendingRail;
     static DcMotor RotatingBase;
     static CRServo Claw;
-
+    static ColorSensor rightColorSensor;
+    static ColorSensor leftColorSensor;
+    static RevBlinkinLedDriver LightStrip;
     static VoltageSensor voltageSensor;
 
     //Sensors
@@ -145,6 +149,9 @@ public class SprintAutoRightMedium extends LinearOpMode {
         ExtendingRail = hardwareMap.get(DcMotor.class, "ExtendingRail");
         RotatingBase = hardwareMap.get(DcMotor.class, "RotatingBase");
         IMU = hardwareMap.get(BNO055IMU.class, "imu");
+        rightColorSensor = hardwareMap.get(ColorSensor.class, "rightColorSensor");
+        leftColorSensor = hardwareMap.get(ColorSensor.class, "leftColorSensor");
+        LightStrip = hardwareMap.get(RevBlinkinLedDriver.class, "LightStrip");
 
 //        rightColorsensor = hardwareMap.get(NormalizedColorSensor.class, "rightColorSensor");
 //        leftColorsensor = hardwareMap.get(NormalizedColorSensor.class, "leftColorSensor");
@@ -247,6 +254,8 @@ public class SprintAutoRightMedium extends LinearOpMode {
         telemetry.update();
 
         while (opModeIsActive()) {
+
+            LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE);
 
             switch (programOrder) {
 
@@ -359,13 +368,13 @@ public class SprintAutoRightMedium extends LinearOpMode {
                     if (BaseControl.GetTaskState() == Task_State.READY || BaseControl.GetTaskState() == Task_State.DONE) {
                         if (coneLevel == 0) {
                                 if (ET.milliseconds() > 100) {
-                                    SetAttachment_LowPwrRail(1870, 2645 + angleAdjustment);
+                                    SetAttachment_LowPwrRail(1800, 2645 + angleAdjustment);
                                     ET.reset();
                                     programOrder++;
                                 }
                         } else {
                                 if (ET.milliseconds() > 100) {
-                                    SetAttachment_LowPwrRail(1870, 2455 + angleAdjustment);
+                                    SetAttachment_LowPwrRail(1800, 2455 + angleAdjustment);
                                     ET.reset();
                                     programOrder++;
                                 }
@@ -406,7 +415,7 @@ public class SprintAutoRightMedium extends LinearOpMode {
 
                 case 10:
                     if (ET.milliseconds() > 200) {
-                        SetAttachmentPosition(1870, 0);
+                        SetAttachmentPosition(1800, 0);
                         SetExtendingPosition(0);
                         programOrder++;
                     }
@@ -493,7 +502,7 @@ public class SprintAutoRightMedium extends LinearOpMode {
                             MechDrive.GetTaskState() == Task_State.DONE) {
 
                         if (posOne) {
-                            MechDrive.SetTargets(-90, 1150, 0.9, 1);
+                            MechDrive.SetTargets(-90, 1150, 0.95, 1);
                             SetAttachmentPosition(2170, 0);
                             SetExtendingPosition(0);
                             ET.reset();
@@ -503,7 +512,7 @@ public class SprintAutoRightMedium extends LinearOpMode {
                             SetExtendingPosition(0);
                             ET.reset();
                         } else if (posThree) {
-                            MechDrive.SetTargets(90, 1550, 0.9, 1);
+                            MechDrive.SetTargets(90, 1550, 0.95, 1);
                             SetAttachmentPosition(2170, 1020);
                             SetExtendingPosition(0);
                             ET.reset();
