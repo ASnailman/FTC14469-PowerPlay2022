@@ -316,7 +316,7 @@ public class SprintAutoLeft extends LinearOpMode {
                 case 5:
                     if (RotatingBase.getCurrentPosition() <= -1170 && RotatingBase.getCurrentPosition() >= -1270) {
 
-                    SetExtendingPosition(120 + tickAdjustment);
+                    SetExtendingPosition(110 + tickAdjustment);
                     programOrder++;
 
                     }
@@ -325,7 +325,7 @@ public class SprintAutoLeft extends LinearOpMode {
                 case 6:
                     if (MechDrive.GetTaskState() == Task_State.DONE) {
                         DirectionControl.SetTargetDirection(0, 0.2);
-                        SetAttachmentPositionLowPower(2970, -1480 + angleAdjustment);
+                        SetAttachmentPositionLowPower(2970, -1550 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -337,14 +337,14 @@ public class SprintAutoLeft extends LinearOpMode {
                     if (BaseControl.GetTaskState() == Task_State.READY || BaseControl.GetTaskState() == Task_State.DONE) {
                             if (coneLevel == 0) {
                                 if (ET.milliseconds() > 400) {
-                                    SetAttachment_LowPwrRail(2690, -1490 + angleAdjustment);
+                                    SetAttachment_LowPwrRail(2690, -1560 + angleAdjustment);
                                     ET.reset();
                                     programOrder++;
                                 }
                             }
                             else {
                                 if (ET.milliseconds() > 400) {
-                                    SetAttachment_LowPwrRail(2690, -1420 + angleAdjustment);
+                                    SetAttachment_LowPwrRail(2690, -1490 + angleAdjustment);
                                     ET.reset();
                                     programOrder++;
                                 }
@@ -427,7 +427,7 @@ public class SprintAutoLeft extends LinearOpMode {
                 case 15:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
                         SetExtendingPosition(92 + tickAdjustment);
-                        SetAttachmentPositionLowPower(3025, -1420 + angleAdjustment);
+                        SetAttachmentPositionLowPower(3025, -1490 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
