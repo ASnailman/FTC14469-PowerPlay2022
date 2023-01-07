@@ -457,7 +457,7 @@ public class SprintAutoRight extends LinearOpMode {
                             MechDrive.GetTaskState() == Task_State.DONE) {
 
                         if (posOne) {
-                            MechDrive.SetTargets(-90, 1100, 0.7, 1);
+                            MechDrive.SetTargets(-90, 1100, 0.8, 1);
                             SetAttachmentPosition(0, 0);
                             SetExtendingPosition(0);
                             ET.reset();
@@ -467,7 +467,7 @@ public class SprintAutoRight extends LinearOpMode {
                             SetExtendingPosition(0);
                             ET.reset();
                         } else if (posThree) {
-                            MechDrive.SetTargets(90, 1500, 0.7, 1);
+                            MechDrive.SetTargets(90, 1500, 0.8, 1);
                             SetAttachmentPosition(0, 1020);
                             SetExtendingPosition(0);
                             ET.reset();
