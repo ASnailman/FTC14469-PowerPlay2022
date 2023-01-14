@@ -106,7 +106,8 @@ public class Mech_Drive_FAST {
 
             power_x_new = power_x_old * Math.cos(radians) - power_y_old * Math.sin(radians); // equation for right hand rule
             power_y_new = power_x_old * Math.sin(radians) + power_y_old * Math.cos(radians);
-            steeringoutput = pid.PID_Control(headingangle, 0.03, 0.0001, 0, gyro_Z_reading);
+//            steeringoutput = pid.PID_Control(headingangle, 0.03, 0.0001, 0, gyro_Z_reading);
+            steeringoutput = pid.PID_Control(headingangle, 0.035, 0.00015, 0, gyro_Z_reading);
 
             if (encoder < 0) {
                 encoder = -encoder;

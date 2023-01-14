@@ -384,8 +384,8 @@ public class SprintAutoRightMedium extends LinearOpMode {
 
                 case 8:
                     if (ET.milliseconds() > 430) {
-                        Claw.setPower(-1);
-                        if (Claw.getPower() < -0.95) {
+                        Claw.setPower(-0.4);
+                        if (Claw.getPower() < -0.3) {
                             programOrder++;
                             ET.reset();
                         }

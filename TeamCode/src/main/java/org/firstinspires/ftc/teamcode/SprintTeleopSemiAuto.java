@@ -333,7 +333,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             }
 
             if (!ClawSetting) {
-                Claw.setPower(-1);
+                Claw.setPower(-0.4);
             } else {
                 Claw.setPower(1);
             }
@@ -349,7 +349,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 //                        SetExtendingPosition(0);
                         RailControlV2.SetTargetPosition(1280, -1, 1);
                         ClawSetting = false;
-                        Claw.setPower(-1);
+                        Claw.setPower(-0.4);
                         ET.reset();
                         targetJunction++;
                     }
@@ -471,7 +471,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 case 22:
                     if (ET.milliseconds() > 150) {
                         ClawSetting = false;
-                        Claw.setPower(-1);
+                        Claw.setPower(-0.4);
                         targetJunction++;
                     }
                     break;
@@ -658,7 +658,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                         //code for 4th cone on stack
                         ClawSetting = false;
                         coneStackMode = false;
-                        Claw.setPower(-1);
+                        Claw.setPower(-0.4);
                         RailControlV2.SetTargetPosition(119, -1, 1);
                         SetBasePositionRTP(0);
                         button_x_already_pressed2 = true;
@@ -674,7 +674,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                         //code for 3rd highest cone on stack
                         ClawSetting = false;
                         coneStackMode = false;
-                        Claw.setPower(-1);
+                        Claw.setPower(-0.4);
                         RailControlV2.SetTargetPosition(246, -1, 1);
                         SetBasePositionRTP(0);
                         button_a_already_pressed2 = true;
@@ -690,7 +690,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                         //code for 2nd highest cone on stack
                         ClawSetting = false;
                         coneStackMode = false;
-                        Claw.setPower(-1);
+                        Claw.setPower(-0.4);
                         RailControlV2.SetTargetPosition(371, -1, 1);
                         SetBasePositionRTP(0);
                         button_b_already_pressed2 = true;
@@ -706,7 +706,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                         //code for highest cone on stack
                         ClawSetting = false;
                         coneStackMode = false;
-                        Claw.setPower(-1);
+                        Claw.setPower(-0.4);
                         RailControlV2.SetTargetPosition(479, -1, 1);
                         SetBasePositionRTP(0);
                         button_y_already_pressed2 = true;
@@ -1238,7 +1238,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
     public void SetExtendingPosition(int extendingPos) {
         ExtendingRail.setTargetPosition(extendingPos);
         ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        ExtendingRail.setPower(0.6);
+        ExtendingRail.setPower(1);
     }
 
     public void SemiAutoSCBlitz_Left() {
@@ -1306,7 +1306,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             case 7:
                 if (SC_Blitz_Timer.milliseconds() > 500) {
                     ClawSetting = false;
-                    Claw.setPower(-1);
+                    Claw.setPower(-0.4);
                     if (Claw.getPower() < -0.95) {
                         semi_auto_sc_blitz_step++;
                         SC_Blitz_Timer.reset();
@@ -1424,7 +1424,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             case 7:
                 if (SC_Blitz_Timer.milliseconds() > 500) {
                     ClawSetting = false;
-                    Claw.setPower(-1);
+                    Claw.setPower(-0.4);
                     if (Claw.getPower() < -0.95) {
                         R_semi_auto_sc_blitz_step++;
                         SC_Blitz_Timer.reset();
