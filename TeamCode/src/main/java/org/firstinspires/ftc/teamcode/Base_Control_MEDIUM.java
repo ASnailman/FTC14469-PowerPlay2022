@@ -17,7 +17,7 @@ public class Base_Control_MEDIUM {
     double i_gain;
     double d_gain;
     ElapsedTime et;                     // ElapsedTime object (only used during calibration)
-    final double tolerance = 50;        // How close should we be within the target rail position before saying we're done
+    final double tolerance = 100;        // How close should we be within the target rail position before saying we're done
     Task_State run_state;               // This is used by the opmode to determine when this task has completed and proceed to the next task
 
     // CONSTRUCTOR

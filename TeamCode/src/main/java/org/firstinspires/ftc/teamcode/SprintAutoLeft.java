@@ -325,7 +325,7 @@ public class SprintAutoLeft extends LinearOpMode {
                 case 6:
                     if (MechDrive.GetTaskState() == Task_State.DONE) {
                         DirectionControl.SetTargetDirection(-2, 0.2);
-                        SetAttachmentPositionLowPower(2970, -1550 + angleAdjustment);
+                        SetAttachmentPositionLowPower(2970, -1540 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -337,14 +337,14 @@ public class SprintAutoLeft extends LinearOpMode {
                     if (BaseControl.GetTaskState() == Task_State.READY || BaseControl.GetTaskState() == Task_State.DONE) {
                             if (coneLevel == 0) {
                                 if (ET.milliseconds() > 400) {
-                                    SetAttachment_LowPwrRail(2690, -1560 + angleAdjustment);
+                                    SetAttachment_LowPwrRail(2690, -1550 + angleAdjustment);
                                     ET.reset();
                                     programOrder++;
                                 }
                             }
                             else {
                                 if (ET.milliseconds() > 400) {
-                                    SetAttachment_LowPwrRail(2690, -1490 + angleAdjustment);
+                                    SetAttachment_LowPwrRail(2690, -1482 + angleAdjustment);
                                     ET.reset();
                                     programOrder++;
                                 }
@@ -427,7 +427,7 @@ public class SprintAutoLeft extends LinearOpMode {
                 case 15:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
                         SetExtendingPositionLowPower(92 + tickAdjustment);
-                        SetAttachmentPositionLowPower(3025, -1490 + angleAdjustment);
+                        SetAttachmentPositionLowPower(3025, -1482 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -467,7 +467,7 @@ public class SprintAutoLeft extends LinearOpMode {
                             SetExtendingPosition(0);
                             ET.reset();
                         } else if (posThree) {
-                            MechDrive.SetTargets(90, 1370, 0.8, 1);
+                            MechDrive.SetTargets(90, 1450, 0.8, 1);
                             SetAttachmentPosition(0, 0);
                             SetExtendingPosition(0);
                             ET.reset();

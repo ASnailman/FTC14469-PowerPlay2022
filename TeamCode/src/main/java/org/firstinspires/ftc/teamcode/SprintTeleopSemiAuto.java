@@ -420,17 +420,17 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
                 case 14:
                     if (ET.milliseconds() > 800) {
-                        RailControlV2.SetTargetPosition(215, -1, 1);
+                        RailControlV2.SetTargetPosition(130, -0.7, 0.7);
                         ET.reset();
                         targetJunction++;
                     }
                     break;
 
                 case 15:
-                    if (ET.milliseconds() > 500) {
-                        SetBasePositionRTP(0);
-                        targetJunction++;
-                    }
+//                    if (ET.milliseconds() > 500) {
+//                        SetBasePositionRTP(0);
+//                        targetJunction++;
+//                    }
                     break;
 
                 case 16:
@@ -535,7 +535,8 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                             groundJunctionMode = false;
 //                            RightClaw.setPosition(0);
 //                            LeftClaw.setPosition(0);
-                            targetJunction = 1;
+                            RailControlV2.SetTargetPosition(0, -0.7, 0.7);
+                            ClawSetting = false;
                             button_a_already_pressed2 = true;
                         }
                     } else {
@@ -909,7 +910,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             if (!button_dpad_down_already_pressed2) {
                 if (gamepad2.dpad_down) {
-                    //code for releasing cone and resetting base
+                    //code for picking up cone for ground junction
                     ClawSetting = true;
                     coneStackMode = false;
                     groundJunctionMode = true;
