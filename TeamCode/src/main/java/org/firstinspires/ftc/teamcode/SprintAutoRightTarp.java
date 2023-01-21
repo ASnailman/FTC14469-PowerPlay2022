@@ -3,9 +3,11 @@ package org.firstinspires.ftc.teamcode;
 import android.graphics.Color;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -26,8 +28,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "SprintAutoRightRed", group = "MecanumDrive")
-public class SprintAutoRightRed extends LinearOpMode {
+@Autonomous(name = "SprintAutoRightTarp", group = "MecanumDrive")
+public class SprintAutoRightTarp extends LinearOpMode {
 
     //Control Hub Orientation
     byte AXIS_MAP_CONFIG_BYTE = 0x06; //rotates control hub 90 degrees around y axis by swapping x and z axis
@@ -43,7 +45,9 @@ public class SprintAutoRightRed extends LinearOpMode {
     static DcMotor ExtendingRail;
     static DcMotor RotatingBase;
     static CRServo Claw;
-
+    static ColorSensor rightColorSensor;
+    static ColorSensor leftColorSensor;
+    static RevBlinkinLedDriver LightStrip;
     static VoltageSensor voltageSensor;
 
     //Sensors
@@ -51,14 +55,12 @@ public class SprintAutoRightRed extends LinearOpMode {
     OpenCvWebcam webcam;
     VisionClassAutoRightBlue.SignalDeterminationPipeline pipeline;
 
-    static NormalizedColorSensor rightColorsensor;
-    static NormalizedColorSensor leftColorsensor;
-    static NormalizedColorSensor centerRightColorsensor;
-    static NormalizedColorSensor centerLeftColorsensor;
-//    static DistanceSensor frontRightDistanceSensor;
-//    static DistanceSensor frontLeftDistanceSensor;
-    static DistanceSensor backRightDistanceSensor;
-    static DistanceSensor backLeftDistanceSensor;
+//    static NormalizedColorSensor rightColorsensor;
+//    static NormalizedColorSensor leftColorsensor;
+//    static NormalizedColorSensor centerRightColorsensor;
+//    static NormalizedColorSensor centerLeftColorsensor;
+//    static DistanceSensor backRightDistanceSensor;
+//    static DistanceSensor backLeftDistanceSensor;
 
     //Variables of Classes
     Methods motorMethods;
@@ -81,6 +83,8 @@ public class SprintAutoRightRed extends LinearOpMode {
     int coneLevel = 0;
     int readVoltOnce = 0;
     int angleAdjustment;
+    int tickAdjustment;
+    int extendingAdjustment;
 
     int leftCenterTickCount;
 
@@ -143,15 +147,16 @@ public class SprintAutoRightRed extends LinearOpMode {
         ExtendingRail = hardwareMap.get(DcMotor.class, "ExtendingRail");
         RotatingBase = hardwareMap.get(DcMotor.class, "RotatingBase");
         IMU = hardwareMap.get(BNO055IMU.class, "imu");
+        rightColorSensor = hardwareMap.get(ColorSensor.class, "rightColorSensor");
+        leftColorSensor = hardwareMap.get(ColorSensor.class, "leftColorSensor");
+        LightStrip = hardwareMap.get(RevBlinkinLedDriver.class, "LightStrip");
 
-        rightColorsensor = hardwareMap.get(NormalizedColorSensor.class, "rightColorSensor");
-        leftColorsensor = hardwareMap.get(NormalizedColorSensor.class, "leftColorSensor");
-        centerRightColorsensor = hardwareMap.get(NormalizedColorSensor.class, "centerRightColorSensor");
-        centerLeftColorsensor = hardwareMap.get(NormalizedColorSensor.class, "centerLeftColorSensor");
-//        frontRightDistanceSensor = hardwareMap.get(DistanceSensor.class, "frontRightDistanceSensor");
-//        frontLeftDistanceSensor = hardwareMap.get(DistanceSensor.class, "frontLeftDistanceSensor");
-        backRightDistanceSensor = hardwareMap.get(DistanceSensor.class, "backRightDistanceSensor");
-        backLeftDistanceSensor = hardwareMap.get(DistanceSensor.class, "backLeftDistanceSensor");
+//        rightColorsensor = hardwareMap.get(NormalizedColorSensor.class, "rightColorSensor");
+//        leftColorsensor = hardwareMap.get(NormalizedColorSensor.class, "leftColorSensor");
+//        centerRightColorsensor = hardwareMap.get(NormalizedColorSensor.class, "centerRightColorSensor");
+//        centerLeftColorsensor = hardwareMap.get(NormalizedColorSensor.class, "centerLeftColorSensor");
+//        backRightDistanceSensor = hardwareMap.get(DistanceSensor.class, "backRightDistanceSensor");
+//        backLeftDistanceSensor = hardwareMap.get(DistanceSensor.class, "backLeftDistanceSensor");
 
 //        voltageSensor = hardwareMap.get(VoltageSensor.class, "VoltageSensor");
 
@@ -225,20 +230,30 @@ public class SprintAutoRightRed extends LinearOpMode {
 
         if (readVoltOnce == 0) {
             telemetry.addData("voltage", "%.1f volts", new Func<Double>() { @Override public Double value() { return getBatteryVoltage(); } });
-            if (getBatteryVoltage() > 13.2) {
-                angleAdjustment = -20;
+            if (getBatteryVoltage() > 13.7) {
+                angleAdjustment = -22;
+                tickAdjustment = -5;
+            }
+            else if (getBatteryVoltage() > 13.2) {
+                angleAdjustment = -12;
+                tickAdjustment = 5;
             }
             else if (getBatteryVoltage() > 12.7) {
-                angleAdjustment = -8;
+                angleAdjustment = 5;
+                tickAdjustment = 5;
             }
             else {
-                angleAdjustment = 0;
+                angleAdjustment = 5;
+                tickAdjustment = 5;
             }
             readVoltOnce++;
 
         }
+        telemetry.update();
 
         while (opModeIsActive()) {
+
+            LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE);
 
             switch (programOrder) {
 
@@ -278,84 +293,58 @@ public class SprintAutoRightRed extends LinearOpMode {
                 case 1:
                     if (ET.milliseconds() > 550) {
                         if (RailControlV2.GetTaskState() == Task_State.INIT || RailControlV2.GetTaskState() == Task_State.READY) {
-//                        SetAttachmentPosition(0, 4953);
-                            SetAttachment_LowPwr2Rail(2970, 1020);
-                            MechDrive.SetTargets(0, 2109, 0.6, 1);
-//                        } else if (RailControlV2.GetTaskState() == Task_State.DONE) {
+                            SetAttachment_LowPwr2Rail(2970, 1220);
+//                            SetAttachment_LowPwr2Rail(2970, 1540 + angleAdjustment);
+                            MechDrive.SetTargets(1, 2160, 0.7, 1);
                             programOrder++;
                         }
                     }
                     break;
 
                 case 2:
-//                    if (MechDrive.GetTaskState() == Task_State.INIT ||
-//                            MechDrive.GetTaskState() == Task_State.READY ||
-//                            MechDrive.GetTaskState() == Task_State.DONE) {
-//                        MechDrive.SetTargets(0, 994, 0.36, 1);
-//                        ET.reset();
-                        programOrder++;
-//                    }
-
+                    programOrder++;
                     break;
 
                 case 3:
-//                    if (ET.milliseconds() > 600) {
-//                        if (RotatingBase.getCurrentPosition() >= 570 && RotatingBase.getCurrentPosition() <= 670) {
-//                            if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-//                                SetAttachmentPosition(420, 1320);
-                                programOrder++;
-//                                ET.reset();
-//                            }
-//                        }
-//                    }
+                    programOrder++;
                     break;
 
                 case 4:
-//                    if (MechDrive.GetTaskState() == Task_State.INIT ||
-//                            MechDrive.GetTaskState() == Task_State.READY ||
-//                            MechDrive.GetTaskState() == Task_State.DONE) {
-//                        MechDrive.SetTargets(-1, 1050, 0.7, 1);
-//                    if ((RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY)) {
-//                        SetAttachmentPosition(2150, 1020);
-                        programOrder++;
-//                    }
+                    programOrder++;
                     break;
 
                 case 5:
-                    if (RotatingBase.getCurrentPosition() >= 970 && RotatingBase.getCurrentPosition() <= 1070) {
+                    if (RotatingBase.getCurrentPosition() >= 1170 && RotatingBase.getCurrentPosition() <= 1270) {
 
-//                            SetAttachmentPosition(2980, 1020);
-                            SetExtendingPosition(100);
-                            programOrder++;
+                    SetExtendingPosition(110 + tickAdjustment);
+                    programOrder++;
 
                     }
                     break;
 
                 case 6:
-//                    if (RailControlV2.GetTaskState() == Task_State.DONE ||
-//                            RailControlV2.GetTaskState() == Task_State.READY) {
                     if (MechDrive.GetTaskState() == Task_State.DONE) {
-//                        MechDrive.SetTargets(-90, 0, 0.4, 1);
-                        DirectionControl.SetTargetDirection(0, 0.2);
-                        SetAttachmentPositionLowPower(2970, 1365 + angleAdjustment);
+                        DirectionControl.SetTargetDirection(1, 0.2);
+                        SetAttachmentPositionLowPower(2970, 1580 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
                     break;
 
                 case 7:
-                        if (RotatingBase.getCurrentPosition() >= 1355 + angleAdjustment && (RailControlV2.GetTaskState() == Task_State.DONE ||
-                                RailControlV2.GetTaskState() == Task_State.READY)) {
+//                        if (RotatingBase.getCurrentPosition() >= 1520 + angleAdjustment && (RailControlV2.GetTaskState() == Task_State.DONE ||
+//                                RailControlV2.GetTaskState() == Task_State.READY)) {
+                    if (BaseControl.GetTaskState() == Task_State.READY || BaseControl.GetTaskState() == Task_State.DONE) {
                             if (coneLevel == 0) {
-                                if (ET.milliseconds() > 200) {
-                                    SetAttachment_LowPwrRail(2690, 1365 + angleAdjustment);
+                                if (ET.milliseconds() > 400) {
+                                    SetAttachment_LowPwrRail(2690, 1590 + angleAdjustment);
                                     ET.reset();
                                     programOrder++;
                                 }
                             }
                             else {
                                 if (ET.milliseconds() > 400) {
-                                    SetAttachment_LowPwrRail(2690, 1395 + angleAdjustment);
+                                    SetAttachment_LowPwrRail(2690, 1522 + angleAdjustment);
                                     ET.reset();
                                     programOrder++;
                                 }
@@ -364,9 +353,9 @@ public class SprintAutoRightRed extends LinearOpMode {
                     break;
 
                 case 8:
-                    if (ET.milliseconds() > 500) {
-                        Claw.setPower(-1);
-                        if (Claw.getPower() < -0.95) {
+                    if (ET.milliseconds() > 300) {
+                        Claw.setPower(-0.4);
+                        if (Claw.getPower() < -0.3) {
                             programOrder++;
                             ET.reset();
                         }
@@ -374,7 +363,7 @@ public class SprintAutoRightRed extends LinearOpMode {
                     break;
 
                 case 9:
-                    if (coneLevel == 4) {
+                    if (coneLevel == 5) {
                         ET.reset();
                         programOrder = 17;
                     } else {
@@ -394,34 +383,34 @@ public class SprintAutoRightRed extends LinearOpMode {
                 case 11:
                     if (RotatingBase.getCurrentPosition() < 1020) {
                         if (coneLevel == 0) {
-                            SetAttachmentPositionLowPower(600, 0);
+                            SetAttachmentPosition(570, 0);
                         }
                         else if (coneLevel == 1) {
-                            SetAttachmentPositionLowPower(520, 0);
+                            SetAttachmentPosition(490, 0);
                         }
                         else if (coneLevel == 2) {
-                            SetAttachmentPositionLowPower(410, 0);
+                            SetAttachmentPosition(380, 0);
                         }
                         else if (coneLevel == 3) {
-                            SetAttachmentPositionLowPower(325, 0);
+                            SetAttachmentPosition(295, 0);
                         }
-//                        else if (coneLevel == 4) {
-//                            SetAttachmentPositionLowPower(280, 0);
-//                        }
+                        else if (coneLevel == 4) {
+                            SetAttachmentPosition(180, 0);
+                        }
                         programOrder++;
                     }
                     break;
 
                 case 12:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPosition(595);
+                        SetExtendingPosition(580 + tickAdjustment);
                         ET.reset();
                         programOrder++;
                     }
                     break;
 
                 case 13:
-                    if (ET.milliseconds() > 480) {
+                    if (ET.milliseconds() > 300) {
                         Claw.setPower(1);
                         ET.reset();
                         programOrder++;
@@ -429,7 +418,7 @@ public class SprintAutoRightRed extends LinearOpMode {
                     break;
 
                 case 14:
-                    if (ET.milliseconds() > 480) {
+                    if (ET.milliseconds() > 450) {
                         SetAttachmentPosition(1200, 0);
                         programOrder++;
                     }
@@ -437,8 +426,8 @@ public class SprintAutoRightRed extends LinearOpMode {
 
                 case 15:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPosition(75);
-                        SetAttachmentPositionLowPower(3025, 1395 + angleAdjustment);
+                        SetExtendingPositionLowPower(85 + tickAdjustment);
+                        SetAttachmentPositionLowPower(3025, 1522 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -448,7 +437,7 @@ public class SprintAutoRightRed extends LinearOpMode {
                     if (ET.milliseconds() > 100) {
                         ET.reset();
                         coneLevel++;
-                        if (coneLevel < 5) {
+                        if (coneLevel < 6) {
                             programOrder = 7;
                         }
                     }
@@ -468,17 +457,17 @@ public class SprintAutoRightRed extends LinearOpMode {
                             MechDrive.GetTaskState() == Task_State.DONE) {
 
                         if (posOne) {
-                            MechDrive.SetTargets(-90, 1000, 0.7, 1);
+                            MechDrive.SetTargets(-90, 1100, 0.8, 1);
                             SetAttachmentPosition(0, 0);
                             SetExtendingPosition(0);
                             ET.reset();
                         } else if (posTwo) {
-                            MechDrive.SetTargets(90, 100, 0, 1);
+                            MechDrive.SetTargets(90, 0, 0, 1);
                             SetAttachmentPosition(0, 1020);
                             SetExtendingPosition(0);
                             ET.reset();
                         } else if (posThree) {
-                            MechDrive.SetTargets(90, 1400, 0.7, 1);
+                            MechDrive.SetTargets(90, 1500, 0.8, 1);
                             SetAttachmentPosition(0, 1020);
                             SetExtendingPosition(0);
                             ET.reset();
@@ -491,7 +480,7 @@ public class SprintAutoRightRed extends LinearOpMode {
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
                         SetAttachmentPosition(0, 1020);
-                        MechDrive.SetTargets(180, 200, 0.3, 1);
+                        MechDrive.SetTargets(180, 300, 0.6, 1);
                         DirectionControl.SetTargetDirection(0, 0.2);
                         programOrder++;
                     }
@@ -505,12 +494,12 @@ public class SprintAutoRightRed extends LinearOpMode {
                 SetAttachmentPosition(0, 1020);
             }
 
-            rightColorSensorLineDetector();
-            leftColorSensorLineDetector();
-            centerRightColorSensorLineDetector();
-            centerLeftColorSensorLineDetector();
-            backRightJunctionDetector();
-            backLeftJunctionDetector();
+//            rightColorSensorLineDetector();
+//            leftColorSensorLineDetector();
+//            centerRightColorSensorLineDetector();
+//            centerLeftColorSensorLineDetector();
+//            backRightJunctionDetector();
+//            backLeftJunctionDetector();
 //            frontRightJunctionDetector();
 //            frontLeftJunctionDetector();
             DirectionControl.GyroTask();
@@ -521,6 +510,7 @@ public class SprintAutoRightRed extends LinearOpMode {
 //            telemetry.addData("Voltage", voltageSensor.getVoltage());
             telemetry.addData("LeftCenterTicks", leftCenterTickCount);
 //            telemetry.addData("backright encoder", BackRight.getCurrentPosition());
+            telemetry.addData("ExtendingRail", ExtendingRail.getCurrentPosition());
             telemetry.addData("gyro", GyroContinuity());
             telemetry.update();
         }
@@ -627,7 +617,7 @@ public class SprintAutoRightRed extends LinearOpMode {
         RailRight.setTargetPosition(0);
         RailRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        RotatingBase.setDirection(DcMotorSimple.Direction.FORWARD);
+        RotatingBase.setDirection(DcMotorSimple.Direction.REVERSE);
         RotatingBase.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         RotatingBase.setTargetPosition(0);
         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -643,11 +633,11 @@ public class SprintAutoRightRed extends LinearOpMode {
 //        RotatingBase.setTargetPosition(basePos);
 //        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //        RotatingBase.setPower(1);
-        BaseControl.SetTargetPosition(basePos, -1, 1);
+        BaseControl.SetTargetPosition(basePos, -0.3, 0.3);
     }
 
     public void SetAttachment_LowPwrRail(int railPos, int basePos) {
-        RailControlV2.SetTargetPosition(railPos, -0.8, 0.8);
+        RailControlV2.SetTargetPosition(railPos, -0.5, 0.5);
 //        RotatingBase.setTargetPosition(basePos);
 //        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //        RotatingBase.setPower(1);
@@ -665,6 +655,12 @@ public class SprintAutoRightRed extends LinearOpMode {
     public void SetExtendingPosition(int extendingPos) {
         ExtendingRail.setTargetPosition(extendingPos);
         ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ExtendingRail.setPower(1);
+    }
+
+    public void SetExtendingPositionLowPower(int extendingPos) {
+        ExtendingRail.setTargetPosition(extendingPos);
+        ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ExtendingRail.setPower(0.6);
     }
 
@@ -676,219 +672,219 @@ public class SprintAutoRightRed extends LinearOpMode {
         BaseControl.SetTargetPosition(basePos, -0.5, 0.5);
     }
 
-    private int rightColorSensorLineDetector() {
-
-        float[] rHSV = new float[3];
-        NormalizedRGBA rightRGBA = rightColorsensor.getNormalizedColors();
-        rightColorsensor.setGain(30);
-
-        Color.colorToHSV(rightRGBA.toColor(), rHSV);
-        telemetry.addData("Right H:", rHSV[0]);
-        telemetry.addData("Right S:", rHSV[1]);
-        telemetry.addData("Right V:", rHSV[2]);
-
-        int rBlue = 2;
-        int rRed = 1;
-        int rUnknown = 0;
-
-        //Right Colorsensor from back of Robot
-        if (rHSV[0] >= 170 && rHSV[0] <= 240) {
-            telemetry.addData("Color:", "Blue");
+//    private int rightColorSensorLineDetector() {
+//
+//        float[] rHSV = new float[3];
+//        NormalizedRGBA rightRGBA = rightColorsensor.getNormalizedColors();
+//        rightColorsensor.setGain(30);
+//
+//        Color.colorToHSV(rightRGBA.toColor(), rHSV);
+//        telemetry.addData("Right H:", rHSV[0]);
+//        telemetry.addData("Right S:", rHSV[1]);
+//        telemetry.addData("Right V:", rHSV[2]);
+//
+//        int rBlue = 2;
+//        int rRed = 1;
+//        int rUnknown = 0;
+//
+//        //Right Colorsensor from back of Robot
+//        if (rHSV[0] >= 170 && rHSV[0] <= 240) {
+//            telemetry.addData("Color:", "Blue");
+////            telemetry.update();
+//            rightBlue = true;
+//            rightRed = false;
+//            rightUnknown = false;
+//            return rBlue;
+//        } else if (rHSV[0] >= 10 && rHSV[0] <= 50) {
+//            telemetry.addData("Color:", "Red");
+////            telemetry.update();
+//            rightBlue = false;
+//            rightRed = true;
+//            rightUnknown = false;
+//            return rRed;
+//        } else {
+//            telemetry.addData("Color:", "Unknown");
+////            telemetry.update();
+//            rightBlue = false;
+//            rightRed = false;
+//            rightUnknown = true;
+//            return rUnknown;
+//        }
+//    }
+//
+//    private int leftColorSensorLineDetector() {
+//
+//        float[] lHSV = new float[3];
+//        NormalizedRGBA leftRGBA = leftColorsensor.getNormalizedColors();
+//        leftColorsensor.setGain(30);
+//
+//        Color.colorToHSV(leftRGBA.toColor(), lHSV);
+//        telemetry.addData("Left H:", lHSV[0]);
+//        telemetry.addData("Left S:", lHSV[1]);
+//        telemetry.addData("Left V:", lHSV[2]);
+//
+//        int lBlue = 2;
+//        int lRed = 1;
+//        int lUnknown = 0;
+//
+//        //Left Colorsensor from back of Robot
+//        if (lHSV[0] >= 170 && lHSV[0] <= 240) {
+//            telemetry.addData("Color:", "Blue");
 //            telemetry.update();
-            rightBlue = true;
-            rightRed = false;
-            rightUnknown = false;
-            return rBlue;
-        } else if (rHSV[0] >= 10 && rHSV[0] <= 50) {
-            telemetry.addData("Color:", "Red");
+//            leftBlue = true;
+//            leftRed = false;
+//            leftUnknown = false;
+//            return lBlue;
+//        } else if (lHSV[0] >= 10 && lHSV[0] <= 50) {
+//            telemetry.addData("Color:", "Red");
 //            telemetry.update();
-            rightBlue = false;
-            rightRed = true;
-            rightUnknown = false;
-            return rRed;
-        } else {
-            telemetry.addData("Color:", "Unknown");
+//            leftBlue = false;
+//            leftRed = true;
+//            leftUnknown = false;
+//            return lRed;
+//        } else {
+//            telemetry.addData("Color:", "Unknown");
 //            telemetry.update();
-            rightBlue = false;
-            rightRed = false;
-            rightUnknown = true;
-            return rUnknown;
-        }
-    }
-
-    private int leftColorSensorLineDetector() {
-
-        float[] lHSV = new float[3];
-        NormalizedRGBA leftRGBA = leftColorsensor.getNormalizedColors();
-        leftColorsensor.setGain(30);
-
-        Color.colorToHSV(leftRGBA.toColor(), lHSV);
-        telemetry.addData("Left H:", lHSV[0]);
-        telemetry.addData("Left S:", lHSV[1]);
-        telemetry.addData("Left V:", lHSV[2]);
-
-        int lBlue = 2;
-        int lRed = 1;
-        int lUnknown = 0;
-
-        //Left Colorsensor from back of Robot
-        if (lHSV[0] >= 170 && lHSV[0] <= 240) {
-            telemetry.addData("Color:", "Blue");
-            telemetry.update();
-            leftBlue = true;
-            leftRed = false;
-            leftUnknown = false;
-            return lBlue;
-        } else if (lHSV[0] >= 10 && lHSV[0] <= 50) {
-            telemetry.addData("Color:", "Red");
-            telemetry.update();
-            leftBlue = false;
-            leftRed = true;
-            leftUnknown = false;
-            return lRed;
-        } else {
-            telemetry.addData("Color:", "Unknown");
-            telemetry.update();
-            leftBlue = false;
-            leftRed = false;
-            leftUnknown = true;
-            return lUnknown;
-        }
-    }
-
-    private int centerRightColorSensorLineDetector() {
-
-        float[] centerRHSV = new float[3];
-        NormalizedRGBA centerRightRGBA = centerRightColorsensor.getNormalizedColors();
-        centerRightColorsensor.setGain(30);
-
-        Color.colorToHSV(centerRightRGBA.toColor(), centerRHSV);
-        telemetry.addData("Center Right H:", centerRHSV[0]);
-        telemetry.addData("Center Right S:", centerRHSV[1]);
-        telemetry.addData("Center Right V:", centerRHSV[2]);
-
-        int centerRBlue = 2;
-        int centerRRed = 1;
-        int centerRUnknown = 0;
-
-        //Center Right Colorsensor from back of Robot
-        if (centerRHSV[0] >= 170 && centerRHSV[0] <= 240) {
-            telemetry.addData("Color:", "Blue");
-            telemetry.update();
-            centerRightBlue = true;
-            centerRightRed = false;
-            centerRightUnknown = false;
-            return centerRBlue;
-        } else if (centerRHSV[0] >= 10 && centerRHSV[0] <= 50) {
-            telemetry.addData("Color:", "Red");
-            telemetry.update();
-            centerRightBlue = false;
-            centerRightRed = true;
-            centerRightUnknown = false;
-            return centerRRed;
-        } else {
-            telemetry.addData("Color:", "Unknown");
-            telemetry.update();
-            centerRightBlue = false;
-            centerRightRed = false;
-            centerRightUnknown = true;
-            return centerRUnknown;
-        }
-    }
-
-    private int centerLeftColorSensorLineDetector() {
-
-        float[] centerLHSV = new float[3];
-        NormalizedRGBA centerLeftRGBA = centerLeftColorsensor.getNormalizedColors();
-        centerLeftColorsensor.setGain(30);
-
-        Color.colorToHSV(centerLeftRGBA.toColor(), centerLHSV);
-        telemetry.addData("Center Left H:", centerLHSV[0]);
-        telemetry.addData("Center Left S:", centerLHSV[1]);
-        telemetry.addData("Center Left V:", centerLHSV[2]);
-
-        int centerLBlue = 2;
-        int centerLRed = 1;
-        int centerLUnknown = 0;
-
-        //Center Left Colorsensor from back of Robot
-        if (centerLHSV[0] >= 170 && centerLHSV[0] <= 240) {
-            telemetry.addData("Color:", "Blue");
-            telemetry.update();
-            centerLeftBlue = true;
-            centerLeftRed = false;
-            centerLeftUnknown = false;
-            return centerLBlue;
-        } else if (centerLHSV[0] >= 10 && centerLHSV[0] <= 50) {
-            telemetry.addData("Color:", "Red");
-            telemetry.update();
-            centerLeftBlue = false;
-            centerLeftRed = true;
-            centerLeftUnknown = false;
-            return centerLRed;
-        } else {
-            telemetry.addData("Color:", "Unknown");
-            telemetry.update();
-            centerLeftBlue = false;
-            centerLeftRed = false;
-            centerLeftUnknown = true;
-            return centerLUnknown;
-        }
-    }
-
-    //From Back of robot
-    private void backRightJunctionDetector() {
-        if (backRightDistanceSamples_Reset) {
-            backRightDistanceSamples[0] = 819;
-            backRightDistanceSamples[1] = 819;
-            backRightDistanceSamples[2] = 819;
-            backRightDistanceSamples_Reset = false;
-        }
-        else {
-            backRightDistanceSamples[backRightCount] = backRightDistanceSensor.getDistance(DistanceUnit.CM);
-            backRightCount++;
-            backRightDistance = (backRightDistanceSamples[0] + backRightDistanceSamples[1] + backRightDistanceSamples[2]) / 3;
-
-            telemetry.addData("Back Right Distance Sensor", backRightDistance);
-            if (backRightDistance < 50) {
-                rightBackDistanceCleared = true;
-            } else {
-                rightBackDistanceCleared = false;
-            }
-
-            if (backRightCount > 2) {
-                backRightCount = 0;
-            }
-        }
-    }
-
-    //From Back of robot
-    private void backLeftJunctionDetector() {
-        if (backLeftDistanceSamples_Reset) {
-            backLeftDistanceSamples[0] = 122;
-            backLeftDistanceSamples[1] = 122;
-            backLeftDistanceSamples[2] = 122;
-            backLeftDistanceSamples[3] = 122;
-            backLeftDistanceSamples[4] = 122;
-            backLeftDistanceSamples_Reset = false;
-        }
-        else {
-            backLeftDistanceSamples[backLeftCount] = backLeftDistanceSensor.getDistance(DistanceUnit.CM);
-            backLeftCount++;
-            backLeftDistance = (backLeftDistanceSamples[0] + backLeftDistanceSamples[1] + backLeftDistanceSamples[2] + backLeftDistanceSamples[3] + backLeftDistanceSamples[4]) / 5;
-
-            telemetry.addData("Back Left Distance Sensor", backLeftDistance);
-            if (backLeftDistance < 90) {
-                leftBackDistanceCleared = true;
-            } else {
-                leftBackDistanceCleared = false;
-            }
-
-            if (backLeftCount > 4) {
-                backLeftCount = 0;
-            }
-        }
-    }
+//            leftBlue = false;
+//            leftRed = false;
+//            leftUnknown = true;
+//            return lUnknown;
+//        }
+//    }
+//
+//    private int centerRightColorSensorLineDetector() {
+//
+//        float[] centerRHSV = new float[3];
+//        NormalizedRGBA centerRightRGBA = centerRightColorsensor.getNormalizedColors();
+//        centerRightColorsensor.setGain(30);
+//
+//        Color.colorToHSV(centerRightRGBA.toColor(), centerRHSV);
+//        telemetry.addData("Center Right H:", centerRHSV[0]);
+//        telemetry.addData("Center Right S:", centerRHSV[1]);
+//        telemetry.addData("Center Right V:", centerRHSV[2]);
+//
+//        int centerRBlue = 2;
+//        int centerRRed = 1;
+//        int centerRUnknown = 0;
+//
+//        //Center Right Colorsensor from back of Robot
+//        if (centerRHSV[0] >= 170 && centerRHSV[0] <= 240) {
+//            telemetry.addData("Color:", "Blue");
+//            telemetry.update();
+//            centerRightBlue = true;
+//            centerRightRed = false;
+//            centerRightUnknown = false;
+//            return centerRBlue;
+//        } else if (centerRHSV[0] >= 10 && centerRHSV[0] <= 50) {
+//            telemetry.addData("Color:", "Red");
+//            telemetry.update();
+//            centerRightBlue = false;
+//            centerRightRed = true;
+//            centerRightUnknown = false;
+//            return centerRRed;
+//        } else {
+//            telemetry.addData("Color:", "Unknown");
+//            telemetry.update();
+//            centerRightBlue = false;
+//            centerRightRed = false;
+//            centerRightUnknown = true;
+//            return centerRUnknown;
+//        }
+//    }
+//
+//    private int centerLeftColorSensorLineDetector() {
+//
+//        float[] centerLHSV = new float[3];
+//        NormalizedRGBA centerLeftRGBA = centerLeftColorsensor.getNormalizedColors();
+//        centerLeftColorsensor.setGain(30);
+//
+//        Color.colorToHSV(centerLeftRGBA.toColor(), centerLHSV);
+//        telemetry.addData("Center Left H:", centerLHSV[0]);
+//        telemetry.addData("Center Left S:", centerLHSV[1]);
+//        telemetry.addData("Center Left V:", centerLHSV[2]);
+//
+//        int centerLBlue = 2;
+//        int centerLRed = 1;
+//        int centerLUnknown = 0;
+//
+//        //Center Left Colorsensor from back of Robot
+//        if (centerLHSV[0] >= 170 && centerLHSV[0] <= 240) {
+//            telemetry.addData("Color:", "Blue");
+//            telemetry.update();
+//            centerLeftBlue = true;
+//            centerLeftRed = false;
+//            centerLeftUnknown = false;
+//            return centerLBlue;
+//        } else if (centerLHSV[0] >= 10 && centerLHSV[0] <= 50) {
+//            telemetry.addData("Color:", "Red");
+//            telemetry.update();
+//            centerLeftBlue = false;
+//            centerLeftRed = true;
+//            centerLeftUnknown = false;
+//            return centerLRed;
+//        } else {
+//            telemetry.addData("Color:", "Unknown");
+//            telemetry.update();
+//            centerLeftBlue = false;
+//            centerLeftRed = false;
+//            centerLeftUnknown = true;
+//            return centerLUnknown;
+//        }
+//    }
+//
+//    //From Back of robot
+//    private void backRightJunctionDetector() {
+//        if (backRightDistanceSamples_Reset) {
+//            backRightDistanceSamples[0] = 819;
+//            backRightDistanceSamples[1] = 819;
+//            backRightDistanceSamples[2] = 819;
+//            backRightDistanceSamples_Reset = false;
+//        }
+//        else {
+//            backRightDistanceSamples[backRightCount] = backRightDistanceSensor.getDistance(DistanceUnit.CM);
+//            backRightCount++;
+//            backRightDistance = (backRightDistanceSamples[0] + backRightDistanceSamples[1] + backRightDistanceSamples[2]) / 3;
+//
+//            telemetry.addData("Back Right Distance Sensor", backRightDistance);
+//            if (backRightDistance < 50) {
+//                rightBackDistanceCleared = true;
+//            } else {
+//                rightBackDistanceCleared = false;
+//            }
+//
+//            if (backRightCount > 2) {
+//                backRightCount = 0;
+//            }
+//        }
+//    }
+//
+//    //From Back of robot
+//    private void backLeftJunctionDetector() {
+//        if (backLeftDistanceSamples_Reset) {
+//            backLeftDistanceSamples[0] = 122;
+//            backLeftDistanceSamples[1] = 122;
+//            backLeftDistanceSamples[2] = 122;
+//            backLeftDistanceSamples[3] = 122;
+//            backLeftDistanceSamples[4] = 122;
+//            backLeftDistanceSamples_Reset = false;
+//        }
+//        else {
+//            backLeftDistanceSamples[backLeftCount] = backLeftDistanceSensor.getDistance(DistanceUnit.CM);
+//            backLeftCount++;
+//            backLeftDistance = (backLeftDistanceSamples[0] + backLeftDistanceSamples[1] + backLeftDistanceSamples[2] + backLeftDistanceSamples[3] + backLeftDistanceSamples[4]) / 5;
+//
+//            telemetry.addData("Back Left Distance Sensor", backLeftDistance);
+//            if (backLeftDistance < 90) {
+//                leftBackDistanceCleared = true;
+//            } else {
+//                leftBackDistanceCleared = false;
+//            }
+//
+//            if (backLeftCount > 4) {
+//                backLeftCount = 0;
+//            }
+//        }
+//    }
 
     //From Back of robot
     private void frontRightJunctionDetector() {

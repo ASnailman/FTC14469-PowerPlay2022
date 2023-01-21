@@ -28,8 +28,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "SprintAutoRightMedium", group = "MecanumDrive")
-public class SprintAutoRightMedium extends LinearOpMode {
+@Autonomous(name = "SprintAutoRightMediumNoTarp", group = "MecanumDrive")
+public class SprintAutoRightMediumNoTarp extends LinearOpMode {
 
     //Control Hub Orientation
     byte AXIS_MAP_CONFIG_BYTE = 0x06; //rotates control hub 90 degrees around y axis by swapping x and z axis

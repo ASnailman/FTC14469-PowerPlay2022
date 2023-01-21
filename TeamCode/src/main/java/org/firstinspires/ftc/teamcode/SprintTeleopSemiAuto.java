@@ -959,6 +959,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     ClawSetting = true;
                     coneStackMode = false;
                     groundJunctionMode = false;
+                    changeBaseDeg60 = false;
                     Claw.setPower(1);
                     RailControlV2.SetTargetPosition(0, -1, 1);
                     button_dpad_right_already_pressed2 = true;
@@ -1115,7 +1116,8 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 //                    if (ET.milliseconds() > 450) {
                         ExtendingRail.setTargetPosition(0);
                         ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        ExtendingRail.setPower(0.5);
+                        ExtendingRail.setPower(0);
+
                         extendoSeq++;
 //                    }
                     break;
@@ -1698,7 +1700,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     RailControlV2.SetTargetPosition(2925, -1, 1);
                     RotatingBase.setTargetPosition(1020);
                     RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    RotatingBase.setPower(0.6);
+                    RotatingBase.setPower(0.5);
 //                    BaseControl.SetTargetPosition(1020, -0.57, 0.57);
                     SetExtendingPosition(0);
                     semi_auto_HJ_blitz_order++;
