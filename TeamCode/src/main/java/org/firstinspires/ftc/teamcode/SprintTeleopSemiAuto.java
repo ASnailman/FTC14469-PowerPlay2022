@@ -85,6 +85,9 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
     boolean manualRotateBase;
     double powerCompensation;
     double movementPowerCompensation;
+    double strafingPowerCompensationL;
+    double strafingPowerCompensationR;
+    boolean changeBaseDeg60;
 
     double l;
 //    double assist_gain = 0.03;
@@ -237,7 +240,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             double rx = gamepad1.right_stick_x * movement;
 
             if (PowerSetting) {
-                if ((y > 0.2) || (y < -0.2)) {
+                if ((y > 0.45) || (y < -0.45) || (x > 0.45) || (x < -0.45)) {
                     movement = movement + 0.01;
                 }
                 else {
@@ -254,15 +257,35 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             if (!PowerSetting) {
                 movementPowerCompensation = 0;
             } else {
-                movementPowerCompensation = 0.005;
+                movementPowerCompensation = 0.01;
             }
 
-            if (y > 0.2) {
+            if (y > 0.45) {
                 powerCompensation = 0.0015 + movementPowerCompensation;
-            } else if (y < -0.2) {
+            } else if (y < -0.45) {
                 powerCompensation = -0.0015 - movementPowerCompensation;
             } else {
                 powerCompensation = 0;
+            }
+
+            if (x > 0.45) {
+//                strafingPowerCompensationR = strafingPowerCompensationR + 0.001;
+                strafingPowerCompensationR = 0.048;
+                strafingPowerCompensationL = 0;
+//                if (strafingPowerCompensationR > 0.048) {
+//                    strafingPowerCompensationR = 0;
+//                }
+            } else if (x < -0.45) {
+//                strafingPowerCompensationL = strafingPowerCompensationL + 0.001;
+
+                strafingPowerCompensationL = 0.02;
+                strafingPowerCompensationR = 0;
+//                if (strafingPowerCompensationL > 0.02) {
+//                    strafingPowerCompensationL = 0.02;
+//                }
+            } else {
+                strafingPowerCompensationR = 0;
+                strafingPowerCompensationL = 0;
             }
 
 //            if (y < 0.1 && y > -0.1 || x < 0.1 && x > -0.1) {
@@ -328,9 +351,9 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             double BRPower = (y + x - rx - l) / denominator;
 
             FrontLeft.setPower(FLPower);
-            BackLeft.setPower(BLPower);
+            BackLeft.setPower(BLPower + strafingPowerCompensationL);
             FrontRight.setPower(FRPower + powerCompensation);
-            BackRight.setPower(BRPower + powerCompensation);
+            BackRight.setPower(BRPower + powerCompensation + strafingPowerCompensationR);
 
             /*****************************************************************
              * Dpad Up (G2) - Open/Close Claw
@@ -360,7 +383,6 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             switch (targetJunction) {
                 case 1:
                     ET.reset();
-//                    LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
                     targetJunction++;
                     break;
                 case 2:
@@ -385,7 +407,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
                 case 5:
                     ET.reset();
-//                    LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
+                    changeBaseDeg60 = true;
                     targetJunction++;
                     break;
 
@@ -400,10 +422,10 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     }
                     break;
                 case 7:
-                    if (ET.milliseconds() > 500) {
-//                            SetBasePosition(0);
+//                    if (ET.milliseconds() > 500) {
+//                        SetBasePositionRTP(0);
                         targetJunction++;
-                    }
+//                    }
                     break;
 
                 case 8:
@@ -411,7 +433,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
                 case 9:
                     ET.reset();
-//                    LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
+                    changeBaseDeg60 = true;
                     targetJunction++;
                     break;
 
@@ -428,10 +450,10 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     break;
 
                 case 11:
-                    if (ET.milliseconds() > 500) {
-//                            SetBasePosition(0);
+//                    if (ET.milliseconds() > 500) {
+//                        SetBasePositionRTP(0);
                         targetJunction++;
-                    }
+//                    }
                     break;
 
                 case 12:
@@ -466,6 +488,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 case 17:
                     ET.reset();
                     ClawSetting = true;
+                    changeBaseDeg60 = true;
                     Claw.setPower(1);
 //                    LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
                     targetJunction++;
@@ -492,6 +515,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     break;
 
                 case 21:
+                    changeBaseDeg60 = false;
                     RailControlV2.SetTargetPosition(0, -1, 1);
                     ExtendingRail.setTargetPosition(0);
                     ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -504,11 +528,19 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     if (ET.milliseconds() > 150) {
                         ClawSetting = false;
                         Claw.setPower(-0.4);
+                        ET.reset();
                         targetJunction++;
                     }
                     break;
 
                 case 23:
+                    if (ET.milliseconds() > 400) {
+                        SetBasePositionRTP(0);
+                        targetJunction++;
+                    }
+                    break;
+
+                case 24:
                     break;
 
                 default:
@@ -984,9 +1016,16 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             if (!button_bumper_right_already_pressed2) {
                 if (gamepad2.right_bumper) {
-                    RotatingBase.setTargetPosition(-1035);
-                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    RotatingBase.setPower(1);
+//                    RotatingBase.setTargetPosition(-1035);
+                    if (changeBaseDeg60) {
+                        RotatingBase.setTargetPosition(-610);
+                        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        RotatingBase.setPower(1);
+                    } else {
+                        RotatingBase.setTargetPosition(-1035);
+                        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        RotatingBase.setPower(1);
+                    }
                     button_bumper_right_already_pressed2 = true;
                 }
             } else {
@@ -1001,9 +1040,17 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             if (!button_bumper_left_already_pressed2) {
                 if (gamepad2.left_bumper) {
-                    RotatingBase.setTargetPosition(1035);
-                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    RotatingBase.setPower(1);
+//                    RotatingBase.setTargetPosition(1035);
+                    if (changeBaseDeg60) {
+                        RotatingBase.setTargetPosition(610);
+                        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        RotatingBase.setPower(1);
+                    } else {
+                        RotatingBase.setTargetPosition(1035);
+                        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        RotatingBase.setPower(1);
+                    }
+
                     button_bumper_left_already_pressed2 = true;
                 }
             } else {
@@ -1029,7 +1076,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             if (!button_start_already_pressed2) {
                 if (gamepad2.start) {
-                    extendoSeq = 3;
+                    extendoSeq = 5;
                     button_start_already_pressed2 = true;
                 }
             } else {
@@ -1053,6 +1100,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     break;
 
                 case 3:
+
                     break;
 
                 case 4:
@@ -1064,12 +1112,12 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     break;
 
                 case 5:
-                    if (ET.milliseconds() > 450) {
+//                    if (ET.milliseconds() > 450) {
                         ExtendingRail.setTargetPosition(0);
                         ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         ExtendingRail.setPower(0.5);
                         extendoSeq++;
-                    }
+//                    }
                     break;
 
                 default:
@@ -1252,6 +1300,8 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             telemetry.addData("SemiAutoMode", semiAutoMode);
             telemetry.addData("ConeStackMode", coneStackMode);
             telemetry.addData("PowerSetting", PowerSetting);
+            telemetry.addData("x", x);
+            telemetry.addData("y", y);
             telemetry.update();
         }
     }
