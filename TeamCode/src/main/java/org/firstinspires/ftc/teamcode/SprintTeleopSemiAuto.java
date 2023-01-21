@@ -1662,7 +1662,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                         ExtendingRail.setTargetPosition(370);
                         ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         ExtendingRail.setPower(1);
-                        semi_auto_HJ_blitz_order = 3;
+                        semi_auto_HJ_blitz_order = 2;
                     }
                 }
                 break;
