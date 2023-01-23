@@ -264,7 +264,7 @@ public class SprintAutoRightMediumNoTarp extends LinearOpMode {
                         posOne = true;
                         posTwo = false;
                         posThree = false;
-//                        sixCones = true;
+                        sixCones = true;
                         Claw.setPower(1);
                         ET.reset();
                         ERT.reset();
@@ -280,6 +280,7 @@ public class SprintAutoRightMediumNoTarp extends LinearOpMode {
                         posOne = false;
                         posTwo = false;
                         posThree = true;
+                        sixCones = true;
                         Claw.setPower(1);
                         ET.reset();
                         ERT.reset();

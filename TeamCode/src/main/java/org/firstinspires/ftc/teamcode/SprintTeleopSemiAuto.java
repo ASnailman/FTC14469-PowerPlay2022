@@ -244,14 +244,14 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     movement = movement + 0.01;
                 }
                 else {
-                    movement = 0.5;
+                    movement = 0.6;
                 }
 
                 if (movement > 1) {
                     movement = 1;
                 }
             } else {
-                movement = 0.5;
+                movement = 0.6;
             }
 
             if (!PowerSetting) {
@@ -260,7 +260,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 movementPowerCompensation = 0.01;
             }
 
-            if (y > 0.45) {
+            if (y > 0.45 && FrontLeft.getPower() > 0.4) {
                 powerCompensation = 0.0015 + movementPowerCompensation;
             } else if (y < -0.45) {
                 powerCompensation = -0.0015 - movementPowerCompensation;
@@ -268,14 +268,14 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 powerCompensation = 0;
             }
 
-            if (x > 0.45) {
+            if (x > 0.45 && FrontLeft.getPower() > 0.4) {
 //                strafingPowerCompensationR = strafingPowerCompensationR + 0.001;
                 strafingPowerCompensationR = 0.048;
                 strafingPowerCompensationL = 0;
 //                if (strafingPowerCompensationR > 0.048) {
 //                    strafingPowerCompensationR = 0;
 //                }
-            } else if (x < -0.45) {
+            } else if (x < -0.45 && FrontLeft.getPower() < -0.4) {
 //                strafingPowerCompensationL = strafingPowerCompensationL + 0.001;
 
                 strafingPowerCompensationL = 0.02;
@@ -469,7 +469,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                         ExtendingRail.setTargetPosition(0);
                         ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         ExtendingRail.setPower(0.7);
-                        RailControlV2.SetTargetPosition(130, -0.7, 0.7);
+                        RailControlV2.SetTargetPosition(120, -0.7, 0.7);
                         ET.reset();
                         targetJunction++;
                     }
@@ -597,6 +597,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                         if (gamepad2.a) {
                             //code for low junction when pressed
                             groundJunctionMode = false;
+                            changeBaseDeg60 = false;
 //                            RightClaw.setPosition(0);
 //                            LeftClaw.setPosition(0);
                             RailControlV2.SetTargetPosition(0, -0.7, 0.7);
@@ -980,6 +981,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     ClawSetting = true;
                     coneStackMode = false;
                     groundJunctionMode = true;
+                    changeBaseDeg60 = true;
                     Claw.setPower(1);
                     targetJunction = 13;
                     button_dpad_down_already_pressed2 = true;
@@ -1023,7 +1025,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         RotatingBase.setPower(1);
                     } else {
-                        RotatingBase.setTargetPosition(-1035);
+                        RotatingBase.setTargetPosition(-1155);
                         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         RotatingBase.setPower(1);
                     }
@@ -1047,7 +1049,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         RotatingBase.setPower(1);
                     } else {
-                        RotatingBase.setTargetPosition(1035);
+                        RotatingBase.setTargetPosition(1155);
                         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         RotatingBase.setPower(1);
                     }

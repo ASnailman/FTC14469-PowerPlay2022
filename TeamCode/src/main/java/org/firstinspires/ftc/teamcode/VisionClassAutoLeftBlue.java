@@ -238,7 +238,7 @@ public class VisionClassAutoLeftBlue {
             DifferenceTWO = Avg2() + SIGNAL_SLEEVE_THRESHOLD;
             DifferenceTHREE = Avg2() + SIGNAL_SLEEVE_THRESHOLD;
 
-            if ((DifferenceONE > 60) && (DifferenceONE < 95)) { // Was it from region 1?
+            if ((DifferenceONE > 60) && (DifferenceONE < 100)) { // Was it from region 1?
 
                 type = SignalSleeveType.LocationONE; // Record our analysis
 

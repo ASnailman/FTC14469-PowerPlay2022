@@ -28,8 +28,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "SprintAutoRightTarp", group = "MecanumDrive")
-public class SprintAutoRightTarp extends LinearOpMode {
+@Autonomous(name = "SprintAutoRightNoTarp", group = "MecanumDrive")
+public class SprintAutoRightNoTarp extends LinearOpMode {
 
     //Control Hub Orientation
     byte AXIS_MAP_CONFIG_BYTE = 0x06; //rotates control hub 90 degrees around y axis by swapping x and z axis
@@ -65,7 +65,7 @@ public class SprintAutoRightTarp extends LinearOpMode {
     //Variables of Classes
     Methods motorMethods;
     Mech_Drive_FAST MechDrive;
-//    Rail_Control RailControl;
+    //    Rail_Control RailControl;
     Rail_ControlV2 RailControlV2;
     Direction_Control DirectionControl;
     Base_Control BaseControl;
@@ -316,8 +316,8 @@ public class SprintAutoRightTarp extends LinearOpMode {
                 case 5:
                     if (RotatingBase.getCurrentPosition() >= 1170 && RotatingBase.getCurrentPosition() <= 1270) {
 
-                    SetExtendingPosition(110 + tickAdjustment);
-                    programOrder++;
+                        SetExtendingPosition(110 + tickAdjustment);
+                        programOrder++;
 
                     }
                     break;
@@ -325,7 +325,7 @@ public class SprintAutoRightTarp extends LinearOpMode {
                 case 6:
                     if (MechDrive.GetTaskState() == Task_State.DONE) {
                         DirectionControl.SetTargetDirection(1, 0.2);
-                        SetAttachmentPositionLowPower(2970, 1570 + angleAdjustment);
+                        SetAttachmentPositionLowPower(2970, 1540 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -335,21 +335,21 @@ public class SprintAutoRightTarp extends LinearOpMode {
 //                        if (RotatingBase.getCurrentPosition() >= 1520 + angleAdjustment && (RailControlV2.GetTaskState() == Task_State.DONE ||
 //                                RailControlV2.GetTaskState() == Task_State.READY)) {
                     if (BaseControl.GetTaskState() == Task_State.READY || BaseControl.GetTaskState() == Task_State.DONE) {
-                            if (coneLevel == 0) {
-                                if (ET.milliseconds() > 400) {
-                                    SetAttachment_LowPwrRail(2690, 1580 + angleAdjustment);
-                                    ET.reset();
-                                    programOrder++;
-                                }
-                            }
-                            else {
-                                if (ET.milliseconds() > 400) {
-                                    SetAttachment_LowPwrRail(2690, 1512 + angleAdjustment);
-                                    ET.reset();
-                                    programOrder++;
-                                }
+                        if (coneLevel == 0) {
+                            if (ET.milliseconds() > 400) {
+                                SetAttachment_LowPwrRail(2690, 1550 + angleAdjustment);
+                                ET.reset();
+                                programOrder++;
                             }
                         }
+                        else {
+                            if (ET.milliseconds() > 400) {
+                                SetAttachment_LowPwrRail(2690, 1482 + angleAdjustment);
+                                ET.reset();
+                                programOrder++;
+                            }
+                        }
+                    }
                     break;
 
                 case 8:
@@ -427,7 +427,7 @@ public class SprintAutoRightTarp extends LinearOpMode {
                 case 15:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
                         SetExtendingPositionLowPower(85 + tickAdjustment);
-                        SetAttachmentPositionLowPower(3065, 1512 + angleAdjustment);
+                        SetAttachmentPositionLowPower(3025, 1482 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -447,8 +447,8 @@ public class SprintAutoRightTarp extends LinearOpMode {
 //                    if (ET.milliseconds() > 200) {
 //                        SetAttachmentPosition(0,0);
 //                        MechDrive.SetTargets(0, 50, 0.3, 1);
-                        DirectionControl.Override();
-                        programOrder++;
+                    DirectionControl.Override();
+                    programOrder++;
 //                    }
                     break;
 
