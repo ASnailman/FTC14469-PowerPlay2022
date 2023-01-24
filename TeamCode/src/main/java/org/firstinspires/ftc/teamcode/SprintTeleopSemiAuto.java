@@ -88,6 +88,8 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
     double strafingPowerCompensationL;
     double strafingPowerCompensationR;
     boolean changeBaseDeg60;
+    boolean angleResetDeterminator = false;
+    double currentAngle;
 
     double l;
 //    double assist_gain = 0.03;
@@ -240,53 +242,53 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             double rx = gamepad1.right_stick_x * movement;
 
             if (PowerSetting) {
-                if ((y > 0.45) || (y < -0.45) || (x > 0.45) || (x < -0.45)) {
-                    movement = movement + 0.01;
-                }
-                else {
-                    movement = 0.6;
-                }
-
+//                if ((y > 0.45) || (y < -0.45) || (x > 0.45) || (x < -0.45)) {
+                movement = movement + 0.01;
+//                }
+//                else {
+//                    movement = 0.6;
+//                }
+//
                 if (movement > 1) {
                     movement = 1;
                 }
             } else {
-                movement = 0.6;
+                movement = 0.65;
             }
 
-            if (!PowerSetting) {
-                movementPowerCompensation = 0;
-            } else {
-                movementPowerCompensation = 0.01;
-            }
+//            if (!PowerSetting) {
+//                movementPowerCompensation = 0;
+//            } else {
+//                movementPowerCompensation = 0.01;
+//            }
 
-            if (y > 0.45 && FrontLeft.getPower() > 0.4) {
-                powerCompensation = 0.0015 + movementPowerCompensation;
-            } else if (y < -0.45) {
-                powerCompensation = -0.0015 - movementPowerCompensation;
-            } else {
-                powerCompensation = 0;
-            }
+//            if (y > 0.45 && FrontLeft.getPower() > 0.4) {
+//                powerCompensation = 0.0015 + movementPowerCompensation;
+//            } else if (y < -0.45) {
+//                powerCompensation = -0.0015 - movementPowerCompensation;
+//            } else {
+//                powerCompensation = 0;
+//            }
 
-            if (x > 0.45 && FrontLeft.getPower() > 0.4) {
+//            if (x > 0.45 && FrontLeft.getPower() > 0.4) {
 //                strafingPowerCompensationR = strafingPowerCompensationR + 0.001;
-                strafingPowerCompensationR = 0.048;
-                strafingPowerCompensationL = 0;
+//                strafingPowerCompensationR = 0.048;
+//                strafingPowerCompensationL = 0;
 //                if (strafingPowerCompensationR > 0.048) {
 //                    strafingPowerCompensationR = 0;
 //                }
-            } else if (x < -0.45 && FrontLeft.getPower() < -0.4) {
+//            } else if (x < -0.45 && FrontLeft.getPower() < -0.4) {
 //                strafingPowerCompensationL = strafingPowerCompensationL + 0.001;
 
-                strafingPowerCompensationL = 0.02;
-                strafingPowerCompensationR = 0;
+//                strafingPowerCompensationL = 0.02;
+//                strafingPowerCompensationR = 0;
 //                if (strafingPowerCompensationL > 0.02) {
 //                    strafingPowerCompensationL = 0.02;
 //                }
-            } else {
-                strafingPowerCompensationR = 0;
-                strafingPowerCompensationL = 0;
-            }
+//            } else {
+//                strafingPowerCompensationR = 0;
+//                strafingPowerCompensationL = 0;
+//            }
 
 //            if (y < 0.1 && y > -0.1 || x < 0.1 && x > -0.1) {
 //                l = 0;
@@ -329,20 +331,23 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             if (!directionControl) {
                 l = 0;
+                angleResetDeterminator = true;
             } else {
-                DirectionControl.SetTargetDirection(0, 0.17);
-                l = DirectionControl.GyroTask_TeleOp();
+                if (angleResetDeterminator) {
+                    currentAngle = GyroContinuity();
+                    angleResetDeterminator = false;
+                } else {
+                    DirectionControl.SetTargetDirection(currentAngle, 0.17);
+                    l = DirectionControl.GyroTask_TeleOp();
+                }
             }
 
             //if turning, set the gains to 0
-            if (rx != 0) {
-//                l = DirectionControl.GyroTask_TeleOp() * 0;
-                directionControl = false;
-            }
+//            if (rx != 0) {
+//                directionControl = false;
+//            }
 
-//            LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_RAINBOW_PALETTE);
             LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE);
-//            LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_LAVA_PALETTE);
 
             double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
             double FLPower = (y + x + rx + l) / denominator;
@@ -351,9 +356,12 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             double BRPower = (y + x - rx - l) / denominator;
 
             FrontLeft.setPower(FLPower);
-            BackLeft.setPower(BLPower + strafingPowerCompensationL);
-            FrontRight.setPower(FRPower + powerCompensation);
-            BackRight.setPower(BRPower + powerCompensation + strafingPowerCompensationR);
+//            BackLeft.setPower(BLPower + strafingPowerCompensationL);
+//            FrontRight.setPower(FRPower + powerCompensation);
+//            BackRight.setPower(BRPower + powerCompensation + strafingPowerCompensationR);
+            BackLeft.setPower(BLPower);
+            FrontRight.setPower(FRPower);
+            BackRight.setPower(BRPower);
 
             /*****************************************************************
              * Dpad Up (G2) - Open/Close Claw
@@ -413,9 +421,6 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
                 case 6:
                     if (ET.milliseconds() > 800) {
-                        ExtendingRail.setTargetPosition(0);
-                        ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        ExtendingRail.setPower(0.7);
                         RailControlV2.SetTargetPosition(2150, -1, 1);
                         ET.reset();
                         targetJunction++;
@@ -439,10 +444,6 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
                 case 10:
                     if (ET.milliseconds() > 800) {
-//                        SetExtendingPosition(100);
-                        ExtendingRail.setTargetPosition(0);
-                        ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        ExtendingRail.setPower(0.7);
                         RailControlV2.SetTargetPosition(2950, -1, 1);
                         ET.reset();
                         targetJunction++;
@@ -466,9 +467,6 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
                 case 14:
                     if (ET.milliseconds() > 800) {
-                        ExtendingRail.setTargetPosition(0);
-                        ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        ExtendingRail.setPower(0.7);
                         RailControlV2.SetTargetPosition(120, -0.7, 0.7);
                         ET.reset();
                         targetJunction++;
@@ -490,15 +488,10 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     ClawSetting = true;
                     changeBaseDeg60 = true;
                     Claw.setPower(1);
-//                    LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
                     targetJunction++;
                     break;
                 case 18:
                     if (ET.milliseconds() > 800) {
-//                        SetExtendingPosition(100);
-                        ExtendingRail.setTargetPosition(0);
-                        ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        ExtendingRail.setPower(0.7);
                         RailControlV2.SetTargetPosition(1280, -1, 1);
                         ET.reset();
                         targetJunction++;
@@ -517,9 +510,6 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 case 21:
                     changeBaseDeg60 = false;
                     RailControlV2.SetTargetPosition(0, -1, 1);
-                    ExtendingRail.setTargetPosition(0);
-                    ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    ExtendingRail.setPower(0.7);
                     ET.reset();
                     targetJunction++;
                     break;
@@ -597,7 +587,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                         if (gamepad2.a) {
                             //code for low junction when pressed
                             groundJunctionMode = false;
-                            changeBaseDeg60 = false;
+//                            changeBaseDeg60 = false;
 //                            RightClaw.setPosition(0);
 //                            LeftClaw.setPosition(0);
                             RailControlV2.SetTargetPosition(0, -0.7, 0.7);
@@ -981,7 +971,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     ClawSetting = true;
                     coneStackMode = false;
                     groundJunctionMode = true;
-                    changeBaseDeg60 = true;
+//                    changeBaseDeg60 = true;
                     Claw.setPower(1);
                     targetJunction = 13;
                     button_dpad_down_already_pressed2 = true;
@@ -1025,7 +1015,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         RotatingBase.setPower(1);
                     } else {
-                        RotatingBase.setTargetPosition(-1155);
+                        RotatingBase.setTargetPosition(-1030);
                         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         RotatingBase.setPower(1);
                     }
@@ -1049,7 +1039,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         RotatingBase.setPower(1);
                     } else {
-                        RotatingBase.setTargetPosition(1155);
+                        RotatingBase.setTargetPosition(1030);
                         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         RotatingBase.setPower(1);
                     }
@@ -1079,7 +1069,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             if (!button_start_already_pressed2) {
                 if (gamepad2.start) {
-                    extendoSeq = 5;
+                    extendoSeq = 4;
                     button_start_already_pressed2 = true;
                 }
             } else {
@@ -1107,21 +1097,18 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     break;
 
                 case 4:
-                    if (ExtendingRail.getCurrentPosition() > 400) {
-                        ClawSetting = true;
-                        ET.reset();
-                        extendoSeq++;
-                    }
+                    ExtendingRail.setPower(0);
+                    ET.reset();
+                    extendoSeq++;
                     break;
 
                 case 5:
-//                    if (ET.milliseconds() > 450) {
+                    if (ET.milliseconds() > 1000) {
+                        ExtendingRail.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                         ExtendingRail.setTargetPosition(0);
                         ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                        ExtendingRail.setPower(0);
-
                         extendoSeq++;
-//                    }
+                    }
                     break;
 
                 default:

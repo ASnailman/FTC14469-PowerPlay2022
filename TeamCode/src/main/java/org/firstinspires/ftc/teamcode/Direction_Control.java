@@ -21,7 +21,7 @@ public class Direction_Control {
     boolean turnright = false;
     boolean turnleft = false;
     double pwr;
-    int Angle;
+    double Angle;
     double AngleTolerance;
     Task_State run_state;
 
@@ -36,7 +36,7 @@ public class Direction_Control {
         IMU.initialize(parameters);
     }
 
-    public void SetTargetDirection(int angle, double power) {
+    public void SetTargetDirection(double angle, double power) {
         pwr = power;
         Angle = angle;
         run_state = Task_State.RUN;
