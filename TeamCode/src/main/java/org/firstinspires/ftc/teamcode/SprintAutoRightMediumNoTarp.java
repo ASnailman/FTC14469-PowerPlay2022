@@ -501,7 +501,7 @@ public class SprintAutoRightMediumNoTarp extends LinearOpMode {
                             MechDrive.GetTaskState() == Task_State.DONE) {
 
                         if (posOne) {
-                            MechDrive.SetTargets(-90, 1100, 0.85, 1);
+                            MechDrive.SetTargets(-90, 1100, 0.95, 1);
                             SetAttachmentPosition(2170, 0);
                             SetExtendingPosition(0);
                             ET.reset();
@@ -511,8 +511,8 @@ public class SprintAutoRightMediumNoTarp extends LinearOpMode {
                             SetExtendingPosition(0);
                             ET.reset();
                         } else if (posThree) {
-                            MechDrive.SetTargets(90, 1550, 0.85, 1);
-                            SetAttachmentPosition(2170, 1020);
+                            MechDrive.SetTargets(90, 1550, 0.95, 1);
+                            SetAttachmentPosition(0, 1020);
                             SetExtendingPosition(0);
                             ET.reset();
                         }

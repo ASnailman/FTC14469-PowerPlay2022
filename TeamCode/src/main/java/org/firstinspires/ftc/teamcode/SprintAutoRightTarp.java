@@ -323,9 +323,9 @@ public class SprintAutoRightTarp extends LinearOpMode {
                     break;
 
                 case 6:
-                    if (MechDrive.GetTaskState() == Task_State.DONE) {
+                    if (MechDrive.GetTaskState() == Task_State.DONE || MechDrive.GetTaskState() == Task_State.READY) {
                         DirectionControl.SetTargetDirection(1, 0.2);
-                        SetAttachmentPositionLowPower(2970, 1570 + angleAdjustment);
+                        SetAttachmentPositionLowPower(2970, 1540 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -337,14 +337,14 @@ public class SprintAutoRightTarp extends LinearOpMode {
                     if (BaseControl.GetTaskState() == Task_State.READY || BaseControl.GetTaskState() == Task_State.DONE) {
                             if (coneLevel == 0) {
                                 if (ET.milliseconds() > 400) {
-                                    SetAttachment_LowPwrRail(2690, 1580 + angleAdjustment);
+                                    SetAttachment_LowPwrRail(2690, 1550 + angleAdjustment);
                                     ET.reset();
                                     programOrder++;
                                 }
                             }
                             else {
                                 if (ET.milliseconds() > 400) {
-                                    SetAttachment_LowPwrRail(2690, 1512 + angleAdjustment);
+                                    SetAttachment_LowPwrRail(2690, 1482 + angleAdjustment);
                                     ET.reset();
                                     programOrder++;
                                 }
@@ -427,7 +427,7 @@ public class SprintAutoRightTarp extends LinearOpMode {
                 case 15:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
                         SetExtendingPositionLowPower(85 + tickAdjustment);
-                        SetAttachmentPositionLowPower(3065, 1512 + angleAdjustment);
+                        SetAttachmentPositionLowPower(3065, 1482 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }

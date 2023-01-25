@@ -323,7 +323,7 @@ public class SprintAutoLeftNoTarp extends LinearOpMode {
                     break;
 
                 case 6:
-                    if (MechDrive.GetTaskState() == Task_State.DONE) {
+                    if (MechDrive.GetTaskState() == Task_State.DONE || MechDrive.GetTaskState() == Task_State.READY) {
                         DirectionControl.SetTargetDirection(-2, 0.2);
                         SetAttachmentPositionLowPower(2970, -1540 + angleAdjustment);
                         ET.reset();
