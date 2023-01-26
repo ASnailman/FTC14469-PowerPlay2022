@@ -59,7 +59,7 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
     //Variables of Classes
     Methods motorMethods;
     Mech_Drive_FAST MechDrive;
-//    Rail_Control RailControl;
+    //    Rail_Control RailControl;
     Rail_ControlV2 RailControlV2;
     Direction_Control DirectionControl;
     Base_Control_MEDIUM BaseControl;
@@ -308,7 +308,7 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
 //                            MechDrive.GetTaskState() == Task_State.DONE) {
 //                        MechDrive.SetTargets(0, 994, 0.36, 1);
 //                        ET.reset();
-                        programOrder++;
+                    programOrder++;
 //                    }
 
                     break;
@@ -318,7 +318,7 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
 //                        if (RotatingBase.getCurrentPosition() >= 570 && RotatingBase.getCurrentPosition() <= 670) {
 //                            if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
 //                                SetAttachmentPosition(420, 1320);
-                                programOrder++;
+                    programOrder++;
 //                                ET.reset();
 //                            }
 //                        }
@@ -332,7 +332,7 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
 //                        MechDrive.SetTargets(-1, 1050, 0.7, 1);
 //                    if ((RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY)) {
 //                        SetAttachmentPosition(2150, 1020);
-                        programOrder++;
+                    programOrder++;
 //                    }
                     break;
 
@@ -340,9 +340,9 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
                     if (RotatingBase.getCurrentPosition() >= 2000) {
 
 //                            SetAttachmentPosition(2980, 1020);
-                            SetExtendingPositionLowPower(100 + tickAdjustment);
-                            ET.reset();
-                            programOrder++;
+                        SetExtendingPositionLowPower(100 + tickAdjustment);
+                        ET.reset();
+                        programOrder++;
 
                     }
                     break;
@@ -360,17 +360,17 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
 //                        if (RotatingBase.getCurrentPosition() >= 2550) {
                     if (BaseControl.GetTaskState() == Task_State.READY || BaseControl.GetTaskState() == Task_State.DONE) {
                         if (coneLevel == 0) {
-                                if (ET.milliseconds() > 100) {
-                                    SetAttachment_LowPwrRail(1800, 2755 + angleAdjustment);
-                                    ET.reset();
-                                    programOrder++;
-                                }
+                            if (ET.milliseconds() > 100) {
+                                SetAttachment_LowPwrRail(1800, 2755 + angleAdjustment);
+                                ET.reset();
+                                programOrder++;
+                            }
                         } else {
-                                if (ET.milliseconds() > 100) {
-                                    SetAttachment_LowPwrRail(1800, 2545 + angleAdjustment);
-                                    ET.reset();
-                                    programOrder++;
-                                }
+                            if (ET.milliseconds() > 100) {
+                                SetAttachment_LowPwrRail(1800, 2545 + angleAdjustment);
+                                ET.reset();
+                                programOrder++;
+                            }
                         }
                     }
                     break;
