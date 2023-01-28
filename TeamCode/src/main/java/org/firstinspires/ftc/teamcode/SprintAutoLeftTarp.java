@@ -375,7 +375,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                 case 10:
                     if (ET.milliseconds() > 200) {
                         SetAttachmentPosition(2690, 0);
-                        SetExtendingPosition(0);
+                        SetExtendingPositionLowPower(0);
                         programOrder++;
                     }
                     break;
@@ -410,7 +410,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                     break;
 
                 case 13:
-                    if (ET.milliseconds() > 300) {
+                    if (ET.milliseconds() > 330) {
                         Claw.setPower(1);
                         ET.reset();
                         programOrder++;
@@ -426,8 +426,9 @@ public class SprintAutoLeftTarp extends LinearOpMode {
 
                 case 15:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPositionLowPower(92 + tickAdjustment);
-                        SetAttachmentPositionLowPower(3065, -1512 + angleAdjustment);
+                        SetExtendingPositionLowPower(70);
+//                        SetExtendingPositionLowPower(92 + tickAdjustment);
+                        SetAttachmentPositionLowPower(3025, -1512 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }

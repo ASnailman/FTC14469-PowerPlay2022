@@ -410,7 +410,7 @@ public class SprintAutoRightNoTarp extends LinearOpMode {
                     break;
 
                 case 13:
-                    if (ET.milliseconds() > 300) {
+                    if (ET.milliseconds() > 330) {
                         Claw.setPower(1);
                         ET.reset();
                         programOrder++;

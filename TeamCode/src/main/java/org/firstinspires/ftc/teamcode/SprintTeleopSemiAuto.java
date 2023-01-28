@@ -1432,7 +1432,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
 //                    SetExtendingPosition(75);
                     SetExtendingPositionLowPower(0);
-                    RailControlV2.SetTargetPosition(2925, -1, 1);
+                    RailControlV2.SetTargetPosition(2930, -1, 1);
                     SetBasePosition(-505 + SC_AngleAdjustment);
                     SC_Blitz_Timer.reset();
                     semi_auto_sc_blitz_step++;
@@ -1466,7 +1466,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 break;
             case 8:
                 SC_ConeLevel++;
-                if (SC_ConeLevel >= 4) {
+                if (SC_ConeLevel >= 5) {
                     RailControlV2.SetTargetPosition(0, -1, 1);
                     SetBasePosition(0);
                     SetExtendingPositionLowPower(0);
@@ -1498,6 +1498,9 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                         semi_auto_sc_blitz_step = 1;
                     } else if (SC_ConeLevel == 3) {
                         RailControlV2.SetTargetPosition(295, -1, 1);
+                        semi_auto_sc_blitz_step = 1;
+                    } else if (SC_ConeLevel == 4) {
+                        RailControlV2.SetTargetPosition(180, -1, 1);
                         semi_auto_sc_blitz_step = 1;
                     } else {
                         semi_auto_sc_blitz_step++;
@@ -1558,7 +1561,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
 //                    SetExtendingPosition(75);
                     SetExtendingPositionLowPower(0);
-                    RailControlV2.SetTargetPosition(2925, -1, 1);
+                    RailControlV2.SetTargetPosition(2930, -1, 1);
                     SetBasePosition(505 + SC_AngleAdjustment);
                     SC_Blitz_Timer.reset();
                     R_semi_auto_sc_blitz_step++;
@@ -1592,7 +1595,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 break;
             case 8:
                 R_SC_ConeLevel++;
-                if (R_SC_ConeLevel >= 4) {
+                if (R_SC_ConeLevel >= 5) {
                     RailControlV2.SetTargetPosition(0, -1, 1);
                     SetBasePosition(0);
                     SetExtendingPositionLowPower(0);
@@ -1625,7 +1628,10 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     } else if (R_SC_ConeLevel == 3) {
                         RailControlV2.SetTargetPosition(295, -1, 1);
                         R_semi_auto_sc_blitz_step = 1;
-                    } else {
+                    } else if (R_SC_ConeLevel == 4) {
+                        RailControlV2.SetTargetPosition(180, -1, 1);
+                        R_semi_auto_sc_blitz_step = 1;
+                    }  else {
                         R_semi_auto_sc_blitz_step++;
                     }
                 }
