@@ -469,7 +469,7 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
 
                 case 16:
                     if (ET.milliseconds() > 100 && RotatingBase.getCurrentPosition() > 1900) {
-                        SetExtendingPositionLowPower(105 + tickAdjustment);
+                        SetExtendingPositionLowPower(150 + tickAdjustment);
                         ET.reset();
                         coneLevel++;
                         if (sixCones) {
