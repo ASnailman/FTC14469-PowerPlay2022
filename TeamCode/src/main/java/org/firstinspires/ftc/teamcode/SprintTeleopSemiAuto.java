@@ -2058,12 +2058,199 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 //    }
 
     /** Medium junction doesnt start from above high junction */
+//    public void SemiAutoHJBlitz() {
+//
+//        switch (semi_auto_HJ_blitz_order) {
+//            case 0:
+//                if (HJAutoBlitzReady) {
+//                    RotatingBase.setTargetPosition(-920);
+//                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    RotatingBase.setPower(0.7);
+//                    semi_auto_HJ_blitz_order++;
+//                }
+//                break;
+//
+//            case 1:
+//                if (RotatingBase.getCurrentPosition() < -890) {
+//                    ExtendingRail.setTargetPosition(470);
+//                    ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    ExtendingRail.setPower(1);
+//                    HJAutoBlitzReady = false;
+//                    semi_auto_HJ_blitz_order++;
+//                }
+//                break;
+//
+//            case 2:
+//                if (!HJAutoBlitzReady) {
+//                    if (dropConeHigh) {
+//                        HJAutoBlitzReady = true;
+//                        ClawSetting = true;
+//                        HJBET.reset();
+//                        semi_auto_HJ_blitz_order = 3;
+//                    }
+//                    else if (dropConeMedium) {
+//                        HJAutoBlitzReady = true;
+//                        ClawSetting = true;
+//                        HJBET.reset();
+//                        semi_auto_HJ_blitz_order = 21;
+//                    }
+//                }
+//                break;
+//
+//            //high junction
+//            case 3:
+//                if (HJBET.milliseconds() > 450) {
+//                    SetExtendingPositionLowPower(0);
+//                    RailControlV2.SetTargetPosition(2925, -1, 1);
+//                    HJBET.reset();
+//                    semi_auto_HJ_blitz_order++;
+//                }
+//                break;
+//
+//            case 4:
+//                if (HJBET.milliseconds() > 700) {
+//                    RotatingBase.setTargetPosition(560 + SC_AngleAdjustment);
+//                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    RotatingBase.setPower(0.9);
+//                    semiAutoMode = true;
+//                    semi_auto_HJ_blitz_order++;
+//                }
+//                break;
+//
+//            case 5:
+//                if (RotatingBase.getCurrentPosition() > 540) {
+//                    SetExtendingPositionLowPower(110);
+//                    semi_auto_HJ_blitz_order++;
+//                }
+//                break;
+//
+//            //load cone high junction
+//            case 6:
+//                if (RotatingBase.getCurrentPosition() > 300) {
+//                    if (dropConeHigh) {
+//                        semiAutoMode = false;
+//                        semi_auto_HJ_blitz_order++;
+//                    } else {
+//                        RotatingBase.setTargetPosition(560 + SC_AngleAdjustment);
+//                        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                        RotatingBase.setPower(0.7);
+//                    }
+//                }
+//                break;
+//
+//            //high junction for substation blitz
+//            case 7:
+//                if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
+//                    RailControlV2.SetTargetPosition(2725, -1, 1);
+//                    ET.reset();
+//                    semi_auto_HJ_blitz_order++;
+//                }
+//                break;
+//
+//            case 8:
+//                if (HJBET.milliseconds() > 300) {
+//                    ClawSetting = false;
+//                    HJBET.reset();
+//                    semi_auto_HJ_blitz_order = 11;
+//                }
+//                break;
+//
+//            //medium junction
+//            case 21:
+//                if (HJBET.milliseconds() > 450) {
+//                    SetExtendingPositionLowPower(0);
+//                    RailControlV2.SetTargetPosition(2100, -1, 1);
+//                    HJBET.reset();
+//                    semi_auto_HJ_blitz_order++;
+//                }
+//                break;
+//
+//            case 22:
+//                if (HJBET.milliseconds() > 700) {
+//                    RotatingBase.setTargetPosition(1460 + SC_AngleAdjustment);
+//                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    RotatingBase.setPower(1);
+//                    SetExtendingPositionLowPower(0);
+//                    semi_auto_HJ_blitz_order++;
+//                }
+//                break;
+//
+//            case 23:
+//                if (RotatingBase.getCurrentPosition() > 1440) {
+//                    SetExtendingPositionLowPower(120);
+//                    semiAutoMode = true;
+//                    semi_auto_HJ_blitz_order++;
+//                }
+//                break;
+//
+//            //load cone medium junction
+//            case 24:
+//                if (dropConeMedium) {
+//                    semiAutoMode = false;
+//                    semi_auto_HJ_blitz_order++;
+//                } else {
+//                    RotatingBase.setTargetPosition(1460 + SC_AngleAdjustment);
+//                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    RotatingBase.setPower(0.9);
+//                }
+//                break;
+//
+//            case 25:
+//                if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
+//                    RailControlV2.SetTargetPosition(1850, -1, 1);
+//                    HJBET.reset();
+//                    semi_auto_HJ_blitz_order = 7;
+//                }
+//                break;
+//
+//            case 11:
+//                if (HJBET.milliseconds() > 250) {
+//                    SetExtendingPositionLowPower(0);
+//                    RotatingBase.setTargetPosition(-920);
+//                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    RotatingBase.setPower(1);
+////                    BaseControl.SetTargetPosition(1020, -1, 1);
+//                    semi_auto_HJ_blitz_order++;
+//                }
+//                break;
+//
+//            case 12:
+//                if (RotatingBase.getCurrentPosition() < -300) {
+//                    RailControlV2.SetTargetPosition(40, -1, 1);
+//                    semi_auto_HJ_blitz_order++;
+//                }
+//                break;
+//
+//            case 13:
+//                if (RotatingBase.getCurrentPosition() < -100) {
+//                    ExtendingRail.setTargetPosition(200);
+//                    ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    ExtendingRail.setPower(0.5);
+//                    semi_auto_HJ_blitz_order++;
+//                }
+//                break;
+//
+//            case 14:
+//                if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
+//                    ExtendingRail.setTargetPosition(0);
+//                    ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    ExtendingRail.setPower(0.5);
+//                    semi_auto_HJ_blitz_order = 0;
+//                }
+//                break;
+//
+//            default:
+//                break;
+//        }
+//    }
+
+    /** defaults to high junction; press and hold b to go medium junction */
     public void SemiAutoHJBlitz() {
 
         switch (semi_auto_HJ_blitz_order) {
             case 0:
                 if (HJAutoBlitzReady) {
-                    RotatingBase.setTargetPosition(-920);
+                    RotatingBase.setTargetPosition(-930);
                     RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     RotatingBase.setPower(0.7);
                     semi_auto_HJ_blitz_order++;
@@ -2071,10 +2258,10 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 break;
 
             case 1:
-                if (RotatingBase.getCurrentPosition() < -890) {
-                    ExtendingRail.setTargetPosition(470);
+                if (RotatingBase.getCurrentPosition() < -900) {
+                    ExtendingRail.setTargetPosition(510);
                     ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    ExtendingRail.setPower(1);
+                    ExtendingRail.setPower(0.8);
                     HJAutoBlitzReady = false;
                     semi_auto_HJ_blitz_order++;
                 }
@@ -2082,24 +2269,23 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             case 2:
                 if (!HJAutoBlitzReady) {
-                    if (dropConeHigh) {
-                        HJAutoBlitzReady = true;
-                        ClawSetting = true;
-                        HJBET.reset();
-                        semi_auto_HJ_blitz_order = 3;
-                    }
-                    else if (dropConeMedium) {
+                    if (dropConeMedium) {
                         HJAutoBlitzReady = true;
                         ClawSetting = true;
                         HJBET.reset();
                         semi_auto_HJ_blitz_order = 21;
+                    } else {
+                        HJAutoBlitzReady = true;
+                        ClawSetting = true;
+                        HJBET.reset();
+                        semi_auto_HJ_blitz_order = 3;
                     }
                 }
                 break;
 
             //high junction
             case 3:
-                if (HJBET.milliseconds() > 450) {
+                if (HJBET.milliseconds() > 570) {
                     SetExtendingPositionLowPower(0);
                     RailControlV2.SetTargetPosition(2925, -1, 1);
                     HJBET.reset();
@@ -2109,29 +2295,37 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             case 4:
                 if (HJBET.milliseconds() > 700) {
-                    RotatingBase.setTargetPosition(560);
+                    RotatingBase.setTargetPosition(560 + SC_AngleAdjustment);
                     RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    RotatingBase.setPower(0.45);
-                    SetExtendingPositionLowPower(110);
+                    RotatingBase.setPower(0.9);
                     semiAutoMode = true;
                     semi_auto_HJ_blitz_order++;
                 }
                 break;
 
-            //load cone high junction
             case 5:
-                if (dropConeHigh) {
-                    semiAutoMode = false;
+                if (RotatingBase.getCurrentPosition() > 550) {
+                    SetExtendingPosition(120);
                     semi_auto_HJ_blitz_order++;
-                } else {
-                    RotatingBase.setTargetPosition(560 + SC_AngleAdjustment);
-                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    RotatingBase.setPower(0.9);
+                }
+                break;
+
+            //load cone high junction
+            case 6:
+                if (RotatingBase.getCurrentPosition() > 300 && ExtendingRail.getCurrentPosition() > 110) {
+                    if (dropConeHigh) {
+                        semiAutoMode = false;
+                        semi_auto_HJ_blitz_order++;
+                    } else {
+                        RotatingBase.setTargetPosition(560 + SC_AngleAdjustment);
+                        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        RotatingBase.setPower(0.7);
+                    }
                 }
                 break;
 
             //high junction for substation blitz
-            case 6:
+            case 7:
                 if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
                     RailControlV2.SetTargetPosition(2725, -1, 1);
                     ET.reset();
@@ -2139,7 +2333,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 }
                 break;
 
-            case 7:
+            case 8:
                 if (HJBET.milliseconds() > 300) {
                     ClawSetting = false;
                     HJBET.reset();
@@ -2149,7 +2343,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             //medium junction
             case 21:
-                if (HJBET.milliseconds() > 450) {
+                if (HJBET.milliseconds() > 570) {
                     SetExtendingPositionLowPower(0);
                     RailControlV2.SetTargetPosition(2100, -1, 1);
                     HJBET.reset();
@@ -2159,17 +2353,17 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             case 22:
                 if (HJBET.milliseconds() > 700) {
-                    RotatingBase.setTargetPosition(1460);
+                    SetExtendingPositionLowPower(0);
+                    RotatingBase.setTargetPosition(1460 + SC_AngleAdjustment);
                     RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     RotatingBase.setPower(1);
-                    SetExtendingPositionLowPower(0);
                     semi_auto_HJ_blitz_order++;
                 }
                 break;
 
             case 23:
-                if (RotatingBase.getCurrentPosition() > 1200) {
-                    SetExtendingPositionLowPower(120);
+                if (RotatingBase.getCurrentPosition() > 1450) {
+                    SetExtendingPosition(130);
                     semiAutoMode = true;
                     semi_auto_HJ_blitz_order++;
                 }
@@ -2177,13 +2371,15 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             //load cone medium junction
             case 24:
-                if (dropConeMedium) {
-                    semiAutoMode = false;
-                    semi_auto_HJ_blitz_order++;
-                } else {
-                    RotatingBase.setTargetPosition(1460 + SC_AngleAdjustment);
-                    RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    RotatingBase.setPower(0.9);
+                if (RotatingBase.getCurrentPosition() > 1440 && ExtendingRail.getCurrentPosition() > 120) {
+                    if (dropConeMedium) {
+                        semiAutoMode = false;
+                        semi_auto_HJ_blitz_order++;
+                    } else {
+                        RotatingBase.setTargetPosition(1460 + SC_AngleAdjustment);
+                        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        RotatingBase.setPower(0.9);
+                    }
                 }
                 break;
 
@@ -2191,17 +2387,16 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
                     RailControlV2.SetTargetPosition(1850, -1, 1);
                     HJBET.reset();
-                    semi_auto_HJ_blitz_order = 7;
+                    semi_auto_HJ_blitz_order = 8;
                 }
                 break;
 
             case 11:
                 if (HJBET.milliseconds() > 250) {
                     SetExtendingPositionLowPower(0);
-                    RotatingBase.setTargetPosition(-920);
+                    RotatingBase.setTargetPosition(-930);
                     RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     RotatingBase.setPower(1);
-//                    BaseControl.SetTargetPosition(1020, -1, 1);
                     semi_auto_HJ_blitz_order++;
                 }
                 break;
