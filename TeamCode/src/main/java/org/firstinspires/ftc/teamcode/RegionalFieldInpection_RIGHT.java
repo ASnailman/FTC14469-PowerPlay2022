@@ -78,6 +78,7 @@ public class RegionalFieldInpection_RIGHT extends LinearOpMode {
     int readVoltOnce = 0;
     int angleAdjustment;
     int tickAdjustment;
+    int railAdjustment;
     int extendingAdjustment;
 
     int leftCenterTickCount;
@@ -227,18 +228,22 @@ public class RegionalFieldInpection_RIGHT extends LinearOpMode {
             if (getBatteryVoltage() > 13.7) {
                 angleAdjustment = -22;
                 tickAdjustment = -5;
+                railAdjustment = -30;
             }
             else if (getBatteryVoltage() > 13.2) {
                 angleAdjustment = -12;
                 tickAdjustment = 5;
+                railAdjustment = 0;
             }
             else if (getBatteryVoltage() > 12.7) {
                 angleAdjustment = 5;
                 tickAdjustment = 5;
+                railAdjustment = 10;
             }
             else {
                 angleAdjustment = 5;
                 tickAdjustment = 5;
+                railAdjustment = 40;
             }
             readVoltOnce++;
 
@@ -287,7 +292,7 @@ public class RegionalFieldInpection_RIGHT extends LinearOpMode {
                 case 1:
                     if (ET.milliseconds() > 550) {
                         if (RailControlV2.GetTaskState() == Task_State.INIT || RailControlV2.GetTaskState() == Task_State.READY) {
-                            SetAttachment_LowPwr2Rail(2970, 1220);
+                            SetAttachment_LowPwr2Rail(3025 + railAdjustment, 1220);
 //                            SetAttachment_LowPwr2Rail(2970, 1540 + angleAdjustment);
                             MechDrive.SetTargets(1, 2160, 0.7, 1);
                             programOrder++;
@@ -319,7 +324,7 @@ public class RegionalFieldInpection_RIGHT extends LinearOpMode {
                 case 6:
                     if (MechDrive.GetTaskState() == Task_State.DONE || MechDrive.GetTaskState() == Task_State.READY) {
                         DirectionControl.SetTargetDirection(1, 0.2);
-                        SetAttachmentPositionLowPower(2970, 1570 + angleAdjustment);
+                        SetAttachmentPositionLowPower(3025 + railAdjustment, 1570 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -345,28 +350,28 @@ public class RegionalFieldInpection_RIGHT extends LinearOpMode {
                         }
                         else if (coneLevel == 2) {
                             if (ET.milliseconds() > 400) {
-                                SetAttachmentPositionLowPower(2690, 1492 + angleAdjustment);
+                                SetAttachmentPositionLowPower(2690, 1482 + angleAdjustment);
                                 ET.reset();
                                 programOrder++;
                             }
                         }
                         else if (coneLevel == 3) {
                             if (ET.milliseconds() > 400) {
-                                SetAttachmentPositionLowPower(2690, 1532 + angleAdjustment);
+                                SetAttachmentPositionLowPower(2690, 1542 + angleAdjustment);
                                 ET.reset();
                                 programOrder++;
                             }
                         }
                         else if (coneLevel == 4) {
                             if (ET.milliseconds() > 400) {
-                                SetAttachmentPositionLowPower(1800, 2545);
+                                SetAttachmentPositionLowPower(1800, 2615);
                                 ET.reset();
                                 programOrder++;
                             }
                         }
                         else if (coneLevel == 5) {
                             if (ET.milliseconds() > 400) {
-                                SetAttachmentPositionLowPower(2690, 1552 + angleAdjustment);
+                                SetAttachmentPositionLowPower(1800, 2635);
                                 ET.reset();
                                 programOrder++;
                             }
@@ -396,7 +401,7 @@ public class RegionalFieldInpection_RIGHT extends LinearOpMode {
                 case 9:
                     if (coneLevel == 5) {
                         ET.reset();
-                        programOrder = 17;
+                        programOrder = 18;
                     } else {
                         programOrder++;
                         ET.reset();
@@ -457,49 +462,63 @@ public class RegionalFieldInpection_RIGHT extends LinearOpMode {
 
                 case 15:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPositionLowPower(60);
                         if (coneLevel == 0) {
-                            SetAttachmentPositionLowPower(3025, 1512 + angleAdjustment);
+                            SetExtendingPositionLowPower(80);
+                            SetAttachmentPositionLowPower(3025 + railAdjustment, 1512 + angleAdjustment);
+                            ET.reset();
+                            programOrder = 17;
                         }
                         else if (coneLevel == 1) {
-                            SetAttachmentPositionLowPower(3025, 1492 + angleAdjustment);
+                            SetExtendingPositionLowPower(80);
+                            SetAttachmentPositionLowPower(3025 + railAdjustment, 1482 + angleAdjustment);
+                            ET.reset();
+                            programOrder = 17;
                         }
                         else if (coneLevel == 2) {
-                            SetAttachmentPositionLowPower(3025, 1532 + angleAdjustment);
+                            SetExtendingPositionLowPower(80);
+                            SetAttachmentPositionLowPower(3025 + railAdjustment, 1542 + angleAdjustment);
+                            ET.reset();
+                            programOrder = 17;
                         }
                         else if (coneLevel == 3) {
-                            SetAttachmentPositionLowPower(2170, 2545);
+                            SetExtendingPosition(0);
+                            RailControlV2.SetTargetPosition(2170, -1, 1);
+                            BaseControl.SetTargetPosition(1900, -0.8, 0.8);
+                            ET.reset();
+                            programOrder++;
                         }
                         else if (coneLevel == 4) {
-                            SetAttachmentPositionLowPower(3025, 1552 + angleAdjustment);
+                            SetExtendingPosition(0);
+                            RailControlV2.SetTargetPosition(2170, -1, 1);
+                            BaseControl.SetTargetPosition(1920, -0.8, 0.8);
+                            ET.reset();
+                            programOrder++;
                         }
-                        ET.reset();
+                    }
+                    break;
+
+                case 16:
+                    if (BaseControl.GetTaskState() == Task_State.DONE || BaseControl.GetTaskState() == Task_State.READY) {
+                        if (coneLevel == 3) {
+                            BaseControl.SetTargetPosition(2615 + angleAdjustment, -0.5, 0.5);
+                        }
+                        else if (coneLevel == 4) {
+                            BaseControl.SetTargetPosition(2635 + angleAdjustment, -0.5, 0.5);
+                        }
+                        SetExtendingPositionLowPower(160 + tickAdjustment);
                         programOrder++;
                     }
                     break;
 
-//                case 16:
-//                    if (ExtendingRail.getCurrentPosition() < 10) {
-//                        ExtendingRail.setPower(0);
-//                        ET.reset();
-//                        programOrder++;
-//                    }
-//                    break;
-
-                case 16:
-                    if (RotatingBase.getCurrentPosition() > 1900 && coneLevel == 3) {
-                        SetExtendingPositionLowPower(150);
-                    }
-                    if (ET.milliseconds() > 100) {
-                        ET.reset();
-                        coneLevel++;
-                        if (coneLevel < 6) {
-                            programOrder = 7;
-                        }
+                case 17:
+                    ET.reset();
+                    coneLevel++;
+                    if (coneLevel < 6) {
+                        programOrder = 7;
                     }
                     break;
 
-                case 17:
+                case 18:
 //                    if (ET.milliseconds() > 200) {
 //                        SetAttachmentPosition(0,0);
 //                        MechDrive.SetTargets(0, 50, 0.3, 1);
@@ -508,7 +527,7 @@ public class RegionalFieldInpection_RIGHT extends LinearOpMode {
 //                    }
                     break;
 
-                case 18:
+                case 19:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
 
@@ -532,7 +551,7 @@ public class RegionalFieldInpection_RIGHT extends LinearOpMode {
                     }
                     break;
 
-                case 19:
+                case 20:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
                         SetAttachmentPosition(0, 1020);
@@ -711,13 +730,19 @@ public class RegionalFieldInpection_RIGHT extends LinearOpMode {
     public void SetExtendingPosition(int extendingPos) {
         ExtendingRail.setTargetPosition(extendingPos);
         ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        ExtendingRail.setPower(1);
+        ExtendingRail.setPower(0.8);
     }
 
     public void SetExtendingPositionLowPower(int extendingPos) {
         ExtendingRail.setTargetPosition(extendingPos);
         ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ExtendingRail.setPower(0.6);
+    }
+
+    public void SetExtendingPositionLowPowerMedium(int extendingPos) {
+        ExtendingRail.setTargetPosition(extendingPos);
+        ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ExtendingRail.setPower(0.3);
     }
 
     public void SetAttachmentPositionLowPower(int railPos, int basePos) {

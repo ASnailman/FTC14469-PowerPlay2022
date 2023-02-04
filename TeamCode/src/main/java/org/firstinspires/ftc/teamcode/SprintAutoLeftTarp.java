@@ -84,6 +84,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
     int readVoltOnce = 0;
     int angleAdjustment;
     int tickAdjustment;
+    int railAdjustment;
     int extendingAdjustment;
 
     int leftCenterTickCount;
@@ -233,18 +234,22 @@ public class SprintAutoLeftTarp extends LinearOpMode {
             if (getBatteryVoltage() > 13.7) {
                 angleAdjustment = 22;
                 tickAdjustment = -5;
+                railAdjustment = -30;
             }
             else if (getBatteryVoltage() > 13.2) {
                 angleAdjustment = 12;
                 tickAdjustment = 5;
+                railAdjustment = 0;
             }
             else if (getBatteryVoltage() > 12.7) {
                 angleAdjustment = -5;
                 tickAdjustment = 5;
+                railAdjustment = 10;
             }
             else {
                 angleAdjustment = -5;
                 tickAdjustment = 5;
+                railAdjustment = 40;
             }
             readVoltOnce++;
 
@@ -293,7 +298,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                 case 1:
                     if (ET.milliseconds() > 550) {
                         if (RailControlV2.GetTaskState() == Task_State.INIT || RailControlV2.GetTaskState() == Task_State.READY) {
-                            SetAttachment_LowPwr2Rail(2970, -1220);
+                            SetAttachment_LowPwr2Rail(3025 + railAdjustment, -1220);
 //                            SetAttachment_LowPwr2Rail(2970, 1540 + angleAdjustment);
                             MechDrive.SetTargets(-1, 2160, 0.7, 1);
                             programOrder++;
@@ -325,7 +330,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                 case 6:
                     if (MechDrive.GetTaskState() == Task_State.DONE || MechDrive.GetTaskState() == Task_State.READY) {
                         DirectionControl.SetTargetDirection(-2, 0.2);
-                        SetAttachmentPositionLowPower(2970, -1570 + angleAdjustment);
+                        SetAttachmentPositionLowPower(3025 + railAdjustment, -1570 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -428,9 +433,9 @@ public class SprintAutoLeftTarp extends LinearOpMode {
 
                 case 15:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPositionLowPower(70);
+                        SetExtendingPositionLowPower(80);
 //                        SetExtendingPositionLowPower(92 + tickAdjustment);
-                        SetAttachmentPositionLowPower(3025, -1512 + angleAdjustment);
+                        SetAttachmentPositionLowPower(3025 + railAdjustment, -1512 + angleAdjustment);
                         //NO TARP
 //                        SetAttachmentPositionLowPower(3055, -1542 + angleAdjustment);
                         ET.reset();

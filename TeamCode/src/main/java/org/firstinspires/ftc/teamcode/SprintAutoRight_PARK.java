@@ -291,10 +291,10 @@ public class SprintAutoRight_PARK extends LinearOpMode {
                             SetAttachmentPosition(1300, 1020);
                             ET.reset();
                         } else if (posTwo) {
-                            SetAttachmentPosition(200, 1020);
+                            SetAttachmentPosition(300, 1020);
                             ET.reset();
                         } else if (posThree) {
-                            SetAttachmentPosition(1300, 1020);
+                            SetAttachmentPosition(300, 1020);
                             ET.reset();
                         }
                         programOrder++;
@@ -323,10 +323,17 @@ public class SprintAutoRight_PARK extends LinearOpMode {
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
                         MechDrive.SetTargets(0, 1700, 0.6, 1);
-                        SetAttachmentPosition(200, 1020);
+                        SetAttachmentPosition(300, 1020);
                         programOrder++;
                     }
                     break;
+
+                case 4:
+                    if (RailControlV2.GetTaskState() == Task_State.READY ||
+                            RailControlV2.GetTaskState() == Task_State.DONE) {
+                        RailControlV2.SetTargetPosition(0, -0.5, 0.5);
+                        programOrder++;
+                    }
 
                 default:
                     break;
@@ -487,11 +494,11 @@ public class SprintAutoRight_PARK extends LinearOpMode {
     }
 
     public void SetAttachmentPosition(int railPos, int basePos) {
-        RailControlV2.SetTargetPosition(railPos, -1, 1);
+        RailControlV2.SetTargetPosition(railPos, -0.7, 0.7);
 //        RotatingBase.setTargetPosition(basePos);
 //        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //        RotatingBase.setPower(1);
-        BaseControl.SetTargetPosition(basePos, -1, 1);
+        BaseControl.SetTargetPosition(basePos, -0.7, 0.7);
     }
 
     public void SetExtendingPosition(int extendingPos) {
