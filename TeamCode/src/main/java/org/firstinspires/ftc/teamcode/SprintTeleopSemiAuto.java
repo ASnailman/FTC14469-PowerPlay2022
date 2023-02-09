@@ -2341,7 +2341,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             case 23:
                 if (RotatingBase.getCurrentPosition() > 1450) {
-                    SetExtendingPosition(130);
+                    SetExtendingPosition(145);
                     semiAutoMode = true;
                     semi_auto_HJ_blitz_order++;
                 }
@@ -2349,7 +2349,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             //load cone medium junction
             case 24:
-                if (RotatingBase.getCurrentPosition() > 1440 && ExtendingRail.getCurrentPosition() > 120) {
+                if (RotatingBase.getCurrentPosition() > 1440 && ExtendingRail.getCurrentPosition() > 135) {
                     if (dropConeMedium) {
                         semiAutoMode = false;
                         semi_auto_HJ_blitz_order++;

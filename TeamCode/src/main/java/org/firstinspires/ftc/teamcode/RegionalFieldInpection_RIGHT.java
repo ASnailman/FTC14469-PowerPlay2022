@@ -350,7 +350,7 @@ public class RegionalFieldInpection_RIGHT extends LinearOpMode {
                         }
                         else if (coneLevel == 2) {
                             if (ET.milliseconds() > 400) {
-                                SetAttachmentPositionLowPower(2690, 1482 + angleAdjustment);
+                                SetAttachmentPositionLowPower(2690, 1602 + angleAdjustment);
                                 ET.reset();
                                 programOrder++;
                             }
@@ -470,7 +470,7 @@ public class RegionalFieldInpection_RIGHT extends LinearOpMode {
                         }
                         else if (coneLevel == 1) {
                             SetExtendingPositionLowPower(80);
-                            SetAttachmentPositionLowPower(3025 + railAdjustment, 1482 + angleAdjustment);
+                            SetAttachmentPositionLowPower(3025 + railAdjustment, 1602 + angleAdjustment);
                             ET.reset();
                             programOrder = 17;
                         }
