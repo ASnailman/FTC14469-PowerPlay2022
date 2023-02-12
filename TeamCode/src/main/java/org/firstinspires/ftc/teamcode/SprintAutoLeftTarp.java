@@ -80,12 +80,16 @@ public class SprintAutoLeftTarp extends LinearOpMode {
     int repeat = 0;
     ElapsedTime ET = new ElapsedTime();
     ElapsedTime ERT = new ElapsedTime(); //Elapsed Reset Timer
+    ElapsedTime EFT = new ElapsedTime(); //Elapsed Failsafe Timer
     int coneLevel = 0;
     int readVoltOnce = 0;
     int angleAdjustment;
     int tickAdjustment;
     int railAdjustment;
     int extendingAdjustment;
+    int baseTargetPosition;
+    int railTargetPosition;
+    int extendingTargetPosition;
 
     int leftCenterTickCount;
 
@@ -896,61 +900,61 @@ public class SprintAutoLeftTarp extends LinearOpMode {
 //        }
 //    }
 
-    //From Back of robot
-    private void frontRightJunctionDetector() {
-        if (frontRightDistanceSamples_Reset) {
-            frontRightDistanceSamples[0] = 819;
-            frontRightDistanceSamples[1] = 819;
-            frontRightDistanceSamples[2] = 819;
-//            frontRightDistanceSamples[3] = 819;
-//            frontRightDistanceSamples[4] = 819;
-            frontRightDistanceSamples_Reset = false;
-        }
-        else {
-//            frontRightDistanceSamples[frontRightCount] = frontRightDistanceSensor.getDistance(DistanceUnit.CM);
-            frontRightCount++;
-            frontRightDistance = (frontRightDistanceSamples[0] + frontRightDistanceSamples[1] + frontRightDistanceSamples[2]) / 3;
+//    //From Back of robot
+//    private void frontRightJunctionDetector() {
+//        if (frontRightDistanceSamples_Reset) {
+//            frontRightDistanceSamples[0] = 819;
+//            frontRightDistanceSamples[1] = 819;
+//            frontRightDistanceSamples[2] = 819;
+////            frontRightDistanceSamples[3] = 819;
+////            frontRightDistanceSamples[4] = 819;
+//            frontRightDistanceSamples_Reset = false;
+//        }
+//        else {
+////            frontRightDistanceSamples[frontRightCount] = frontRightDistanceSensor.getDistance(DistanceUnit.CM);
+//            frontRightCount++;
+//            frontRightDistance = (frontRightDistanceSamples[0] + frontRightDistanceSamples[1] + frontRightDistanceSamples[2]) / 3;
+//
+//            telemetry.addData("Front Right Distance Sensor", frontRightDistance);
+//            if (frontRightDistance < 50) {
+//                rightFrontDistanceCleared = true;
+//            } else {
+//                rightFrontDistanceCleared = false;
+//            }
+//
+//            if (frontRightCount > 2) {
+//                frontRightCount = 0;
+//            }
+//        }
+//    }
 
-            telemetry.addData("Front Right Distance Sensor", frontRightDistance);
-            if (frontRightDistance < 50) {
-                rightFrontDistanceCleared = true;
-            } else {
-                rightFrontDistanceCleared = false;
-            }
-
-            if (frontRightCount > 2) {
-                frontRightCount = 0;
-            }
-        }
-    }
-
-    //From Back of robot
-    private void frontLeftJunctionDetector() {
-
-        if (frontLeftDistanceSamples_Reset) {
-            frontLeftDistanceSamples[0] = 819;
-            frontLeftDistanceSamples[1] = 819;
-            frontLeftDistanceSamples[2] = 819;
-//            frontLeftDistanceSamples[3] = 819;
-//            frontLeftDistanceSamples[4] = 819;
-            frontLeftDistanceSamples_Reset = false;
-        }
-        else {
-//            frontLeftDistanceSamples[frontLeftCount] = frontLeftDistanceSensor.getDistance(DistanceUnit.CM);
-            frontLeftCount++;
-            frontLeftDistance = (frontLeftDistanceSamples[0] + frontLeftDistanceSamples[1] + frontLeftDistanceSamples[2]) / 3;
-
-            telemetry.addData("Front Left Distance Sensor", frontLeftDistance);
-            if (frontLeftDistance < 50) {
-                leftFrontDistanceCleared = true;
-            } else {
-                leftFrontDistanceCleared = false;
-            }
-
-            if (frontLeftCount > 2) {
-                frontLeftCount = 0;
-            }
-        }
-    }
+//    //From Back of robot
+//    private void frontLeftJunctionDetector() {
+//
+//        if (frontLeftDistanceSamples_Reset) {
+//            frontLeftDistanceSamples[0] = 819;
+//            frontLeftDistanceSamples[1] = 819;
+//            frontLeftDistanceSamples[2] = 819;
+////            frontLeftDistanceSamples[3] = 819;
+////            frontLeftDistanceSamples[4] = 819;
+//            frontLeftDistanceSamples_Reset = false;
+//        }
+//        else {
+////            frontLeftDistanceSamples[frontLeftCount] = frontLeftDistanceSensor.getDistance(DistanceUnit.CM);
+//            frontLeftCount++;
+//            frontLeftDistance = (frontLeftDistanceSamples[0] + frontLeftDistanceSamples[1] + frontLeftDistanceSamples[2]) / 3;
+//
+//            telemetry.addData("Front Left Distance Sensor", frontLeftDistance);
+//            if (frontLeftDistance < 50) {
+//                leftFrontDistanceCleared = true;
+//            } else {
+//                leftFrontDistanceCleared = false;
+//            }
+//
+//            if (frontLeftCount > 2) {
+//                frontLeftCount = 0;
+//            }
+//        }
+//    }
 
 }
