@@ -508,6 +508,8 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                 SetAttachmentPosition(0, -1020);
             }
 
+            //monitor code
+
 //            rightColorSensorLineDetector();
 //            leftColorSensorLineDetector();
 //            centerRightColorSensorLineDetector();

@@ -88,8 +88,12 @@ public class SprintAutoRightTarp extends LinearOpMode {
     int railAdjustment;
     int extendingAdjustment;
     int baseTargetPosition;
+    boolean baseMonitorOn = false;
     int railTargetPosition;
+    boolean railMonitorOn = false;
     int extendingTargetPosition;
+    boolean extendingMonitorOn = false;
+
 
     int leftCenterTickCount;
 
@@ -518,11 +522,28 @@ public class SprintAutoRightTarp extends LinearOpMode {
                 SetAttachmentPosition(0, 1020);
             }
 
-//            if (RotatingBase.getCurrentPosition() != targetPosition) {
-//                if (EFT.milliseconds() > 500) {
-//
-//                }
-//            }
+            if (baseMonitorOn) {
+                if (RotatingBase.getCurrentPosition() != baseTargetPosition) {
+                    if (EFT.milliseconds() > 700) {
+                        SetAttachmentPosition(0, 1020);
+                    }
+                }
+            }
+            if (extendingMonitorOn) {
+                if (ExtendingRail.getCurrentPosition() != extendingTargetPosition) {
+                    if (EFT.milliseconds() > 700) {
+                        SetAttachmentPosition(0, 1020);
+                    }
+                }
+            }
+            if (railMonitorOn) {
+                if (RailRight.getCurrentPosition() != railTargetPosition) {
+                    if (EFT.milliseconds() > 700) {
+                        SetAttachmentPosition(0, 1020);
+                    }
+                }
+            }
+
 
 //            rightColorSensorLineDetector();
 //            leftColorSensorLineDetector();
