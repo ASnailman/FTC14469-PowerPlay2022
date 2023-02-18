@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -45,6 +46,7 @@ public class SprintAutoRightTarp extends LinearOpMode {
     static DcMotor ExtendingRail;
     static DcMotor RotatingBase;
     static CRServo Claw;
+    static Servo Stopper;
     static ColorSensor rightColorSensor;
     static ColorSensor leftColorSensor;
     static RevBlinkinLedDriver LightStrip;
@@ -151,6 +153,7 @@ public class SprintAutoRightTarp extends LinearOpMode {
         FrontLeft = hardwareMap.get(DcMotor.class, "FrontLeft");
         FrontRight = hardwareMap.get(DcMotor.class, "FrontRight");
         Claw = hardwareMap.get(CRServo.class, "Claw");
+        Stopper = hardwareMap.get(Servo.class, "Stopper");
         RailRight = hardwareMap.get(DcMotor.class, "RailRight");
         RailLeft = hardwareMap.get(DcMotor.class, "RailLeft");
         ExtendingRail = hardwareMap.get(DcMotor.class, "ExtendingRail");
@@ -183,6 +186,10 @@ public class SprintAutoRightTarp extends LinearOpMode {
         //Claw Presets
         Claw.setDirection(CRServo.Direction.FORWARD);
         Claw.setPower(0);
+
+        //Stopper Presets
+        Stopper.scaleRange(0, 1);
+        Stopper.setPosition(0.8);
 
         //Configrue IMU for GyroTurning
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -543,7 +550,6 @@ public class SprintAutoRightTarp extends LinearOpMode {
                     }
                 }
             }
-
 
 //            rightColorSensorLineDetector();
 //            leftColorSensorLineDetector();

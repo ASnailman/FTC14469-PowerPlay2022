@@ -36,7 +36,8 @@ public class SprintTeleopTest extends LinearOpMode {
     static DcMotor RotatingBase;
     //    static CRServo LeftClaw;
 //    static CRServo RightClaw;
-    static Servo Claw;
+    static CRServo Claw;
+    static CRServo Stopper;
     static ColorSensor rightColorSensor;
     static ColorSensor leftColorSensor;
 
@@ -167,7 +168,8 @@ public class SprintTeleopTest extends LinearOpMode {
         FrontRight = hardwareMap.get(DcMotor.class, "FrontRight");
 //        LeftClaw = hardwareMap.get(CRServo.class, "leftClaw");
 //        RightClaw = hardwareMap.get(CRServo.class, "rightClaw");
-        Claw = hardwareMap.get(Servo.class, "Claw");
+        Claw = hardwareMap.get(CRServo.class, "Claw");
+        Stopper = hardwareMap.get(CRServo.class, "Stopper");
         RailLeft = hardwareMap.get(DcMotor.class, "RailLeft");
         RailRight = hardwareMap.get(DcMotor.class, "RailRight");
         ExtendingRail = hardwareMap.get(DcMotor.class, "ExtendingRail");
@@ -191,11 +193,11 @@ public class SprintTeleopTest extends LinearOpMode {
         //Attachment Presets
         AttachmentMotorPresets();
 
-        //Claw Presets
-//        Claw.setDirection(DcMotorSimple.Direction.FORWARD);
-        Claw.setDirection(Servo.Direction.FORWARD);
-        Claw.scaleRange(0, 1);
-        Claw.setPosition(0);
+//        Claw Presets
+        Claw.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        //Stopper Presets
+        Stopper.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //Configrue IMU for GyroTurning
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -228,8 +230,6 @@ public class SprintTeleopTest extends LinearOpMode {
             /*****************************************************************
              * Bumper Right (G1) - Set Low Power Mode/High Power Mode for driving
              *****************************************************************/
-
-
 
             if (gamepad1.right_bumper) {
                 PowerSetting = true;
@@ -325,12 +325,19 @@ public class SprintTeleopTest extends LinearOpMode {
             }
 
             if (!ClawSetting) {
-//                Claw.setPower(-0.4);
-                Claw.setPosition(0);
+                Claw.setPower(-0.4);
             } else {
-//                Claw.setPower(1);
-                Claw.setPosition(1);
+                Claw.setPower(1);
             }
+
+                if (gamepad2.dpad_right) {
+                    Stopper.setPower(0.6);
+                    button_dpad_up_already_pressed2 = true;
+                }
+                if (gamepad2.dpad_down) {
+                    Stopper.setPower(-0.7);
+                    button_dpad_up_already_pressed2 = false;
+                }
 
             switch (targetJunction) {
                 case 1:
@@ -922,44 +929,44 @@ public class SprintTeleopTest extends LinearOpMode {
              * Button Dpad Right (G2) : Bring rail down without opening claw
              *****************************************************************/
 
-            //Lower Rail In the Direction it is facing
-            if (!button_dpad_right_already_pressed2) {
-                if (gamepad2.dpad_right) {
-                    //code for releasing cone and resetting base
-                    ClawSetting = true;
-                    coneStackMode = false;
-                    groundJunctionMode = false;
-                    changeBaseDeg60 = false;
-//                    Claw.setPower(1);
-                    RailControlV2.SetTargetPosition(0, -1, 1);
-                    button_dpad_right_already_pressed2 = true;
-                }
-            } else {
-                if (!gamepad2.dpad_right) {
-                    button_dpad_right_already_pressed2 = false;
-                }
-            }
+//            //Lower Rail In the Direction it is facing
+//            if (!button_dpad_right_already_pressed2) {
+//                if (gamepad2.dpad_right) {
+//                    //code for releasing cone and resetting base
+//                    ClawSetting = true;
+//                    coneStackMode = false;
+//                    groundJunctionMode = false;
+//                    changeBaseDeg60 = false;
+////                    Claw.setPower(1);
+//                    RailControlV2.SetTargetPosition(0, -1, 1);
+//                    button_dpad_right_already_pressed2 = true;
+//                }
+//            } else {
+//                if (!gamepad2.dpad_right) {
+//                    button_dpad_right_already_pressed2 = false;
+//                }
+//            }
 
             /*****************************************************************
              * Button Dpad Down (G2) : Set Rail For Ground Junction
              *****************************************************************/
 
-            if (!button_dpad_down_already_pressed2) {
-                if (gamepad2.dpad_down) {
-                    //code for picking up cone for ground junction
-                    ClawSetting = true;
-                    coneStackMode = false;
-                    groundJunctionMode = true;
-//                    changeBaseDeg60 = true;
-//                    Claw.setPower(1);
-                    targetJunction = 13;
-                    button_dpad_down_already_pressed2 = true;
-                }
-            } else {
-                if (!gamepad2.dpad_down) {
-                    button_dpad_down_already_pressed2 = false;
-                }
-            }
+//            if (!button_dpad_down_already_pressed2) {
+//                if (gamepad2.dpad_down) {
+//                    //code for picking up cone for ground junction
+//                    ClawSetting = true;
+//                    coneStackMode = false;
+//                    groundJunctionMode = true;
+////                    changeBaseDeg60 = true;
+////                    Claw.setPower(1);
+//                    targetJunction = 13;
+//                    button_dpad_down_already_pressed2 = true;
+//                }
+//            } else {
+//                if (!gamepad2.dpad_down) {
+//                    button_dpad_down_already_pressed2 = false;
+//                }
+//            }
 
 //            /*****************************************************************
 //             * Bumper Right (G1) : Reset Rail to 0

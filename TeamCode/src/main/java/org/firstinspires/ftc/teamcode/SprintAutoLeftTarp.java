@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -45,6 +46,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
     static DcMotor ExtendingRail;
     static DcMotor RotatingBase;
     static CRServo Claw;
+    static Servo Stopper;
     static ColorSensor rightColorSensor;
     static ColorSensor leftColorSensor;
     static RevBlinkinLedDriver LightStrip;
@@ -88,8 +90,11 @@ public class SprintAutoLeftTarp extends LinearOpMode {
     int railAdjustment;
     int extendingAdjustment;
     int baseTargetPosition;
+    boolean baseMonitorOn = false;
     int railTargetPosition;
+    boolean railMonitorOn = false;
     int extendingTargetPosition;
+    boolean extendingMonitorOn = false;
 
     int leftCenterTickCount;
 
@@ -147,6 +152,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
         FrontLeft = hardwareMap.get(DcMotor.class, "FrontLeft");
         FrontRight = hardwareMap.get(DcMotor.class, "FrontRight");
         Claw = hardwareMap.get(CRServo.class, "Claw");
+        Stopper = hardwareMap.get(Servo.class, "Stopper");
         RailRight = hardwareMap.get(DcMotor.class, "RailRight");
         RailLeft = hardwareMap.get(DcMotor.class, "RailLeft");
         ExtendingRail = hardwareMap.get(DcMotor.class, "ExtendingRail");
@@ -179,6 +185,10 @@ public class SprintAutoLeftTarp extends LinearOpMode {
         //Claw Presets
         Claw.setDirection(CRServo.Direction.FORWARD);
         Claw.setPower(0);
+
+        //Stopper Presets
+        Stopper.scaleRange(0, 1);
+        Stopper.setPosition(0.8);
 
         //Configrue IMU for GyroTurning
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -508,7 +518,27 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                 SetAttachmentPosition(0, -1020);
             }
 
-            //monitor code
+            if (baseMonitorOn) {
+                if (RotatingBase.getCurrentPosition() != baseTargetPosition) {
+                    if (EFT.milliseconds() > 700) {
+                        SetAttachmentPosition(0, 1020);
+                    }
+                }
+            }
+            if (extendingMonitorOn) {
+                if (ExtendingRail.getCurrentPosition() != extendingTargetPosition) {
+                    if (EFT.milliseconds() > 700) {
+                        SetAttachmentPosition(0, 1020);
+                    }
+                }
+            }
+            if (railMonitorOn) {
+                if (RailRight.getCurrentPosition() != railTargetPosition) {
+                    if (EFT.milliseconds() > 700) {
+                        SetAttachmentPosition(0, 1020);
+                    }
+                }
+            }
 
 //            rightColorSensorLineDetector();
 //            leftColorSensorLineDetector();

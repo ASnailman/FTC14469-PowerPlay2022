@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -38,6 +39,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
     //    static CRServo LeftClaw;
 //    static CRServo RightClaw;
     static CRServo Claw;
+    static Servo Stopper;
     static ColorSensor rightColorSensor;
     static ColorSensor leftColorSensor;
 
@@ -169,6 +171,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 //        LeftClaw = hardwareMap.get(CRServo.class, "leftClaw");
 //        RightClaw = hardwareMap.get(CRServo.class, "rightClaw");
         Claw = hardwareMap.get(CRServo.class, "Claw");
+        Stopper = hardwareMap.get(Servo.class, "Stopper");
         RailLeft = hardwareMap.get(DcMotor.class, "RailLeft");
         RailRight = hardwareMap.get(DcMotor.class, "RailRight");
         ExtendingRail = hardwareMap.get(DcMotor.class, "ExtendingRail");
@@ -194,6 +197,10 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
         //Claw Presets
         Claw.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        //Stopper Presets
+        Stopper.scaleRange(0, 1);
+        Stopper.setPosition(0.8);
 
         //Configrue IMU for GyroTurning
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
