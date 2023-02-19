@@ -46,7 +46,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
     static DcMotor ExtendingRail;
     static DcMotor RotatingBase;
     static CRServo Claw;
-    static Servo Stopper;
+    static CRServo Stopper;
     static ColorSensor rightColorSensor;
     static ColorSensor leftColorSensor;
     static RevBlinkinLedDriver LightStrip;
@@ -152,7 +152,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
         FrontLeft = hardwareMap.get(DcMotor.class, "FrontLeft");
         FrontRight = hardwareMap.get(DcMotor.class, "FrontRight");
         Claw = hardwareMap.get(CRServo.class, "Claw");
-        Stopper = hardwareMap.get(Servo.class, "Stopper");
+        Stopper = hardwareMap.get(CRServo.class, "Stopper");
         RailRight = hardwareMap.get(DcMotor.class, "RailRight");
         RailLeft = hardwareMap.get(DcMotor.class, "RailLeft");
         ExtendingRail = hardwareMap.get(DcMotor.class, "ExtendingRail");
@@ -187,8 +187,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
         Claw.setPower(0);
 
         //Stopper Presets
-        Stopper.scaleRange(0, 1);
-        Stopper.setPosition(0.8);
+        Stopper.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //Configrue IMU for GyroTurning
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -282,6 +281,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                         posTwo = false;
                         posThree = false;
                         Claw.setPower(1);
+                        Stopper.setPower(-0.4);
                         ET.reset();
                         ERT.reset();
                     } else if (pipeline.type == VisionClassAutoLeftBlue.SignalDeterminationPipeline.SignalSleeveType.LocationTWO) {
@@ -289,6 +289,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                         posTwo = true;
                         posThree = false;
                         Claw.setPower(1);
+                        Stopper.setPower(-0.4);
                         ET.reset();
                         ERT.reset();
                     } else if (pipeline.type == VisionClassAutoLeftBlue.SignalDeterminationPipeline.SignalSleeveType.LocationTHREE) {
@@ -296,6 +297,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                         posTwo = false;
                         posThree = true;
                         Claw.setPower(1);
+                        Stopper.setPower(-0.4);
                         ET.reset();
                         ERT.reset();
                     } else {
@@ -303,6 +305,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                         posTwo = true;
                         posThree = false;
                         Claw.setPower(1);
+                        Stopper.setPower(-0.4);
                         ET.reset();
                         ERT.reset();
                     }
@@ -314,18 +317,22 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                         if (RailControlV2.GetTaskState() == Task_State.INIT || RailControlV2.GetTaskState() == Task_State.READY) {
                             SetAttachment_LowPwr2Rail(3025 + railAdjustment, -1220);
 //                            SetAttachment_LowPwr2Rail(2970, 1540 + angleAdjustment);
-                            MechDrive.SetTargets(-1, 2160, 0.7, 1);
+                            MechDrive.SetTargets(-3, 2160, 0.7, 1);
                             programOrder++;
                         }
                     }
                     break;
 
                 case 2:
+                    ET.reset();
                     programOrder++;
                     break;
 
                 case 3:
-                    programOrder++;
+                    if (ET.milliseconds() > 700) {
+                        Stopper.setPower(0.6);
+                        programOrder++;
+                    }
                     break;
 
                 case 4:
@@ -334,17 +341,15 @@ public class SprintAutoLeftTarp extends LinearOpMode {
 
                 case 5:
                     if (RotatingBase.getCurrentPosition() <= -1170 && RotatingBase.getCurrentPosition() >= -1270) {
-
                         SetExtendingPosition(110 + tickAdjustment);
                         programOrder++;
-
                     }
                     break;
 
                 case 6:
                     if (MechDrive.GetTaskState() == Task_State.DONE || MechDrive.GetTaskState() == Task_State.READY) {
                         DirectionControl.SetTargetDirection(-2, 0.2);
-                        SetAttachmentPositionLowPower(3025 + railAdjustment, -1660 + angleAdjustment);
+                        SetAttachmentPositionLowPower(3025 + railAdjustment, -1700 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -355,15 +360,15 @@ public class SprintAutoLeftTarp extends LinearOpMode {
 //                                RailControlV2.GetTaskState() == Task_State.READY)) {
                     if (BaseControl.GetTaskState() == Task_State.READY || BaseControl.GetTaskState() == Task_State.DONE) {
                         if (coneLevel == 0) {
-                            if (ET.milliseconds() > 400) {
-                                SetAttachment_LowPwrRail(2690, -1670 + angleAdjustment);
+                            if (ET.milliseconds() > 200) {
+                                SetAttachment_LowPwrRail(2690, -1700 + angleAdjustment);
                                 ET.reset();
                                 programOrder++;
                             }
                         }
                         else {
-                            if (ET.milliseconds() > 400) {
-                                SetAttachment_LowPwrRail(2690, -1602 + angleAdjustment);
+                            if (ET.milliseconds() > 200) {
+                                SetAttachment_LowPwrRail(2690, -1642 + angleAdjustment);
                                 //NO TARP
 //                                SetAttachment_LowPwrRail(2690, -1542 + angleAdjustment);
                                 ET.reset();
@@ -374,7 +379,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                     break;
 
                 case 8:
-                    if (ET.milliseconds() > 300) {
+                    if (ET.milliseconds() > 200) {
                         Claw.setPower(-0.4);
                         if (Claw.getPower() < -0.3) {
                             programOrder++;
@@ -385,6 +390,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
 
                 case 9:
                     if (coneLevel == 5) {
+                        Stopper.setPower(-0.8);
                         ET.reset();
                         programOrder = 17;
                     } else {
@@ -396,6 +402,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                 case 10:
                     if (ET.milliseconds() > 200) {
                         SetAttachmentPosition(2690, 0);
+                        Stopper.setPower(-0.8);
                         SetExtendingPositionLowPower(0);
                         programOrder++;
                     }
@@ -404,19 +411,19 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                 case 11:
                     if (RotatingBase.getCurrentPosition() > -1020) {
                         if (coneLevel == 0) {
-                            SetAttachmentPosition(570, 0);
+                            SetAttachmentPosition(570, -30);
                         }
                         else if (coneLevel == 1) {
-                            SetAttachmentPosition(490, 0);
+                            SetAttachmentPosition(490, -30);
                         }
                         else if (coneLevel == 2) {
-                            SetAttachmentPosition(380, 0);
+                            SetAttachmentPosition(380, -30);
                         }
                         else if (coneLevel == 3) {
-                            SetAttachmentPosition(295, 0);
+                            SetAttachmentPosition(295, -30);
                         }
                         else if (coneLevel == 4) {
-                            SetAttachmentPosition(180, 0);
+                            SetAttachmentPosition(180, -30);
                         }
                         programOrder++;
                     }
@@ -424,7 +431,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
 
                 case 12:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPosition(560 + tickAdjustment);
+                        SetExtendingPosition(590 + tickAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -447,9 +454,10 @@ public class SprintAutoLeftTarp extends LinearOpMode {
 
                 case 15:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPositionLowPower(80);
+                        SetExtendingPositionLowPower(90);
+                        Stopper.setPower(0.6);
 //                        SetExtendingPositionLowPower(92 + tickAdjustment);
-                        SetAttachmentPositionLowPower(3025 + railAdjustment, -1602 + angleAdjustment);
+                        SetAttachmentPositionLowPower(2985 + railAdjustment, -1642 + angleAdjustment);
                         //NO TARP
 //                        SetAttachmentPositionLowPower(3055, -1542 + angleAdjustment);
                         ET.reset();
@@ -471,8 +479,10 @@ public class SprintAutoLeftTarp extends LinearOpMode {
 //                    if (ET.milliseconds() > 200) {
 //                        SetAttachmentPosition(0,0);
 //                        MechDrive.SetTargets(0, 50, 0.3, 1);
-                    DirectionControl.Override();
-                    programOrder++;
+                    if (ET.milliseconds() > 300) {
+                        DirectionControl.Override();
+                        programOrder++;
+                    }
 //                    }
                     break;
 
