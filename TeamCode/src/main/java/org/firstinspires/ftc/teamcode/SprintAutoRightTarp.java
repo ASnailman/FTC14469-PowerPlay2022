@@ -350,7 +350,7 @@ public class SprintAutoRightTarp extends LinearOpMode {
                 case 6:
                     if (MechDrive.GetTaskState() == Task_State.DONE || MechDrive.GetTaskState() == Task_State.READY) {
                         DirectionControl.SetTargetDirection(1, 0.2);
-                        SetAttachmentPositionLowPower(3025 + railAdjustment, 1730 + angleAdjustment);
+                        SetAttachmentPositionLowPower(3025 + railAdjustment, 1700 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -362,14 +362,14 @@ public class SprintAutoRightTarp extends LinearOpMode {
                     if (BaseControl.GetTaskState() == Task_State.READY || BaseControl.GetTaskState() == Task_State.DONE) {
                         if (coneLevel == 0) {
                             if (ET.milliseconds() > 200) {
-                                SetAttachment_LowPwrRail(2690, 1740 + angleAdjustment);
+                                SetAttachment_LowPwrRail(2690, 1700 + angleAdjustment);
                                 ET.reset();
                                 programOrder++;
                             }
                         }
                         else {
                             if (ET.milliseconds() > 200) {
-                                SetAttachment_LowPwrRail(2690, 1672 + angleAdjustment);
+                                SetAttachment_LowPwrRail(2690, 1622 + angleAdjustment);
                                 //NO TARP
 //                                SetAttachment_LowPwrRail(2690, 1542 + angleAdjustment);
                                 ET.reset();
@@ -457,10 +457,10 @@ public class SprintAutoRightTarp extends LinearOpMode {
                 case 15:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
 //                        SetExtendingPositionLowPower(85 + tickAdjustment);
-                        SetExtendingPositionLowPower(80);
+                        SetExtendingPositionLowPower(100);
                         Stopper.setPower(0.6);
 //                        SetExtendingPositionLowPower(0);
-                        SetAttachmentPositionLowPower(3025 + railAdjustment, 1672 + angleAdjustment);
+                        SetAttachmentPositionLowPower(2985 + railAdjustment, 1622 + angleAdjustment);
                         //NO TARP
 //                        SetAttachmentPositionLowPower(3055, 1542 + angleAdjustment);
                         ET.reset();

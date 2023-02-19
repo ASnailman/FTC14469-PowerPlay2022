@@ -77,6 +77,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
     boolean lowJunctionResetMode;
     boolean PowerSetting = false;
     boolean ClawSetting = false;
+    boolean StopperSetting = false;
     boolean originalMode = false;
     boolean coneStackMode = false;
     boolean groundJunctionMode = false;
@@ -200,6 +201,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
         //Stopper Presets
         Stopper.setDirection(DcMotorSimple.Direction.FORWARD);
+        Stopper.setPower(-0.4);
 
         //Configrue IMU for GyroTurning
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -232,8 +234,6 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             /*****************************************************************
              * Bumper Right (G1) - Set Low Power Mode/High Power Mode for driving
              *****************************************************************/
-
-
 
             if (gamepad1.right_bumper) {
                 PowerSetting = true;
@@ -334,6 +334,31 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 Claw.setPower(1);
             }
 
+            /*****************************************************************
+             * Button Back (G1) - Open/Close Stopper
+             *****************************************************************/
+
+            if (!button_back_already_pressed) {
+                if (gamepad1.back) {
+                    if (!StopperSetting) {
+                        StopperSetting = true;
+                    } else {
+                        StopperSetting = false;
+                    }
+                    button_back_already_pressed = true;
+                }
+            } else {
+                if (!gamepad1.back) {
+                    button_back_already_pressed = false;
+                }
+            }
+
+            if (!StopperSetting) {
+                Stopper.setPower(-0.7);
+            } else {
+                Stopper.setPower(0.6);
+            }
+
             switch (targetJunction) {
                 case 1:
                     ET.reset();
@@ -343,6 +368,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     if (ET.milliseconds() > 100) {
 //                        SetExtendingPosition(0);
                         RailControlV2.SetTargetPosition(1280, -1, 1);
+                        StopperSetting = false;
                         ClawSetting = false;
                         Claw.setPower(-0.4);
                         ET.reset();
@@ -367,6 +393,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
                 case 6:
                     if (ET.milliseconds() > 600 + delayOffset) {
+                        StopperSetting = true;
                         RailControlV2.SetTargetPosition(2150, -1, 1);
                         ET.reset();
                         targetJunction++;
@@ -385,13 +412,13 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
                 case 9:
                     ET.reset();
-
                     changeBaseDeg60 = true;
                     targetJunction++;
                     break;
 
                 case 10:
                     if (ET.milliseconds() > 600 + delayOffset) {
+                        StopperSetting = true;
                         RailControlV2.SetTargetPosition(2950, -1, 1);
                         ET.reset();
                         targetJunction++;
@@ -448,9 +475,10 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     }
                     break;
                 case 19:
-                    if (ET.milliseconds() > 500) {
+                    if (ET.milliseconds() > 600) {
                         SetExtendingPositionLowPower(0);
                         SetBasePositionRTP(0);
+//                        StopperSetting = true;
                         targetJunction++;
                     }
                     break;
@@ -459,15 +487,23 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     break;
 
                 case 21:
-                    changeBaseDeg60 = false;
-                    delayOffset = 0;
-                    SetExtendingPositionLowPower(0);
-                    RailControlV2.SetTargetPosition(0, -1, 1);
+                    StopperSetting = false;
                     ET.reset();
                     targetJunction++;
                     break;
 
                 case 22:
+                    if (ET.milliseconds() > 700) {
+                        changeBaseDeg60 = false;
+                        delayOffset = 0;
+                        SetExtendingPositionLowPower(0);
+                        RailControlV2.SetTargetPosition(0, -1, 1);
+                        ET.reset();
+                        targetJunction++;
+                    }
+                    break;
+
+                case 23:
                     if (ET.milliseconds() > 150) {
                         ClawSetting = false;
                         Claw.setPower(-0.4);
@@ -476,14 +512,14 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     }
                     break;
 
-                case 23:
+                case 24:
                     if (ET.milliseconds() > 400) {
                         SetBasePositionRTP(0);
                         targetJunction++;
                     }
                     break;
 
-                case 24:
+                case 25:
                     break;
 
                 default:
