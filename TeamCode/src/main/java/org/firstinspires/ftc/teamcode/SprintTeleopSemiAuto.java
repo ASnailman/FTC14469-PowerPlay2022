@@ -82,6 +82,8 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
     boolean coneStackMode = false;
     boolean groundJunctionMode = false;
     boolean semiAutoMode = false;
+    boolean mediumJunction;
+    boolean highJunction;
     int basePosition;
     int readVoltOnce = 0;
     boolean directionControl = false;
@@ -361,8 +363,20 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             switch (targetJunction) {
                 case 1:
-                    ET.reset();
-                    targetJunction++;
+                    if (mediumJunction && !highJunction) {
+                        RailControlV2.SetTargetPosition(1900, -1, 1);
+                        ET.reset();
+                        targetJunction++;
+                    }
+                    else if (!mediumJunction && highJunction) {
+                        RailControlV2.SetTargetPosition(2700, -1, 1);
+                        ET.reset();
+                        targetJunction++;
+                    }
+                    else {
+                        ET.reset();
+                        targetJunction++;
+                    }
                     break;
                 case 2:
                     if (ET.milliseconds() > 100) {
@@ -370,6 +384,8 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                         RailControlV2.SetTargetPosition(1280, -1, 1);
                         StopperSetting = false;
                         ClawSetting = false;
+                        mediumJunction = false;
+                        highJunction = false;
                         Claw.setPower(-0.4);
                         ET.reset();
                         targetJunction++;
@@ -388,12 +404,13 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 case 5:
                     ET.reset();
                     changeBaseDeg60 = true;
+                    mediumJunction = true;
+                    highJunction = false;
                     targetJunction++;
                     break;
 
                 case 6:
                     if (ET.milliseconds() > 600 + delayOffset) {
-                        StopperSetting = true;
                         RailControlV2.SetTargetPosition(2150, -1, 1);
                         ET.reset();
                         targetJunction++;
@@ -401,6 +418,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     break;
                 case 7:
                     if (ET.milliseconds() > 500) {
+                        StopperSetting = true;
                         SetExtendingPositionLowPower(0);
 //                        SetBasePositionRTP(0);
                         targetJunction++;
@@ -413,12 +431,13 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 case 9:
                     ET.reset();
                     changeBaseDeg60 = true;
+                    mediumJunction = false;
+                    highJunction = true;
                     targetJunction++;
                     break;
 
                 case 10:
                     if (ET.milliseconds() > 600 + delayOffset) {
-                        StopperSetting = true;
                         RailControlV2.SetTargetPosition(2950, -1, 1);
                         ET.reset();
                         targetJunction++;
@@ -427,6 +446,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
                 case 11:
                     if (ET.milliseconds() > 500) {
+                        StopperSetting = true;
                         SetExtendingPositionLowPower(0);
 //                        SetBasePositionRTP(0);
                         targetJunction++;
@@ -487,23 +507,37 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     break;
 
                 case 21:
+                    if (mediumJunction && !highJunction) {
+                        RailControlV2.SetTargetPosition(1900, -1, 1);
+                        targetJunction++;
+                    }
+                    else if (!mediumJunction && highJunction) {
+                        RailControlV2.SetTargetPosition(2700, -1, 1);
+                        targetJunction++;
+                    }
+                    else {
+                        targetJunction++;
+                    }
+                    break;
+
+                case 22:
                     StopperSetting = false;
                     ET.reset();
                     targetJunction++;
                     break;
 
-                case 22:
-                    if (ET.milliseconds() > 700) {
+                case 23:
+                    if (ET.milliseconds() > 100) {
                         changeBaseDeg60 = false;
                         delayOffset = 0;
                         SetExtendingPositionLowPower(0);
-                        RailControlV2.SetTargetPosition(0, -1, 1);
+                        RailControlV2.SetTargetPosition(0, -0.9, 0.9);
                         ET.reset();
                         targetJunction++;
                     }
                     break;
 
-                case 23:
+                case 24:
                     if (ET.milliseconds() > 150) {
                         ClawSetting = false;
                         Claw.setPower(-0.4);
@@ -512,14 +546,16 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     }
                     break;
 
-                case 24:
+                case 25:
                     if (ET.milliseconds() > 400) {
                         SetBasePositionRTP(0);
+                        mediumJunction = false;
+                        highJunction = false;
                         targetJunction++;
                     }
                     break;
 
-                case 25:
+                case 26:
                     break;
 
                 default:
@@ -2307,15 +2343,15 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             case 3:
                 if (HJBET.milliseconds() > 570) {
                     SetExtendingPositionLowPower(0);
-                    RailControlV2.SetTargetPosition(2925, -1, 1);
+                    RailControlV2.SetTargetPosition(2905, -1, 1);
                     HJBET.reset();
                     semi_auto_HJ_blitz_order++;
                 }
                 break;
 
             case 4:
-                if (HJBET.milliseconds() > 700) {
-                    RotatingBase.setTargetPosition(560 + SC_AngleAdjustment);
+                if (HJBET.milliseconds() > 500) {
+                    RotatingBase.setTargetPosition(570 + SC_AngleAdjustment);
                     RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     RotatingBase.setPower(0.9);
                     semiAutoMode = true;
@@ -2337,7 +2373,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                         semiAutoMode = false;
                         semi_auto_HJ_blitz_order++;
                     } else {
-                        RotatingBase.setTargetPosition(560 + SC_AngleAdjustment);
+                        RotatingBase.setTargetPosition(570 + SC_AngleAdjustment);
                         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         RotatingBase.setPower(0.7);
                     }
@@ -2355,6 +2391,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             case 8:
                 if (HJBET.milliseconds() > 300) {
+                    StopperSetting = false;
                     ClawSetting = false;
                     HJBET.reset();
                     semi_auto_HJ_blitz_order = 11;
@@ -2382,6 +2419,13 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 break;
 
             case 23:
+                if (RotatingBase.getCurrentPosition() > 800) {
+                    StopperSetting = true;
+                    semi_auto_HJ_blitz_order++;
+                }
+                break;
+
+            case 24:
                 if (RotatingBase.getCurrentPosition() > 1450) {
                     SetExtendingPosition(145);
                     semiAutoMode = true;
@@ -2390,7 +2434,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 break;
 
             //load cone medium junction
-            case 24:
+            case 25:
                 if (RotatingBase.getCurrentPosition() > 1440 && ExtendingRail.getCurrentPosition() > 135) {
                     if (dropConeMedium) {
                         semiAutoMode = false;
@@ -2403,7 +2447,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 }
                 break;
 
-            case 25:
+            case 26:
                 if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
                     RailControlV2.SetTargetPosition(1850, -1, 1);
                     HJBET.reset();

@@ -278,7 +278,7 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
                         posOne = false;
                         posTwo = true;
                         posThree = false;
-                        sixCones = true;
+                        sixCones = false;
                         Claw.setPower(1);
                         ET.reset();
                         ERT.reset();
@@ -294,7 +294,7 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
                         posOne = false;
                         posTwo = true;
                         posThree = false;
-                        sixCones = true;
+                        sixCones = false;
                         Claw.setPower(1);
                         ET.reset();
                         ERT.reset();
@@ -322,12 +322,11 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
                 case 3:
 //                    if (ET.milliseconds() > 700) {
 //
-//                        programOrder++;
+                        programOrder++;
 //                    }
                     break;
 
                 case 4:
-
                     programOrder++;
                     break;
 
@@ -336,7 +335,7 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
 
 //                            SetAttachmentPosition(2980, 1020);
                         Stopper.setPower(0.6);
-                        SetExtendingPositionLowPower(150 + tickAdjustment);
+                        SetExtendingPositionLowPower(120 + tickAdjustment);
                         ET.reset();
                         programOrder++;
 
@@ -346,7 +345,7 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
                 case 6:
                     if (MechDrive.GetTaskState() == Task_State.DONE || MechDrive.GetTaskState() == Task_State.READY) {
                         DirectionControl.SetTargetDirection(1, 0.2);
-                        SetAttachmentPositionLowPower(2150, 2800 + angleAdjustment);
+                        SetAttachmentPositionLowPower(2150, 2780 + angleAdjustment);
 //                        ET.reset();
                         programOrder++;
                     }
@@ -357,7 +356,7 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
                     if (BaseControl.GetTaskState() == Task_State.READY || BaseControl.GetTaskState() == Task_State.DONE) {
                         if (coneLevel == 0) {
                             if (ET.milliseconds() > 100) {
-                                SetAttachment_LowPwrRail(1800, 2810 + angleAdjustment);
+                                SetAttachment_LowPwrRail(1900, 2780 + angleAdjustment);
                                 ET.reset();
                                 programOrder++;
                             }
@@ -386,7 +385,7 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
                         if (coneLevel == 5) {
                             Stopper.setPower(-0.8);
                             ET.reset();
-                            programOrder = 18;
+                            programOrder = 19;
                         } else {
                             programOrder++;
                             ET.reset();
@@ -396,7 +395,7 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
                         if (coneLevel == 4) {
                             Stopper.setPower(-0.8);
                             ET.reset();
-                            programOrder = 18;
+                            programOrder = 19;
                         } else {
                             programOrder++;
                             ET.reset();
@@ -416,19 +415,19 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
                 case 11:
                     if (RotatingBase.getCurrentPosition() < 1020) {
                         if (coneLevel == 0) {
-                            SetAttachmentPositionLowPower(570, -30);
+                            SetAttachmentPositionLowPower(570, 30);
                         }
                         else if (coneLevel == 1) {
-                            SetAttachmentPositionLowPower(490, -30);
+                            SetAttachmentPositionLowPower(490, 30);
                         }
                         else if (coneLevel == 2) {
-                            SetAttachmentPositionLowPower(380, -30);
+                            SetAttachmentPositionLowPower(380, 30);
                         }
                         else if (coneLevel == 3) {
-                            SetAttachmentPositionLowPower(295, -30);
+                            SetAttachmentPositionLowPower(295, 30);
                         }
                         else if (coneLevel == 4 && sixCones) {
-                            SetAttachmentPositionLowPower(180, -30);
+                            SetAttachmentPositionLowPower(180, 30);
                         }
                         programOrder++;
                     }
@@ -436,7 +435,7 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
 
                 case 12:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPosition(590 + tickAdjustment);
+                        SetExtendingPosition(585 + tickAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -468,15 +467,21 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
                     break;
 
                 case 16:
-                    if (BaseControl.GetTaskState() == Task_State.DONE || BaseControl.GetTaskState() == Task_State.READY) {
-                        Stopper.setPower(0.6);
-                        BaseControl.SetTargetPosition(2705 + angleAdjustment, -0.5, 0.5);
-                        SetExtendingPositionLowPower(160 + tickAdjustment);
+                    if (RotatingBase.getCurrentPosition() > 1850) {
+                        Stopper.setPower(0.7);
                         programOrder++;
                     }
                     break;
 
                 case 17:
+                    if (BaseControl.GetTaskState() == Task_State.DONE || BaseControl.GetTaskState() == Task_State.READY) {
+                        BaseControl.SetTargetPosition(2705 + angleAdjustment, -0.5, 0.5);
+                        SetExtendingPositionLowPower(130 + tickAdjustment);
+                        programOrder++;
+                    }
+                    break;
+
+                case 18:
 //                    if (ET.milliseconds() > 100 && RotatingBase.getCurrentPosition() > 1700) {
 
                         ET.reset();
@@ -494,44 +499,50 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
 //                    }
                     break;
 
-                case 18:
+                case 19:
                     DirectionControl.Override();
+                    Stopper.setPower(-1);
+                    ET.reset();
                     programOrder++;
                     break;
 
-                case 19:
-                    if (MechDrive.GetTaskState() == Task_State.READY ||
-                            MechDrive.GetTaskState() == Task_State.DONE) {
+                case 20:
+                    if (ET.milliseconds() > 500) {
+                        if (MechDrive.GetTaskState() == Task_State.READY ||
+                                MechDrive.GetTaskState() == Task_State.DONE) {
 
-                        if (posOne) {
-                            MechDrive.SetTargets(-90, 1130, 0.95, 1);
-                            SetAttachmentPosition(2170, 0);
+                            if (posOne) {
+                                MechDrive.SetTargets(-90, 1130, 0.95, 1);
+                                SetAttachmentPosition(2170, 0);
 //                            SetAttachmentPosition(1600, 2040);
-                            SetExtendingPosition(0);
-                            ET.reset();
-                        } else if (posTwo) {
-                            MechDrive.SetTargets(90, 0, 0, 1);
-                            SetAttachmentPosition(2170, 1020);
+                                SetExtendingPosition(0);
+                                ET.reset();
+                            } else if (posTwo) {
+                                MechDrive.SetTargets(90, 0, 0, 1);
+                                SetAttachmentPosition(2170, 1020);
 //                            SetAttachmentPosition(1600, 2040);
-                            SetExtendingPosition(0);
-                            ET.reset();
-                        } else if (posThree) {
-                            MechDrive.SetTargets(90, 1550, 0.95, 1);
-                            SetAttachmentPosition(0, 1020);
+                                SetExtendingPosition(0);
+                                ET.reset();
+                            } else if (posThree) {
+                                MechDrive.SetTargets(90, 1550, 0.95, 1);
+                                SetAttachmentPosition(0, 1020);
 //                            SetAttachmentPosition(1600, 2040);
-                            SetExtendingPosition(0);
-                            ET.reset();
+                                SetExtendingPosition(0);
+                                ET.reset();
+                            }
+                            programOrder++;
                         }
-                        programOrder++;
                     }
                     break;
 
-                case 20:
+                case 21:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
-                        SetAttachmentPosition(0, 1020);
-                        MechDrive.SetTargets(180, 300, 0.6, 1);
-                        programOrder++;
+                        if (ET.milliseconds() > 700) {
+                            SetAttachmentPosition(0, 1020);
+                            MechDrive.SetTargets(180, 300, 0.6, 1);
+                            programOrder++;
+                        }
                     }
                     break;
 
@@ -540,6 +551,7 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
             }
 
             if (ERT.milliseconds() > 29500) {
+                Stopper.setPower(-1);
                 SetAttachmentPosition(0, 1020);
             }
 

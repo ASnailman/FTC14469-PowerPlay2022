@@ -1,16 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Color;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -19,15 +16,14 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "SprintAutoLeftMedium", group = "MecanumDrive")
-public class SprintAutoLeftMedium extends LinearOpMode {
+@Autonomous(name = "SprintAutoLeftMediumTarp", group = "MecanumDrive")
+public class SprintAutoLeftMediumTarp extends LinearOpMode {
 
     //Control Hub Orientation
     byte AXIS_MAP_CONFIG_BYTE = 0x06; //rotates control hub 90 degrees around y axis by swapping x and z axis
@@ -43,13 +39,16 @@ public class SprintAutoLeftMedium extends LinearOpMode {
     static DcMotor ExtendingRail;
     static DcMotor RotatingBase;
     static CRServo Claw;
-
+    static CRServo Stopper;
+    static ColorSensor rightColorSensor;
+    static ColorSensor leftColorSensor;
+    static RevBlinkinLedDriver LightStrip;
     static VoltageSensor voltageSensor;
 
     //Sensors
     BNO055IMU IMU;
     OpenCvWebcam webcam;
-    VisionClassAutoLeftBlue.SignalDeterminationPipeline pipeline;
+    VisionClassAutoRightBlue.SignalDeterminationPipeline pipeline;
 
 //    static NormalizedColorSensor rightColorsensor;
 //    static NormalizedColorSensor leftColorsensor;
@@ -61,10 +60,10 @@ public class SprintAutoLeftMedium extends LinearOpMode {
     //Variables of Classes
     Methods motorMethods;
     Mech_Drive_FAST MechDrive;
-//    Rail_Control RailControl;
+    //    Rail_Control RailControl;
     Rail_ControlV2 RailControlV2;
     Direction_Control DirectionControl;
-    Base_Control BaseControl;
+    Base_Control_MEDIUM BaseControl;
 
     //Variables For IMU Gyro
     double globalangle;
@@ -76,12 +75,18 @@ public class SprintAutoLeftMedium extends LinearOpMode {
     int repeat = 0;
     ElapsedTime ET = new ElapsedTime();
     ElapsedTime ERT = new ElapsedTime(); //Elapsed Reset Timer
+    ElapsedTime EFT = new ElapsedTime(); //Elapsed Failsafe Timer
     int coneLevel = 0;
     int readVoltOnce = 0;
     int angleAdjustment;
     int tickAdjustment;
     int extendingAdjustment;
-    int trueAdjust;
+    int baseTargetPosition;
+    boolean baseMonitorOn = false;
+    int railTargetPosition;
+    boolean railMonitorOn = false;
+    int extendingTargetPosition;
+    boolean extendingMonitorOn = false;
     boolean sixCones = false;
 
     int leftCenterTickCount;
@@ -140,11 +145,15 @@ public class SprintAutoLeftMedium extends LinearOpMode {
         FrontLeft = hardwareMap.get(DcMotor.class, "FrontLeft");
         FrontRight = hardwareMap.get(DcMotor.class, "FrontRight");
         Claw = hardwareMap.get(CRServo.class, "Claw");
+        Stopper = hardwareMap.get(CRServo.class, "Stopper");
         RailRight = hardwareMap.get(DcMotor.class, "RailRight");
         RailLeft = hardwareMap.get(DcMotor.class, "RailLeft");
         ExtendingRail = hardwareMap.get(DcMotor.class, "ExtendingRail");
         RotatingBase = hardwareMap.get(DcMotor.class, "RotatingBase");
         IMU = hardwareMap.get(BNO055IMU.class, "imu");
+        rightColorSensor = hardwareMap.get(ColorSensor.class, "rightColorSensor");
+        leftColorSensor = hardwareMap.get(ColorSensor.class, "leftColorSensor");
+        LightStrip = hardwareMap.get(RevBlinkinLedDriver.class, "LightStrip");
 
 //        rightColorsensor = hardwareMap.get(NormalizedColorSensor.class, "rightColorSensor");
 //        leftColorsensor = hardwareMap.get(NormalizedColorSensor.class, "leftColorSensor");
@@ -170,6 +179,9 @@ public class SprintAutoLeftMedium extends LinearOpMode {
         Claw.setDirection(CRServo.Direction.FORWARD);
         Claw.setPower(0);
 
+        //Stopper Presets
+        Stopper.setDirection(DcMotorSimple.Direction.FORWARD);
+
         //Configrue IMU for GyroTurning
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         IMU.initialize(parameters);
@@ -181,7 +193,7 @@ public class SprintAutoLeftMedium extends LinearOpMode {
         RailControlV2 = new Rail_ControlV2(RailLeft, RailRight);
         //        motorMethods = new Methods(telemetry, IMU, orientation, FrontLeft, FrontRight, BackLeft, BackRight, MoveDirection.FORWARD);
         DirectionControl = new Direction_Control(IMU, FrontLeft, FrontRight, BackLeft, BackRight);
-        BaseControl = new Base_Control(RotatingBase);
+        BaseControl = new Base_Control_MEDIUM(RotatingBase);
 
         //Zero Power Behavior
         BackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -193,7 +205,7 @@ public class SprintAutoLeftMedium extends LinearOpMode {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
-        pipeline = new VisionClassAutoLeftBlue.SignalDeterminationPipeline();
+        pipeline = new VisionClassAutoRightBlue.SignalDeterminationPipeline();
         webcam.setPipeline(pipeline);
         pipeline.InitTelemetry(telemetry);
 
@@ -248,28 +260,32 @@ public class SprintAutoLeftMedium extends LinearOpMode {
 
         while (opModeIsActive()) {
 
+            LightStrip.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE);
+
             switch (programOrder) {
 
                 case 0:
-                    if (pipeline.type == VisionClassAutoLeftBlue.SignalDeterminationPipeline.SignalSleeveType.LocationONE) {
+                    if (pipeline.type == VisionClassAutoRightBlue.SignalDeterminationPipeline.SignalSleeveType.LocationONE) {
                         posOne = true;
                         posTwo = false;
                         posThree = false;
+                        sixCones = false;
                         Claw.setPower(1);
                         ET.reset();
                         ERT.reset();
-                    } else if (pipeline.type == VisionClassAutoLeftBlue.SignalDeterminationPipeline.SignalSleeveType.LocationTWO) {
+                    } else if (pipeline.type == VisionClassAutoRightBlue.SignalDeterminationPipeline.SignalSleeveType.LocationTWO) {
                         posOne = false;
                         posTwo = true;
                         posThree = false;
-                        sixCones = true;
+                        sixCones = false;
                         Claw.setPower(1);
                         ET.reset();
                         ERT.reset();
-                    } else if (pipeline.type == VisionClassAutoLeftBlue.SignalDeterminationPipeline.SignalSleeveType.LocationTHREE) {
+                    } else if (pipeline.type == VisionClassAutoRightBlue.SignalDeterminationPipeline.SignalSleeveType.LocationTHREE) {
                         posOne = false;
                         posTwo = false;
                         posThree = true;
+                        sixCones = false;
                         Claw.setPower(1);
                         ET.reset();
                         ERT.reset();
@@ -277,6 +293,7 @@ public class SprintAutoLeftMedium extends LinearOpMode {
                         posOne = false;
                         posTwo = true;
                         posThree = false;
+                        sixCones = false;
                         Claw.setPower(1);
                         ET.reset();
                         ERT.reset();
@@ -288,8 +305,8 @@ public class SprintAutoLeftMedium extends LinearOpMode {
                     if (ET.milliseconds() > 550) {
                         if (RailControlV2.GetTaskState() == Task_State.INIT || RailControlV2.GetTaskState() == Task_State.READY) {
 //                        SetAttachmentPosition(0, 4953);
-                            SetAttachment_LowPwr2Rail(2150, -2270);
-                            MechDrive.SetTargets(0, 2170, 0.6, 1);
+                            SetAttachment_LowPwr2Rail(2150, -2100);
+                            MechDrive.SetTargets(-1, 2170, 0.6, 1);
 //                        } else if (RailControlV2.GetTaskState() == Task_State.DONE) {
                             programOrder++;
                         }
@@ -297,85 +314,66 @@ public class SprintAutoLeftMedium extends LinearOpMode {
                     break;
 
                 case 2:
-//                    if (MechDrive.GetTaskState() == Task_State.INIT ||
-//                            MechDrive.GetTaskState() == Task_State.READY ||
-//                            MechDrive.GetTaskState() == Task_State.DONE) {
-//                        MechDrive.SetTargets(0, 994, 0.36, 1);
-//                        ET.reset();
-                        programOrder++;
-//                    }
-
+                    ET.reset();
+                    programOrder++;
                     break;
 
                 case 3:
-//                    if (ET.milliseconds() > 600) {
-//                        if (RotatingBase.getCurrentPosition() >= 570 && RotatingBase.getCurrentPosition() <= 670) {
-//                            if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-//                                SetAttachmentPosition(420, 1320);
-                                programOrder++;
-//                                ET.reset();
-//                            }
-//                        }
+//                    if (ET.milliseconds() > 700) {
+//
+                        programOrder++;
 //                    }
                     break;
 
                 case 4:
-//                    if (MechDrive.GetTaskState() == Task_State.INIT ||
-//                            MechDrive.GetTaskState() == Task_State.READY ||
-//                            MechDrive.GetTaskState() == Task_State.DONE) {
-//                        MechDrive.SetTargets(-1, 1050, 0.7, 1);
-//                    if ((RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY)) {
-//                        SetAttachmentPosition(2150, 1020);
-                        programOrder++;
-//                    }
+
+                    programOrder++;
                     break;
 
                 case 5:
-                    if (RotatingBase.getCurrentPosition() <= -2220 && RotatingBase.getCurrentPosition() >= -2320) {
+                    if (RotatingBase.getCurrentPosition() <= -2000) {
 
 //                            SetAttachmentPosition(2980, 1020);
-                            SetExtendingPosition(60 + tickAdjustment);
-                            programOrder++;
+                        Stopper.setPower(0.6);
+                        SetExtendingPositionLowPower(120 + tickAdjustment);
+                        ET.reset();
+                        programOrder++;
 
                     }
                     break;
 
                 case 6:
-//                    if (RailControlV2.GetTaskState() == Task_State.DONE ||
-//                            RailControlV2.GetTaskState() == Task_State.READY) {
-                    if (MechDrive.GetTaskState() == Task_State.DONE) {
-//                        MechDrive.SetTargets(-90, 0, 0.4, 1);
-                        DirectionControl.SetTargetDirection(0, 0.2);
-                        SetAttachmentPositionLowPower(2150, -2645 + angleAdjustment);
-                        ET.reset();
+                    if (MechDrive.GetTaskState() == Task_State.DONE || MechDrive.GetTaskState() == Task_State.READY) {
+                        DirectionControl.SetTargetDirection(-1, 0.2);
+                        SetAttachmentPositionLowPower(2150, -2780 + angleAdjustment);
+//                        ET.reset();
                         programOrder++;
                     }
                     break;
 
                 case 7:
-//                        if (RotatingBase.getCurrentPosition() >= 2455 + angleAdjustment + trueAdjust && (RailControlV2.GetTaskState() == Task_State.DONE ||
-//                                RailControlV2.GetTaskState() == Task_State.READY)) {
+//                        if (RotatingBase.getCurrentPosition() >= 2550) {
                     if (BaseControl.GetTaskState() == Task_State.READY || BaseControl.GetTaskState() == Task_State.DONE) {
                         if (coneLevel == 0) {
-                                if (ET.milliseconds() > 100) {
-                                    SetAttachment_LowPwrRail(1870, -2645 + angleAdjustment);
-                                    ET.reset();
-                                    programOrder++;
-                                }
+                            if (ET.milliseconds() > 100) {
+                                SetAttachment_LowPwrRail(1900, -2780 + angleAdjustment);
+                                ET.reset();
+                                programOrder++;
+                            }
                         } else {
-                                if (ET.milliseconds() > 100) {
-                                    SetAttachment_LowPwrRail(1870, -2455 + angleAdjustment);
-                                    ET.reset();
-                                    programOrder++;
-                                }
+                            if (ET.milliseconds() > 100) {
+                                SetAttachment_LowPwrRail(1800, -2705 + angleAdjustment);
+                                ET.reset();
+                                programOrder++;
                             }
                         }
+                    }
                     break;
 
                 case 8:
-                    if (ET.milliseconds() > 500) {
-                        Claw.setPower(-1);
-                        if (Claw.getPower() < -0.95) {
+                    if (ET.milliseconds() > 300) {
+                        Claw.setPower(-0.4);
+                        if (Claw.getPower() < -0.3) {
                             programOrder++;
                             ET.reset();
                         }
@@ -385,8 +383,9 @@ public class SprintAutoLeftMedium extends LinearOpMode {
                 case 9:
                     if (sixCones) {
                         if (coneLevel == 5) {
+                            Stopper.setPower(-0.8);
                             ET.reset();
-                            programOrder = 17;
+                            programOrder = 19;
                         } else {
                             programOrder++;
                             ET.reset();
@@ -394,8 +393,9 @@ public class SprintAutoLeftMedium extends LinearOpMode {
                     }
                     else {
                         if (coneLevel == 4) {
+                            Stopper.setPower(-0.8);
                             ET.reset();
-                            programOrder = 17;
+                            programOrder = 19;
                         } else {
                             programOrder++;
                             ET.reset();
@@ -405,7 +405,8 @@ public class SprintAutoLeftMedium extends LinearOpMode {
 
                 case 10:
                     if (ET.milliseconds() > 200) {
-                        SetAttachmentPosition(1870, 0);
+                        SetAttachmentPosition(1800, 0);
+                        Stopper.setPower(-0.8);
                         SetExtendingPosition(0);
                         programOrder++;
                     }
@@ -414,19 +415,19 @@ public class SprintAutoLeftMedium extends LinearOpMode {
                 case 11:
                     if (RotatingBase.getCurrentPosition() > -1020) {
                         if (coneLevel == 0) {
-                            SetAttachmentPositionLowPower(570, 0);
+                            SetAttachmentPositionLowPower(570, -30);
                         }
                         else if (coneLevel == 1) {
-                            SetAttachmentPositionLowPower(490, 0);
+                            SetAttachmentPositionLowPower(490, -30);
                         }
                         else if (coneLevel == 2) {
-                            SetAttachmentPositionLowPower(380, 0);
+                            SetAttachmentPositionLowPower(380, -30);
                         }
                         else if (coneLevel == 3) {
-                            SetAttachmentPositionLowPower(295, 0);
+                            SetAttachmentPositionLowPower(295, -30);
                         }
                         else if (coneLevel == 4 && sixCones) {
-                            SetAttachmentPositionLowPower(180, 0);
+                            SetAttachmentPositionLowPower(180, -30);
                         }
                         programOrder++;
                     }
@@ -434,14 +435,14 @@ public class SprintAutoLeftMedium extends LinearOpMode {
 
                 case 12:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPosition(600 + tickAdjustment);
+                        SetExtendingPosition(585 + tickAdjustment);
                         ET.reset();
                         programOrder++;
                     }
                     break;
 
                 case 13:
-                    if (ET.milliseconds() > 450) {
+                    if (ET.milliseconds() > 330) {
                         Claw.setPower(1);
                         ET.reset();
                         programOrder++;
@@ -450,7 +451,7 @@ public class SprintAutoLeftMedium extends LinearOpMode {
 
                 case 14:
                     if (ET.milliseconds() > 450) {
-                        SetAttachmentPosition(1200, 0);
+                        SetAttachmentPosition(1300, 0);
                         programOrder++;
                     }
                     break;
@@ -458,15 +459,31 @@ public class SprintAutoLeftMedium extends LinearOpMode {
                 case 15:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
                         SetExtendingPosition(0);
-                        SetAttachmentPositionLowPower(2170, -2455 + angleAdjustment);
+                        RailControlV2.SetTargetPosition(2170, -1, 1);
+                        BaseControl.SetTargetPosition(-1990 + angleAdjustment, -0.8, 0.8);
                         ET.reset();
                         programOrder++;
                     }
                     break;
 
                 case 16:
-                    if (ET.milliseconds() > 100 && RotatingBase.getCurrentPosition() < -1900) {
-                        SetExtendingPosition(30 + tickAdjustment);
+                    if (RotatingBase.getCurrentPosition() < -1850) {
+                        Stopper.setPower(0.7);
+                        programOrder++;
+                    }
+                    break;
+
+                case 17:
+                    if (BaseControl.GetTaskState() == Task_State.DONE || BaseControl.GetTaskState() == Task_State.READY) {
+                        BaseControl.SetTargetPosition(-2705 + angleAdjustment, -0.5, 0.5);
+                        SetExtendingPositionLowPower(130 + tickAdjustment);
+                        programOrder++;
+                    }
+                    break;
+
+                case 18:
+//                    if (ET.milliseconds() > 100 && RotatingBase.getCurrentPosition() > 1700) {
+
                         ET.reset();
                         coneLevel++;
                         if (sixCones) {
@@ -479,44 +496,53 @@ public class SprintAutoLeftMedium extends LinearOpMode {
                                 programOrder = 7;
                             }
                         }
-                    }
-                    break;
-
-                case 17:
-                    DirectionControl.Override();
-                    programOrder++;
-                    break;
-
-                case 18:
-                    if (MechDrive.GetTaskState() == Task_State.READY ||
-                            MechDrive.GetTaskState() == Task_State.DONE) {
-
-                        if (posOne) {
-                            MechDrive.SetTargets(-90, 1250, 0.7, 1);
-                            SetAttachmentPosition(0, -1020);
-                            SetExtendingPosition(0);
-                            ET.reset();
-                        } else if (posTwo) {
-                            MechDrive.SetTargets(-90, 100, 0, 1);
-                            SetAttachmentPosition(0, -1020);
-                            SetExtendingPosition(0);
-                            ET.reset();
-                        } else if (posThree) {
-                            MechDrive.SetTargets(90, 1300, 0.7, 1);
-                            SetAttachmentPosition(0, 0);
-                            SetExtendingPosition(0);
-                            ET.reset();
-                        }
-                        programOrder++;
-                    }
+//                    }
                     break;
 
                 case 19:
+                    DirectionControl.Override();
+                    Stopper.setPower(-1);
+                    ET.reset();
+                    programOrder++;
+                    break;
+
+                case 20:
+                    if (ET.milliseconds() > 500) {
+                        if (MechDrive.GetTaskState() == Task_State.READY ||
+                                MechDrive.GetTaskState() == Task_State.DONE) {
+
+                            if (posOne) {
+                                MechDrive.SetTargets(-90, 1230, 0.95, 1);
+                                SetAttachmentPosition(0, -1020);
+//                            SetAttachmentPosition(1600, 2040);
+                                SetExtendingPosition(0);
+                                ET.reset();
+                            } else if (posTwo) {
+                                MechDrive.SetTargets(-90, 0, 0, 1);
+                                SetAttachmentPosition(2170, -1020);
+//                            SetAttachmentPosition(1600, 2040);
+                                SetExtendingPosition(0);
+                                ET.reset();
+                            } else if (posThree) {
+                                MechDrive.SetTargets(90, 1450, 0.95, 1);
+                                SetAttachmentPosition(2170, 0);
+//                            SetAttachmentPosition(1600, 2040);
+                                SetExtendingPosition(0);
+                                ET.reset();
+                            }
+                            programOrder++;
+                        }
+                    }
+                    break;
+
+                case 21:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
-                        SetAttachmentPosition(0, -1020);
-                        MechDrive.SetTargets(180, 200, 0.3, 1);
-                        programOrder++;
+                        if (ET.milliseconds() > 700) {
+                            SetAttachmentPosition(0, -1020);
+                            MechDrive.SetTargets(180, 300, 0.6, 1);
+                            programOrder++;
+                        }
                     }
                     break;
 
@@ -525,7 +551,30 @@ public class SprintAutoLeftMedium extends LinearOpMode {
             }
 
             if (ERT.milliseconds() > 29500) {
+                Stopper.setPower(-1);
                 SetAttachmentPosition(0, -1020);
+            }
+
+            if (baseMonitorOn) {
+                if (RotatingBase.getCurrentPosition() != baseTargetPosition) {
+                    if (EFT.milliseconds() > 700) {
+                        SetAttachmentPosition(0, 1020);
+                    }
+                }
+            }
+            if (extendingMonitorOn) {
+                if (ExtendingRail.getCurrentPosition() != extendingTargetPosition) {
+                    if (EFT.milliseconds() > 700) {
+                        SetAttachmentPosition(0, 1020);
+                    }
+                }
+            }
+            if (railMonitorOn) {
+                if (RailRight.getCurrentPosition() != railTargetPosition) {
+                    if (EFT.milliseconds() > 700) {
+                        SetAttachmentPosition(0, 1020);
+                    }
+                }
             }
 
 //            rightColorSensorLineDetector();
@@ -667,7 +716,7 @@ public class SprintAutoLeftMedium extends LinearOpMode {
 //        RotatingBase.setTargetPosition(basePos);
 //        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //        RotatingBase.setPower(1);
-        BaseControl.SetTargetPosition(basePos, -1, 1);
+        BaseControl.SetTargetPosition(basePos, -0.4, 0.4);
     }
 
     public void SetAttachment_LowPwrRail(int railPos, int basePos) {
@@ -689,7 +738,13 @@ public class SprintAutoLeftMedium extends LinearOpMode {
     public void SetExtendingPosition(int extendingPos) {
         ExtendingRail.setTargetPosition(extendingPos);
         ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        ExtendingRail.setPower(0.6);
+        ExtendingRail.setPower(0.8);
+    }
+
+    public void SetExtendingPositionLowPower(int extendingPos) {
+        ExtendingRail.setTargetPosition(extendingPos);
+        ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ExtendingRail.setPower(0.3);
     }
 
     public void SetAttachmentPositionLowPower(int railPos, int basePos) {
@@ -697,7 +752,7 @@ public class SprintAutoLeftMedium extends LinearOpMode {
 //        RotatingBase.setTargetPosition(basePos);
 //        RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //        RotatingBase.setPower(0.5);
-        BaseControl.SetTargetPosition(basePos, -0.8, 0.8);
+        BaseControl.SetTargetPosition(basePos, -0.9, 0.9);
     }
 
 //    private int rightColorSensorLineDetector() {
