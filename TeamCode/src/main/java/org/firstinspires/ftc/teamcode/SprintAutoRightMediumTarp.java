@@ -435,7 +435,7 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
 
                 case 12:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPosition(585 + tickAdjustment);
+                        SetExtendingPosition(580 + tickAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -460,15 +460,15 @@ public class SprintAutoRightMediumTarp extends LinearOpMode {
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
                         SetExtendingPosition(0);
                         RailControlV2.SetTargetPosition(2170, -1, 1);
-                        BaseControl.SetTargetPosition(1990 + angleAdjustment, -0.8, 0.8);
-                        ET.reset();
+                        BaseControl.SetTargetPosition(1650 + angleAdjustment, -0.8, 0.8);
                         programOrder++;
                     }
                     break;
 
                 case 16:
-                    if (RotatingBase.getCurrentPosition() > 1850) {
+                    if (RotatingBase.getCurrentPosition() > 1600) {
                         Stopper.setPower(0.7);
+                        BaseControl.SetTargetPosition(1990 + angleAdjustment, -0.8, 0.8);
                         programOrder++;
                     }
                     break;

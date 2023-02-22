@@ -48,7 +48,7 @@ public class SprintAutoLeftMediumTarp extends LinearOpMode {
     //Sensors
     BNO055IMU IMU;
     OpenCvWebcam webcam;
-    VisionClassAutoRightBlue.SignalDeterminationPipeline pipeline;
+    VisionClassAutoLeftBlue.SignalDeterminationPipeline pipeline;
 
 //    static NormalizedColorSensor rightColorsensor;
 //    static NormalizedColorSensor leftColorsensor;
@@ -205,7 +205,7 @@ public class SprintAutoLeftMediumTarp extends LinearOpMode {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
-        pipeline = new VisionClassAutoRightBlue.SignalDeterminationPipeline();
+        pipeline = new VisionClassAutoLeftBlue.SignalDeterminationPipeline();
         webcam.setPipeline(pipeline);
         pipeline.InitTelemetry(telemetry);
 
@@ -265,7 +265,7 @@ public class SprintAutoLeftMediumTarp extends LinearOpMode {
             switch (programOrder) {
 
                 case 0:
-                    if (pipeline.type == VisionClassAutoRightBlue.SignalDeterminationPipeline.SignalSleeveType.LocationONE) {
+                    if (pipeline.type == VisionClassAutoLeftBlue.SignalDeterminationPipeline.SignalSleeveType.LocationONE) {
                         posOne = true;
                         posTwo = false;
                         posThree = false;
@@ -273,7 +273,7 @@ public class SprintAutoLeftMediumTarp extends LinearOpMode {
                         Claw.setPower(1);
                         ET.reset();
                         ERT.reset();
-                    } else if (pipeline.type == VisionClassAutoRightBlue.SignalDeterminationPipeline.SignalSleeveType.LocationTWO) {
+                    } else if (pipeline.type == VisionClassAutoLeftBlue.SignalDeterminationPipeline.SignalSleeveType.LocationTWO) {
                         posOne = false;
                         posTwo = true;
                         posThree = false;
@@ -281,7 +281,7 @@ public class SprintAutoLeftMediumTarp extends LinearOpMode {
                         Claw.setPower(1);
                         ET.reset();
                         ERT.reset();
-                    } else if (pipeline.type == VisionClassAutoRightBlue.SignalDeterminationPipeline.SignalSleeveType.LocationTHREE) {
+                    } else if (pipeline.type == VisionClassAutoLeftBlue.SignalDeterminationPipeline.SignalSleeveType.LocationTHREE) {
                         posOne = false;
                         posTwo = false;
                         posThree = true;
@@ -435,7 +435,7 @@ public class SprintAutoLeftMediumTarp extends LinearOpMode {
 
                 case 12:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPosition(585 + tickAdjustment);
+                        SetExtendingPosition(570 + tickAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -460,15 +460,15 @@ public class SprintAutoLeftMediumTarp extends LinearOpMode {
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
                         SetExtendingPosition(0);
                         RailControlV2.SetTargetPosition(2170, -1, 1);
-                        BaseControl.SetTargetPosition(-1990 + angleAdjustment, -0.8, 0.8);
-                        ET.reset();
+                        BaseControl.SetTargetPosition(-1650 + angleAdjustment, -0.8, 0.8);
                         programOrder++;
                     }
                     break;
 
                 case 16:
-                    if (RotatingBase.getCurrentPosition() < -1850) {
+                    if (RotatingBase.getCurrentPosition() < -1600) {
                         Stopper.setPower(0.7);
+                        BaseControl.SetTargetPosition(-1990 + angleAdjustment, -0.8, 0.8);
                         programOrder++;
                     }
                     break;

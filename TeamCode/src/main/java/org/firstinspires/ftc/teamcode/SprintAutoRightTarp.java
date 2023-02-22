@@ -342,7 +342,7 @@ public class SprintAutoRightTarp extends LinearOpMode {
 
                 case 5:
                     if (RotatingBase.getCurrentPosition() >= 1170 && RotatingBase.getCurrentPosition() <= 1270) {
-                        SetExtendingPosition(110 + tickAdjustment);
+                        SetExtendingPosition(90 + tickAdjustment);
                         programOrder++;
                     }
                     break;
@@ -361,14 +361,14 @@ public class SprintAutoRightTarp extends LinearOpMode {
 //                                RailControlV2.GetTaskState() == Task_State.READY)) {
                     if (BaseControl.GetTaskState() == Task_State.READY || BaseControl.GetTaskState() == Task_State.DONE) {
                         if (coneLevel == 0) {
-                            if (ET.milliseconds() > 200) {
+                            if (ET.milliseconds() > 250) {
                                 SetAttachment_LowPwrRail(2690, 1700 + angleAdjustment);
                                 ET.reset();
                                 programOrder++;
                             }
                         }
                         else {
-                            if (ET.milliseconds() > 200) {
+                            if (ET.milliseconds() > 250) {
                                 SetAttachment_LowPwrRail(2690, 1622 + angleAdjustment);
                                 //NO TARP
 //                                SetAttachment_LowPwrRail(2690, 1542 + angleAdjustment);
@@ -433,7 +433,7 @@ public class SprintAutoRightTarp extends LinearOpMode {
 
                 case 12:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPosition(590 + tickAdjustment);
+                        SetExtendingPosition(580 + tickAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -457,7 +457,7 @@ public class SprintAutoRightTarp extends LinearOpMode {
                 case 15:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
 //                        SetExtendingPositionLowPower(85 + tickAdjustment);
-                        SetExtendingPositionLowPower(100);
+                        SetExtendingPositionLowPower(70);
                         Stopper.setPower(0.6);
 //                        SetExtendingPositionLowPower(0);
                         SetAttachmentPositionLowPower(2985 + railAdjustment, 1622 + angleAdjustment);
