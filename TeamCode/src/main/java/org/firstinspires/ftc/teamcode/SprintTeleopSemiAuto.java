@@ -1492,27 +1492,29 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
 //                    SetExtendingPosition(75);
                     SetExtendingPositionLowPower(0);
+                    StopperSetting = true;
                     RailControlV2.SetTargetPosition(2930, -1, 1);
-                    SetBasePosition(-505 + SC_AngleAdjustment);
+                    SetBasePosition(-635 + SC_AngleAdjustment);
+                    SetExtendingPositionLowPower(90);
                     SC_Blitz_Timer.reset();
                     semi_auto_sc_blitz_step++;
                 }
                 break;
             case 5:
-                if ((RotatingBase.getCurrentPosition() <= -495) &&
+                if ((RotatingBase.getCurrentPosition() <= -625) &&
                         (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY)) {
-                    SetExtendingPositionLowPower(15);
+//                    SetExtendingPositionLowPower(60);
                     semi_auto_sc_blitz_step++;
                 }
                 break;
             case 6:
-                if (ExtendingRail.getCurrentPosition() > 5) {
+                if (ExtendingRail.getCurrentPosition() > 50) {
                     if (OpenClaw) {
                         SC_Blitz_Timer.reset();
                         semi_auto_sc_blitz_step++;
                     } else {
 //                        SetBasePosition(-505 + SC_AngleAdjustment);
-                        RotatingBase.setTargetPosition(-505 + SC_AngleAdjustment);
+                        RotatingBase.setTargetPosition(-635 + SC_AngleAdjustment);
                         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         RotatingBase.setPower(0.7);
                     }
@@ -1526,6 +1528,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             case 8:
                 if (SC_Blitz_Timer.milliseconds() > 200) {
                     ClawSetting = false;
+                    StopperSetting = false;
                     Claw.setPower(-0.4);
                     if (Claw.getPower() < -0.3) {
                         semi_auto_sc_blitz_step++;
@@ -1630,27 +1633,29 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                 if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
 //                    SetExtendingPosition(75);
                     SetExtendingPositionLowPower(0);
+                    StopperSetting = true;
                     RailControlV2.SetTargetPosition(2930, -1, 1);
-                    SetBasePosition(505 + SC_AngleAdjustment);
+                    SetBasePosition(635 + SC_AngleAdjustment);
+                    SetExtendingPositionLowPower(90);
                     SC_Blitz_Timer.reset();
                     R_semi_auto_sc_blitz_step++;
                 }
                 break;
             case 5:
-                if ((RotatingBase.getCurrentPosition() >= 495) &&
+                if ((RotatingBase.getCurrentPosition() >= 625) &&
                         (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY)) {
-                    SetExtendingPositionLowPower(15);
+//                    SetExtendingPositionLowPower(60);
                     R_semi_auto_sc_blitz_step++;
                 }
                 break;
             case 6:
-                if (ExtendingRail.getCurrentPosition() > 5) {
+                if (ExtendingRail.getCurrentPosition() > 50) {
                     if (OpenClaw) {
                         SC_Blitz_Timer.reset();
                         R_semi_auto_sc_blitz_step++;
                     } else {
 //                        SetBasePosition(505 + SC_AngleAdjustment);
-                        RotatingBase.setTargetPosition(505 + SC_AngleAdjustment);
+                        RotatingBase.setTargetPosition(635 + SC_AngleAdjustment);
                         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         RotatingBase.setPower(0.7);
                     }
@@ -1664,6 +1669,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             case 8:
                 if (SC_Blitz_Timer.milliseconds() > 200) {
                     ClawSetting = false;
+                    StopperSetting = false;
                     Claw.setPower(-0.4);
                     if (Claw.getPower() < -0.3) {
                         R_semi_auto_sc_blitz_step++;
@@ -2321,12 +2327,13 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                     ExtendingRail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     ExtendingRail.setPower(0.8);
                     HJAutoBlitzReady = false;
+                    ET.reset();
                     semi_auto_HJ_blitz_order++;
                 }
                 break;
 
             case 2:
-                if (!HJAutoBlitzReady) {
+                if (!HJAutoBlitzReady && ET.milliseconds() > 300) {
                     if (dropConeMedium) {
                         HJAutoBlitzReady = true;
                         ClawSetting = true;
@@ -2353,9 +2360,10 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
 
             case 4:
                 if (HJBET.milliseconds() > 500) {
-                    RotatingBase.setTargetPosition(570 + SC_AngleAdjustment);
+                    RotatingBase.setTargetPosition(560 + SC_AngleAdjustment);
                     RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     RotatingBase.setPower(0.9);
+//                    StopperSetting = true;
                     semiAutoMode = true;
                     semi_auto_HJ_blitz_order++;
                 }
@@ -2364,6 +2372,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
             case 5:
                 if (RotatingBase.getCurrentPosition() > 550) {
                     SetExtendingPosition(120);
+//                    SetExtendingPosition(140);
                     semi_auto_HJ_blitz_order++;
                 }
                 break;
@@ -2375,7 +2384,7 @@ public class SprintTeleopSemiAuto extends LinearOpMode {
                         semiAutoMode = false;
                         semi_auto_HJ_blitz_order++;
                     } else {
-                        RotatingBase.setTargetPosition(570 + SC_AngleAdjustment);
+                        RotatingBase.setTargetPosition(560 + SC_AngleAdjustment);
                         RotatingBase.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                         RotatingBase.setPower(0.7);
                     }

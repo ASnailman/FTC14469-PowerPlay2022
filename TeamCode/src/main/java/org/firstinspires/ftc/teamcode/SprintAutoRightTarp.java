@@ -318,7 +318,7 @@ public class SprintAutoRightTarp extends LinearOpMode {
                         if (RailControlV2.GetTaskState() == Task_State.INIT || RailControlV2.GetTaskState() == Task_State.READY) {
                             SetAttachment_LowPwr2Rail(3025 + railAdjustment, 1220);
 //                            SetAttachment_LowPwr2Rail(2970, 1540 + angleAdjustment);
-                            MechDrive.SetTargets(1, 2160, 0.7, 1);
+                            MechDrive.SetTargets(0, 2160, 0.7, 1);
                             programOrder++;
                         }
                     }
@@ -342,14 +342,14 @@ public class SprintAutoRightTarp extends LinearOpMode {
 
                 case 5:
                     if (RotatingBase.getCurrentPosition() >= 1170 && RotatingBase.getCurrentPosition() <= 1270) {
-                        SetExtendingPosition(90 + tickAdjustment);
+                        SetExtendingPosition(100 + tickAdjustment);
                         programOrder++;
                     }
                     break;
 
                 case 6:
                     if (MechDrive.GetTaskState() == Task_State.DONE || MechDrive.GetTaskState() == Task_State.READY) {
-                        DirectionControl.SetTargetDirection(1, 0.2);
+                        DirectionControl.SetTargetDirection(0, 0.2);
                         SetAttachmentPositionLowPower(3025 + railAdjustment, 1700 + angleAdjustment);
                         ET.reset();
                         programOrder++;
@@ -457,7 +457,7 @@ public class SprintAutoRightTarp extends LinearOpMode {
                 case 15:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
 //                        SetExtendingPositionLowPower(85 + tickAdjustment);
-                        SetExtendingPositionLowPower(70);
+                        SetExtendingPositionLowPower(90);
                         Stopper.setPower(0.6);
 //                        SetExtendingPositionLowPower(0);
                         SetAttachmentPositionLowPower(2985 + railAdjustment, 1622 + angleAdjustment);
