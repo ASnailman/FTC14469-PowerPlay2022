@@ -83,6 +83,8 @@ public class SprintAutoLeftTarp extends LinearOpMode {
     ElapsedTime ET = new ElapsedTime();
     ElapsedTime ERT = new ElapsedTime(); //Elapsed Reset Timer
     ElapsedTime EFT = new ElapsedTime(); //Elapsed Failsafe Timer
+    int delay;
+    int coneReduction;
     int coneLevel = 0;
     int readVoltOnce = 0;
     int angleAdjustment;
@@ -237,6 +239,11 @@ public class SprintAutoLeftTarp extends LinearOpMode {
             }
         });
 
+        //delay
+        delay = 0;
+        //cone reduction
+        coneReduction = 0;
+
         waitForStart();
 
         ET.reset();
@@ -313,7 +320,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                     break;
 
                 case 1:
-                    if (ET.milliseconds() > 550) {
+                    if (ET.milliseconds() > 550 + delay) {
                         if (RailControlV2.GetTaskState() == Task_State.INIT || RailControlV2.GetTaskState() == Task_State.READY) {
                             SetAttachment_LowPwr2Rail(3025 + railAdjustment, -1220);
 //                            SetAttachment_LowPwr2Rail(2970, 1540 + angleAdjustment);
@@ -349,7 +356,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                 case 6:
                     if (MechDrive.GetTaskState() == Task_State.DONE || MechDrive.GetTaskState() == Task_State.READY) {
                         DirectionControl.SetTargetDirection(0, 0.2);
-                        SetAttachmentPositionLowPower(3025 + railAdjustment, -1700 + angleAdjustment);
+                        SetAttachmentPositionLowPower(3025 + railAdjustment, -1680 + angleAdjustment);
                         ET.reset();
                         programOrder++;
                     }
@@ -361,14 +368,14 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                     if (BaseControl.GetTaskState() == Task_State.READY || BaseControl.GetTaskState() == Task_State.DONE) {
                         if (coneLevel == 0) {
                             if (ET.milliseconds() > 250) {
-                                SetAttachment_LowPwrRail(2690, -1700 + angleAdjustment);
+                                SetAttachment_LowPwrRail(2690, -1680 + angleAdjustment);
                                 ET.reset();
                                 programOrder++;
                             }
                         }
                         else {
                             if (ET.milliseconds() > 250) {
-                                SetAttachment_LowPwrRail(2690, -1622 + angleAdjustment);
+                                SetAttachment_LowPwrRail(2690, -1602 + angleAdjustment);
                                 //NO TARP
 //                                SetAttachment_LowPwrRail(2690, -1542 + angleAdjustment);
                                 ET.reset();
@@ -389,7 +396,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                     break;
 
                 case 9:
-                    if (coneLevel == 5) {
+                    if (coneLevel == 5 - coneReduction) {
                         Stopper.setPower(-0.8);
                         ET.reset();
                         programOrder = 17;
@@ -457,7 +464,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                         SetExtendingPositionLowPower(120);
                         Stopper.setPower(0.6);
 //                        SetExtendingPositionLowPower(92 + tickAdjustment);
-                        SetAttachmentPositionLowPower(2985 + railAdjustment, -1622 + angleAdjustment);
+                        SetAttachmentPositionLowPower(2985 + railAdjustment, -1602 + angleAdjustment);
                         //NO TARP
 //                        SetAttachmentPositionLowPower(3055, -1542 + angleAdjustment);
                         ET.reset();
@@ -469,7 +476,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                     if (ET.milliseconds() > 100) {
                         ET.reset();
                         coneLevel++;
-                        if (coneLevel < 6) {
+                        if (coneLevel < 6 - coneReduction) {
                             programOrder = 7;
                         }
                     }
@@ -501,8 +508,8 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                             SetExtendingPosition(0);
                             ET.reset();
                         } else if (posThree) {
-                            MechDrive.SetTargets(-270, 1500, 0.8, 1);
-                            SetAttachmentPosition(0, 0);
+                            MechDrive.SetTargets(88, 3070, 0.8, 1);
+                            SetAttachmentPosition(0, -200);
                             SetExtendingPosition(0);
                             ET.reset();
                         }
@@ -513,8 +520,13 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                 case 19:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
-                        SetAttachmentPosition(0, -1020);
-                        MechDrive.SetTargets(180, 300, 0.6, 1);
+                        if (posOne || posTwo) {
+                            SetAttachmentPosition(0, -1020);
+                            MechDrive.SetTargets(180, 300, 0.6, 1);
+                        }
+//                        else if (posThree) {
+//                            MechDrive.SetTargets(180, 100, 0.6, 1);
+//                        }
                         DirectionControl.SetTargetDirection(0, 0.2);
                         programOrder++;
                     }
@@ -524,9 +536,9 @@ public class SprintAutoLeftTarp extends LinearOpMode {
                     break;
             }
 
-            if (ERT.milliseconds() > 29500) {
-                SetAttachmentPosition(0, -1020);
-            }
+//            if (ERT.milliseconds() > 29500) {
+//                SetAttachmentPosition(0, -1020);
+//            }
 
             if (baseMonitorOn) {
                 if (RotatingBase.getCurrentPosition() != baseTargetPosition) {

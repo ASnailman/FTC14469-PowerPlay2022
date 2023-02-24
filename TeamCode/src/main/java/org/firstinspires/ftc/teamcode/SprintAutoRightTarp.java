@@ -83,6 +83,8 @@ public class SprintAutoRightTarp extends LinearOpMode {
     ElapsedTime ET = new ElapsedTime();
     ElapsedTime ERT = new ElapsedTime(); //Elapsed Reset Timer
     ElapsedTime EFT = new ElapsedTime(); //Elapsed Failsafe Timer
+    int delay;
+    int coneReduction;
     int coneLevel = 0;
     int readVoltOnce = 0;
     int angleAdjustment;
@@ -238,6 +240,11 @@ public class SprintAutoRightTarp extends LinearOpMode {
             }
         });
 
+        //delay
+        delay = 0;
+        //cone reduction
+        coneReduction = 0;
+
         waitForStart();
 
         ET.reset();
@@ -314,7 +321,7 @@ public class SprintAutoRightTarp extends LinearOpMode {
                     break;
 
                 case 1:
-                    if (ET.milliseconds() > 550) {
+                    if (ET.milliseconds() > 550 + delay) {
                         if (RailControlV2.GetTaskState() == Task_State.INIT || RailControlV2.GetTaskState() == Task_State.READY) {
                             SetAttachment_LowPwr2Rail(3025 + railAdjustment, 1220);
 //                            SetAttachment_LowPwr2Rail(2970, 1540 + angleAdjustment);
@@ -390,7 +397,7 @@ public class SprintAutoRightTarp extends LinearOpMode {
                     break;
 
                 case 9:
-                    if (coneLevel == 5) {
+                    if (coneLevel == 5 - coneReduction) {
                         Stopper.setPower(-0.8);
                         ET.reset();
                         programOrder = 17;
@@ -481,7 +488,7 @@ public class SprintAutoRightTarp extends LinearOpMode {
                     if (ET.milliseconds() > 100) {
                         ET.reset();
                         coneLevel++;
-                        if (coneLevel < 6) {
+                        if (coneLevel < 6 - coneReduction) {
                             programOrder = 7;
                         }
                     }
@@ -513,8 +520,8 @@ public class SprintAutoRightTarp extends LinearOpMode {
                             SetExtendingPosition(0);
                             ET.reset();
                         } else if (posThree) {
-                            MechDrive.SetTargets(90, 1500, 0.8, 1);
-                            SetAttachmentPosition(0, 1020);
+                            MechDrive.SetTargets(90, 2800, 0.8, 1);
+                            SetAttachmentPosition(0, 2000);
                             SetExtendingPosition(0);
                             ET.reset();
                         }
@@ -525,8 +532,10 @@ public class SprintAutoRightTarp extends LinearOpMode {
                 case 19:
                     if (MechDrive.GetTaskState() == Task_State.READY ||
                             MechDrive.GetTaskState() == Task_State.DONE) {
-                        SetAttachmentPosition(0, 1020);
-                        MechDrive.SetTargets(180, 300, 0.6, 1);
+                        if (posOne || posTwo) {
+                            SetAttachmentPosition(0, 1020);
+                            MechDrive.SetTargets(180, 300, 0.6, 1);
+                        }
                         DirectionControl.SetTargetDirection(0, 0.2);
                         programOrder++;
                     }
@@ -536,9 +545,9 @@ public class SprintAutoRightTarp extends LinearOpMode {
                     break;
             }
 
-            if (ERT.milliseconds() > 29500) {
-                SetAttachmentPosition(0, 1020);
-            }
+//            if (ERT.milliseconds() > 29500) {
+//                SetAttachmentPosition(0, 1020);
+//            }
 
             if (baseMonitorOn) {
                 if (RotatingBase.getCurrentPosition() != baseTargetPosition) {
