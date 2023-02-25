@@ -438,7 +438,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
 
                 case 12:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPosition(570 + tickAdjustment);
+                        SetExtendingPosition(550 + tickAdjustment);
                         ET.reset();
                         programOrder++;
                     }
