@@ -348,7 +348,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
 
                 case 5:
                     if (RotatingBase.getCurrentPosition() <= -1170 && RotatingBase.getCurrentPosition() >= -1270) {
-                        SetExtendingPosition(100 + tickAdjustment);
+                        SetExtendingPosition(85 + tickAdjustment);
                         programOrder++;
                     }
                     break;
@@ -461,7 +461,7 @@ public class SprintAutoLeftTarp extends LinearOpMode {
 
                 case 15:
                     if (RailControlV2.GetTaskState() == Task_State.DONE || RailControlV2.GetTaskState() == Task_State.READY) {
-                        SetExtendingPositionLowPower(120);
+                        SetExtendingPositionLowPower(90);
                         Stopper.setPower(0.6);
 //                        SetExtendingPositionLowPower(92 + tickAdjustment);
                         SetAttachmentPositionLowPower(2985 + railAdjustment, -1602 + angleAdjustment);

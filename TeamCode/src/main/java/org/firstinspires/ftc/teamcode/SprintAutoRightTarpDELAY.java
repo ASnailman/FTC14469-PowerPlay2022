@@ -234,9 +234,9 @@ public class SprintAutoRightTarpDELAY extends LinearOpMode {
         });
 
         //delay
-        delay = 0;
+        delay = 4000;
         //cone reduction
-        coneReduction = 0;
+        coneReduction = 1;
 
         waitForStart();
 
@@ -424,9 +424,9 @@ public class SprintAutoRightTarpDELAY extends LinearOpMode {
                         else if (coneLevel == 3) {
                             SetAttachmentPosition(295, 30);
                         }
-                        else if (coneLevel == 4) {
-                            SetAttachmentPosition(180, 30);
-                        }
+//                        else if (coneLevel == 4) {
+//                            SetAttachmentPosition(180, 30);
+//                        }
                         programOrder++;
                     }
                     break;
